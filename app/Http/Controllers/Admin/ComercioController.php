@@ -83,7 +83,7 @@ class ComercioController extends Controller
     {
         $validated = $request->validate([
             'grupo_id' => ['required', 'exists:grupos,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'codigo' => ['nullable', 'string', 'max:50'],
             'sigla' => ['nullable', 'string', 'max:50'],
             'color_hex' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/i'],
@@ -108,6 +108,14 @@ class ComercioController extends Controller
             'custom_attributes' => ['nullable', 'array'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'activo' => ['boolean'],
+        ], [
+            'grupo_id.required' => 'Debes seleccionar un grupo corporativo.',
+            'grupo_id.exists' => 'El grupo seleccionado no es válido.',
+            'nombre.required' => 'El nombre institucional del comercio es obligatorio.',
+            'nombre.min' => 'El nombre del comercio debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del comercio no puede exceder los 255 caracteres.',
+            'color_hex.regex' => 'El código de color debe tener un formato hexadecimal válido (ej. #0c43a3).',
+            'descripcion.max' => 'La descripción no puede exceder los 1000 caracteres.',
         ]);
 
         $slug = Str::slug($validated['nombre']);
@@ -123,30 +131,30 @@ class ComercioController extends Controller
 
         Comercio::create([
             'grupo_id' => $validated['grupo_id'],
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'codigo' => $validated['codigo'] ?? null,
-            'sigla' => $validated['sigla'] ?? null,
+            'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
+            'sigla' => !empty($validated['sigla']) ? trim($validated['sigla']) : null,
             'color_hex' => $validated['color_hex'] ?? '#1d4ed8',
-            'pagina_web' => $validated['pagina_web'] ?? null,
-            'plataforma_carrera' => $validated['plataforma_carrera'] ?? null,
-            'certificado_url' => $validated['certificado_url'] ?? null,
-            'resolucion_revalidacion' => $validated['resolucion_revalidacion'] ?? null,
-            'resolucion_creacion' => $validated['resolucion_creacion'] ?? null,
-            'escale_minedu' => $validated['escale_minedu'] ?? null,
-            'link_directo_escale' => $validated['link_directo_escale'] ?? null,
-            'malla_curricular_url' => $validated['malla_curricular_url'] ?? null,
-            'catalogo_url' => $validated['catalogo_url'] ?? null,
-            'como_ingresar_plataforma' => $validated['como_ingresar_plataforma'] ?? null,
-            'reconocimiento_director' => $validated['reconocimiento_director'] ?? null,
-            'seminario' => $validated['seminario'] ?? null,
-            'convenio' => $validated['convenio'] ?? null,
-            'promocion_vigente' => $validated['promocion_vigente'] ?? null,
+            'pagina_web' => !empty($validated['pagina_web']) ? trim($validated['pagina_web']) : null,
+            'plataforma_carrera' => !empty($validated['plataforma_carrera']) ? trim($validated['plataforma_carrera']) : null,
+            'certificado_url' => !empty($validated['certificado_url']) ? trim($validated['certificado_url']) : null,
+            'resolucion_revalidacion' => !empty($validated['resolucion_revalidacion']) ? trim($validated['resolucion_revalidacion']) : null,
+            'resolucion_creacion' => !empty($validated['resolucion_creacion']) ? trim($validated['resolucion_creacion']) : null,
+            'escale_minedu' => !empty($validated['escale_minedu']) ? trim($validated['escale_minedu']) : null,
+            'link_directo_escale' => !empty($validated['link_directo_escale']) ? trim($validated['link_directo_escale']) : null,
+            'malla_curricular_url' => !empty($validated['malla_curricular_url']) ? trim($validated['malla_curricular_url']) : null,
+            'catalogo_url' => !empty($validated['catalogo_url']) ? trim($validated['catalogo_url']) : null,
+            'como_ingresar_plataforma' => !empty($validated['como_ingresar_plataforma']) ? trim($validated['como_ingresar_plataforma']) : null,
+            'reconocimiento_director' => !empty($validated['reconocimiento_director']) ? trim($validated['reconocimiento_director']) : null,
+            'seminario' => !empty($validated['seminario']) ? trim($validated['seminario']) : null,
+            'convenio' => !empty($validated['convenio']) ? trim($validated['convenio']) : null,
+            'promocion_vigente' => !empty($validated['promocion_vigente']) ? trim($validated['promocion_vigente']) : null,
             'canales_youtube' => $canalesYoutube,
             'fotos' => $fotos,
             'custom_attributes' => $request->input('custom_attributes', null),
-            'descripcion' => $validated['descripcion'] ?? null,
-            'activo' => $validated['activo'] ?? true,
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
+            'activo' => $request->boolean('activo', true),
         ]);
 
         Inertia::flash('toast', [
@@ -166,7 +174,7 @@ class ComercioController extends Controller
 
         $validated = $request->validate([
             'grupo_id' => ['required', 'exists:grupos,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'codigo' => ['nullable', 'string', 'max:50'],
             'sigla' => ['nullable', 'string', 'max:50'],
             'color_hex' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/i'],
@@ -191,6 +199,14 @@ class ComercioController extends Controller
             'custom_attributes' => ['nullable', 'array'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'activo' => ['boolean'],
+        ], [
+            'grupo_id.required' => 'Debes seleccionar un grupo corporativo.',
+            'grupo_id.exists' => 'El grupo seleccionado no es válido.',
+            'nombre.required' => 'El nombre institucional del comercio es obligatorio.',
+            'nombre.min' => 'El nombre del comercio debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del comercio no puede exceder los 255 caracteres.',
+            'color_hex.regex' => 'El código de color debe tener un formato hexadecimal válido (ej. #0c43a3).',
+            'descripcion.max' => 'La descripción no puede exceder los 1000 caracteres.',
         ]);
 
         $slug = $comercioModel->slug;
@@ -209,30 +225,30 @@ class ComercioController extends Controller
 
         $comercioModel->update([
             'grupo_id' => $validated['grupo_id'],
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'codigo' => $validated['codigo'] ?? null,
-            'sigla' => $validated['sigla'] ?? null,
+            'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
+            'sigla' => !empty($validated['sigla']) ? trim($validated['sigla']) : null,
             'color_hex' => $validated['color_hex'] ?? $comercioModel->color_hex,
-            'pagina_web' => $validated['pagina_web'] ?? null,
-            'plataforma_carrera' => $validated['plataforma_carrera'] ?? null,
-            'certificado_url' => $validated['certificado_url'] ?? null,
-            'resolucion_revalidacion' => $validated['resolucion_revalidacion'] ?? null,
-            'resolucion_creacion' => $validated['resolucion_creacion'] ?? null,
-            'escale_minedu' => $validated['escale_minedu'] ?? null,
-            'link_directo_escale' => $validated['link_directo_escale'] ?? null,
-            'malla_curricular_url' => $validated['malla_curricular_url'] ?? null,
-            'catalogo_url' => $validated['catalogo_url'] ?? null,
-            'como_ingresar_plataforma' => $validated['como_ingresar_plataforma'] ?? null,
-            'reconocimiento_director' => $validated['reconocimiento_director'] ?? null,
-            'seminario' => $validated['seminario'] ?? null,
-            'convenio' => $validated['convenio'] ?? null,
-            'promocion_vigente' => $validated['promocion_vigente'] ?? null,
+            'pagina_web' => !empty($validated['pagina_web']) ? trim($validated['pagina_web']) : null,
+            'plataforma_carrera' => !empty($validated['plataforma_carrera']) ? trim($validated['plataforma_carrera']) : null,
+            'certificado_url' => !empty($validated['certificado_url']) ? trim($validated['certificado_url']) : null,
+            'resolucion_revalidacion' => !empty($validated['resolucion_revalidacion']) ? trim($validated['resolucion_revalidacion']) : null,
+            'resolucion_creacion' => !empty($validated['resolucion_creacion']) ? trim($validated['resolucion_creacion']) : null,
+            'escale_minedu' => !empty($validated['escale_minedu']) ? trim($validated['escale_minedu']) : null,
+            'link_directo_escale' => !empty($validated['link_directo_escale']) ? trim($validated['link_directo_escale']) : null,
+            'malla_curricular_url' => !empty($validated['malla_curricular_url']) ? trim($validated['malla_curricular_url']) : null,
+            'catalogo_url' => !empty($validated['catalogo_url']) ? trim($validated['catalogo_url']) : null,
+            'como_ingresar_plataforma' => !empty($validated['como_ingresar_plataforma']) ? trim($validated['como_ingresar_plataforma']) : null,
+            'reconocimiento_director' => !empty($validated['reconocimiento_director']) ? trim($validated['reconocimiento_director']) : null,
+            'seminario' => !empty($validated['seminario']) ? trim($validated['seminario']) : null,
+            'convenio' => !empty($validated['convenio']) ? trim($validated['convenio']) : null,
+            'promocion_vigente' => !empty($validated['promocion_vigente']) ? trim($validated['promocion_vigente']) : null,
             'canales_youtube' => $canalesYoutube,
             'fotos' => $fotos,
             'custom_attributes' => $request->input('custom_attributes', null),
-            'descripcion' => $validated['descripcion'] ?? null,
-            'activo' => $validated['activo'] ?? true,
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
+            'activo' => $request->boolean('activo', true),
         ]);
 
         Inertia::flash('toast', [
@@ -254,7 +270,7 @@ class ComercioController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El comercio \"{$nombre}\" ha sido eliminado.",
+            'message' => "El comercio \"{$nombre}\" ha sido eliminado correctamente.",
         ]);
 
         return back();

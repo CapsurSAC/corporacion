@@ -14,8 +14,11 @@ import {
     Box,
     Grid,
     CircularProgress,
+    Typography,
 } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNotification } from '@/hooks/use-notification';
+import { isMinLength } from '@/lib/validation';
 import type { Carrera, Comercio } from '@/types';
 
 interface CarreraDialogProps {
@@ -36,6 +39,8 @@ export function CarreraDialog({
     currentTeamSlug,
 }: CarreraDialogProps) {
     const isEditing = !!carrera;
+    const { notify } = useNotification();
+    const [clientErrors, setClientErrors] = useState<{ comercio_id?: string; nombre?: string }>({});
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm<{
@@ -71,26 +76,56 @@ export function CarreraDialog({
             }
         }
 
+        setClientErrors({});
         clearErrors();
     }, [carrera, open, defaultComercioId, comercios]);
 
+    const validate = (): boolean => {
+        const newErrors: { comercio_id?: string; nombre?: string } = {};
+
+        if (!data.comercio_id) {
+            newErrors.comercio_id = 'Debes seleccionar un instituto o comercio asignado.';
+        }
+        if (!isMinLength(data.nombre, 3)) {
+            newErrors.nombre = 'El nombre de la carrera debe tener al menos 3 caracteres.';
+        } else if (data.nombre.trim().length > 255) {
+            newErrors.nombre = 'El nombre no puede superar los 255 caracteres.';
+        }
+
+        setClientErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validate()) {
+            notify.warning('Corrige los campos obligatorios antes de guardar.');
+            return;
+        }
 
         if (isEditing && carrera) {
             put(`/${currentTeamSlug}/admin/carreras/${carrera.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Carrera "${data.nombre}" actualizada con éxito.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al actualizar la carrera.');
                 },
             });
         } else {
             post(`/${currentTeamSlug}/admin/carreras`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Carrera "${data.nombre}" registrada exitosamente.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al registrar la carrera.');
                 },
             });
         }
@@ -103,20 +138,25 @@ export function CarreraDialog({
             maxWidth="sm"
             fullWidth
         >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
                     <SchoolIcon color="primary" />
                     <span>{isEditing ? 'Editar Carrera' : 'Nueva Carrera'}</span>
                 </DialogTitle>
                 <DialogContent sx={{ pt: 2 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
-                        <FormControl fullWidth size="small" error={!!errors.comercio_id}>
+                        <FormControl fullWidth size="small" error={!!(clientErrors.comercio_id || errors.comercio_id)}>
                             <InputLabel id="select-comercio-label">Comercio / Instituto Asignado *</InputLabel>
                             <Select
                                 labelId="select-comercio-label"
                                 value={data.comercio_id}
                                 label="Comercio / Instituto Asignado *"
-                                onChange={(e) => setData('comercio_id', e.target.value)}
+                                onChange={(e) => {
+                                    setData('comercio_id', e.target.value);
+                                    if (clientErrors.comercio_id) {
+                                        setClientErrors((prev) => ({ ...prev, comercio_id: undefined }));
+                                    }
+                                }}
                             >
                                 {comercios.map((c) => {
                                     const isAcademic =
@@ -133,44 +173,54 @@ export function CarreraDialog({
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                                     <Box
                                                         sx={{
-                                                            width: 10,
-                                                            height: 10,
-                                                            borderRadius: '50%',
-                                                            bgcolor: c.color_hex || '#3b82f6',
-                                                        }}
-                                                    />
-                                                    <span>{c.nombre}</span>
-                                                </Box>
-                                                {isAcademic && (
-                                                    <Box
-                                                        component="span"
-                                                        sx={{
-                                                            fontSize: '0.68rem',
-                                                            bgcolor: 'rgba(12, 67, 163, 0.1)',
-                                                            color: '#0c43a3',
-                                                            px: 0.8,
-                                                            py: 0.2,
-                                                            borderRadius: 1,
-                                                            fontWeight: 'bold',
-                                                        }}
-                                                    >
-                                                        Instituto Oficial
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        </MenuItem>
-                                    );
-                                })}
-                            </Select>
-                        </FormControl>
+                                                             width: 10,
+                                                             height: 10,
+                                                             borderRadius: '50%',
+                                                             bgcolor: c.color_hex || '#3b82f6',
+                                                         }}
+                                                     />
+                                                     <span>{c.nombre}</span>
+                                                 </Box>
+                                                 {isAcademic && (
+                                                     <Box
+                                                         component="span"
+                                                         sx={{
+                                                             fontSize: '0.68rem',
+                                                             bgcolor: 'rgba(12, 67, 163, 0.1)',
+                                                             color: '#0c43a3',
+                                                             px: 0.8,
+                                                             py: 0.2,
+                                                             borderRadius: 1,
+                                                             fontWeight: 'bold',
+                                                         }}
+                                                     >
+                                                         Instituto Oficial
+                                                     </Box>
+                                                 )}
+                                             </Box>
+                                         </MenuItem>
+                                     );
+                                 })}
+                             </Select>
+                             {(clientErrors.comercio_id || errors.comercio_id) && (
+                                 <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                                     {clientErrors.comercio_id || errors.comercio_id}
+                                 </Typography>
+                             )}
+                         </FormControl>
 
                         <TextField
                             label="Nombre de la Carrera *"
                             value={data.nombre}
-                            onChange={(e) => setData('nombre', e.target.value)}
+                            onChange={(e) => {
+                                setData('nombre', e.target.value);
+                                if (clientErrors.nombre) {
+                                    setClientErrors((prev) => ({ ...prev, nombre: undefined }));
+                                }
+                            }}
                             placeholder="Ej. GUIA OFICIAL DE TURISMO, COSMETOLOGIA..."
-                            error={!!errors.nombre}
-                            helperText={errors.nombre}
+                            error={!!(clientErrors.nombre || errors.nombre)}
+                            helperText={clientErrors.nombre || errors.nombre || 'Mínimo 3 caracteres requeridos'}
                             fullWidth
                             required
                             size="small"

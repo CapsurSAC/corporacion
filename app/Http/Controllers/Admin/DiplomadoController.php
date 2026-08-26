@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Carrera;
 use App\Models\Comercio;
 use App\Models\Diplomado;
 use App\Models\Grupo;
@@ -15,42 +16,26 @@ use Inertia\Response;
 class DiplomadoController extends Controller
 {
     /**
-     * Display a listing of diplomados.
+     * Display a listing of the diplomados.
      */
     public function index(Request $request): Response
     {
-        $comercioId = $request->input('comercio_id');
-        $tipo = $request->input('tipo');
-        $search = $request->input('search');
+        $comercioId = $request->query('comercio_id');
+        $carreraId = $request->query('carrera_id');
+        $tipo = $request->query('tipo');
+        $search = $request->query('search');
 
         $diplomadosQuery = Diplomado::query()
-            ->with([
-                'comercio' => function ($query) {
-                    $query->select('id', 'grupo_id', 'nombre', 'slug', 'codigo', 'color_hex')
-                        ->with('grupo:id,nombre');
-                },
-                'carrera:id,comercio_id,nombre,codigo',
-            ])
-            ->when($comercioId && $comercioId !== 'all', function ($query) use ($comercioId) {
-                $query->where('comercio_id', $comercioId);
-            })
-            ->when($tipo && $tipo !== 'all', function ($query) use ($tipo) {
-                if ($tipo === 'sin_categoria' || $tipo === 'none') {
-                    $query->where(function ($q) {
-                        $q->whereNull('tipo')->orWhere('tipo', '');
-                    });
-                } else {
-                    $query->where('tipo', $tipo);
-                }
-            })
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nombre', 'like', "%{$search}%")
-                        ->orWhere('precio', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('tipo', 'asc')
-            ->orderBy('id', 'asc');
+            ->with(['comercio.grupo', 'carrera'])
+            ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
+            ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
+            ->when($tipo, fn ($query) => $query->where('tipo', $tipo))
+            ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                    ->orWhere('tipo', 'like', "%{$search}%")
+                    ->orWhere('precio', 'like', "%{$search}%");
+            }))
+            ->orderBy('id', 'desc');
 
         $comercios = Comercio::query()
             ->with('grupo:id,nombre')
@@ -59,8 +44,8 @@ class DiplomadoController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        $carreras = \App\Models\Carrera::query()
-            ->select('id', 'comercio_id', 'nombre', 'codigo')
+        $carreras = Carrera::query()
+            ->select('id', 'comercio_id', 'nombre')
             ->orderBy('nombre')
             ->get();
 
@@ -76,6 +61,7 @@ class DiplomadoController extends Controller
             'grupos' => $grupos,
             'filters' => [
                 'comercio_id' => $comercioId,
+                'carrera_id' => $carreraId,
                 'tipo' => $tipo,
                 'search' => $search,
             ],
@@ -90,13 +76,20 @@ class DiplomadoController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
             'flyer' => ['nullable', 'string', 'max:500'],
             'brochure' => ['nullable', 'string', 'max:500'],
             'youtube' => ['nullable', 'string', 'max:500'],
             'precio' => ['nullable', 'string', 'max:100'],
             'actualizado_drive' => ['nullable', 'string', 'max:500'],
+        ], [
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
+            'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'nombre.required' => 'El nombre del diplomado es obligatorio.',
+            'nombre.min' => 'El nombre del diplomado debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del diplomado no puede exceder los 255 caracteres.',
         ]);
 
         $slug = Str::slug($validated['nombre']);
@@ -110,14 +103,14 @@ class DiplomadoController extends Controller
         Diplomado::create([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'tipo' => !empty($validated['tipo']) ? $validated['tipo'] : null,
-            'flyer' => $validated['flyer'] ?? null,
-            'brochure' => $validated['brochure'] ?? null,
-            'youtube' => $validated['youtube'] ?? null,
-            'precio' => $validated['precio'] ?? null,
-            'actualizado_drive' => $validated['actualizado_drive'] ?? null,
+            'tipo' => !empty($validated['tipo']) ? trim($validated['tipo']) : null,
+            'flyer' => !empty($validated['flyer']) ? trim($validated['flyer']) : null,
+            'brochure' => !empty($validated['brochure']) ? trim($validated['brochure']) : null,
+            'youtube' => !empty($validated['youtube']) ? trim($validated['youtube']) : null,
+            'precio' => !empty($validated['precio']) ? trim($validated['precio']) : null,
+            'actualizado_drive' => !empty($validated['actualizado_drive']) ? trim($validated['actualizado_drive']) : null,
         ]);
 
         Inertia::flash('toast', [
@@ -138,13 +131,20 @@ class DiplomadoController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
             'flyer' => ['nullable', 'string', 'max:500'],
             'brochure' => ['nullable', 'string', 'max:500'],
             'youtube' => ['nullable', 'string', 'max:500'],
             'precio' => ['nullable', 'string', 'max:100'],
             'actualizado_drive' => ['nullable', 'string', 'max:500'],
+        ], [
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
+            'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'nombre.required' => 'El nombre del diplomado es obligatorio.',
+            'nombre.min' => 'El nombre del diplomado debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del diplomado no puede exceder los 255 caracteres.',
         ]);
 
         $slug = $diplomadoModel->slug;
@@ -161,14 +161,14 @@ class DiplomadoController extends Controller
         $diplomadoModel->update([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'tipo' => !empty($validated['tipo']) ? $validated['tipo'] : null,
-            'flyer' => $validated['flyer'] ?? null,
-            'brochure' => $validated['brochure'] ?? null,
-            'youtube' => $validated['youtube'] ?? null,
-            'precio' => $validated['precio'] ?? null,
-            'actualizado_drive' => $validated['actualizado_drive'] ?? null,
+            'tipo' => !empty($validated['tipo']) ? trim($validated['tipo']) : null,
+            'flyer' => !empty($validated['flyer']) ? trim($validated['flyer']) : null,
+            'brochure' => !empty($validated['brochure']) ? trim($validated['brochure']) : null,
+            'youtube' => !empty($validated['youtube']) ? trim($validated['youtube']) : null,
+            'precio' => !empty($validated['precio']) ? trim($validated['precio']) : null,
+            'actualizado_drive' => !empty($validated['actualizado_drive']) ? trim($validated['actualizado_drive']) : null,
         ]);
 
         Inertia::flash('toast', [

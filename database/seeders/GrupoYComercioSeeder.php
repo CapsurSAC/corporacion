@@ -225,35 +225,6 @@ class GrupoYComercioSeeder extends Seeder
                     ],
                 ],
             ],
-            [
-                'nombre' => 'IGE',
-                'slug' => 'ige',
-                'descripcion' => 'Instituto de Gestión y Especialización IGE.',
-                'activo' => true,
-                'comercios' => [
-                    [
-                        'nombre' => 'ISTP IGE',
-                        'slug' => 'istp-ige',
-                        'codigo' => 'IGE',
-                        'sigla' => 'IGE',
-                        'color_hex' => '#d97706',
-                        'pagina_web' => 'https://institutoige.edu.pe',
-                        'plataforma_carrera' => 'https://campus.institutoige.edu.pe',
-                        'certificado_url' => 'https://institutoige.edu.pe/docs/certificado-ige.pdf',
-                        'resolucion_revalidacion' => 'https://institutoige.edu.pe/docs/resolucion-revalidacion-690-2015-ed.pdf',
-                        'resolucion_creacion' => 'https://institutoige.edu.pe/docs/resolucion-creacion-312-2001-ed.pdf',
-                        'escale_minedu' => 'https://escale.minedu.gob.pe/padron-ce?cod_mod=0719402',
-                        'link_directo_escale' => 'https://escale.minedu.gob.pe/padron-ce?cod_mod=0719402',
-                        'malla_curricular_url' => 'https://institutoige.edu.pe/malla-gestion.pdf',
-                        'reconocimiento_director' => 'https://institutoige.edu.pe/docs/reconocimiento-director.pdf',
-                        'seminario' => 'https://institutoige.edu.pe/webinars-rrhh',
-                        'convenio' => 'Convenio con Colegios Profesionales y Red de Gestión Empresarial.',
-                        'canales_youtube' => ['https://youtube.com/@institutoige'],
-                        'fotos' => [],
-                        'descripcion' => 'Instituto Superior Tecnológico Privado IGE',
-                    ],
-                ],
-            ],
         ];
 
         foreach ($gruposData as $data) {

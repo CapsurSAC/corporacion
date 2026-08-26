@@ -1,5 +1,6 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from '@mui/icons-material/Clear';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -9,32 +10,35 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import {
+    Avatar,
     Box,
-    Grid,
-    Typography,
     Button,
-    IconButton,
     Chip,
-    TextField,
+    FormControl,
+    Grid,
+    IconButton,
     InputAdornment,
+    InputLabel,
+    MenuItem,
     Paper,
     Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Tooltip,
+    Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { DeleteConfirmDialog } from '@/components/admin/delete-confirm-dialog';
 import { CursoDialog } from '@/components/admin/curso-dialog';
+import { useNotification } from '@/hooks/use-notification';
+import { confirmDeleteAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
 import type { Curso, Comercio, Grupo, Carrera } from '@/types';
 
@@ -59,6 +63,7 @@ export default function CursosIndex({
     const page = usePage();
     const currentTeam = page.props.currentTeam as { slug: string } | undefined;
     const currentTeamSlug = currentTeam?.slug || 'default';
+    const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
     const [selectedComercio, setSelectedComercio] = useState<string>(filters.comercio_id || 'all');
@@ -68,26 +73,17 @@ export default function CursosIndex({
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedCurso, setSelectedCurso] = useState<Curso | null>(null);
 
-    // Delete state
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [cursoToDelete, setCursoToDelete] = useState<Curso | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
-
     const applyFilters = (newFilters: {
         comercio_id?: string;
         tipo?: string;
         search?: string;
     }) => {
-        const nextComercio = newFilters.comercio_id !== undefined ? newFilters.comercio_id : selectedComercio;
-        const nextTipo = newFilters.tipo !== undefined ? newFilters.tipo : selectedTipo;
-        const nextSearch = newFilters.search !== undefined ? newFilters.search : search;
-
         router.get(
             `/${currentTeamSlug}/admin/cursos`,
             {
-                comercio_id: nextComercio === 'all' ? undefined : nextComercio,
-                tipo: nextTipo === 'all' ? undefined : nextTipo,
-                search: nextSearch || undefined,
+                comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
+                tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
+                search: newFilters.search !== undefined ? (newFilters.search || undefined) : (search || undefined),
             },
             { preserveState: true, replace: true }
         );
@@ -96,6 +92,21 @@ export default function CursosIndex({
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         applyFilters({ search });
+    };
+
+    const handleClearSearch = () => {
+        setSearch('');
+        applyFilters({ search: '' });
+    };
+
+    const handleComercioChange = (val: string) => {
+        setSelectedComercio(val);
+        applyFilters({ comercio_id: val });
+    };
+
+    const handleTipoChange = (val: string) => {
+        setSelectedTipo(val);
+        applyFilters({ tipo: val });
     };
 
     const handleCreate = () => {
@@ -108,206 +119,265 @@ export default function CursosIndex({
         setDialogOpen(true);
     };
 
-    const handleDeletePrompt = (curso: Curso) => {
-        setCursoToDelete(curso);
-        setDeleteDialogOpen(true);
-    };
-
-    const confirmDelete = () => {
-        if (!cursoToDelete) {
-            return;
-        }
-
-        setIsDeleting(true);
-
-        router.delete(`/${currentTeamSlug}/admin/cursos/${cursoToDelete.id}`, {
-            preserveScroll: true,
-            onFinish: () => {
-                setIsDeleting(false);
-                setDeleteDialogOpen(false);
-                setCursoToDelete(null);
-            },
+    const handleDeletePrompt = async (curso: Curso) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar curso "${curso.nombre}"?`,
+            text: 'Esta acción eliminará permanentemente el curso formativo.',
+            confirmButtonText: 'Sí, eliminar',
         });
+
+        if (confirmed) {
+            router.delete(`/${currentTeamSlug}/admin/cursos/${curso.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    notify.success(`Curso "${curso.nombre}" eliminado exitosamente.`);
+                },
+                onError: () => {
+                    notify.error('No se pudo eliminar el curso.');
+                },
+            });
+        }
     };
 
     return (
         <>
             <Head title="Cursos y Talleres - Grupo Capsur" />
 
-            <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Header */}
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
-                    <Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 500 }}>
-                            <MenuBookIcon fontSize="small" color="primary" />
-                            <span>Catálogo Capsur</span>
-                        </Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 0.5 }}>
-                            Cursos y Talleres
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Gestión de cursos (Tradicionales y Especializados), brochures, flyers, videos de YouTube, precios y actualización en Drive.
-                        </Typography>
-                    </Box>
-
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AddIcon />}
-                        onClick={handleCreate}
-                        sx={{ px: 2.5, py: 0.8 }}
+            <Box
+                sx={{
+                    p: { xs: 2, sm: 3, md: 4 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2.5,
+                    width: '100%',
+                    boxSizing: 'border-box',
+                }}
+            >
+                {/* CABECERA PRINCIPAL UNIFICADA */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                : '0 2px 10px rgba(0,0,0,0.03)',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: 'space-between',
+                            gap: 2,
+                        }}
                     >
-                        Nuevo Curso
-                    </Button>
-                </Box>
-
-                {/* Filters Toolbar */}
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                    <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                        <Grid size={{ xs: 12, sm: 5, md: 4 }}>
-                            <Box component="form" onSubmit={handleSearchSubmit}>
-                                <TextField
-                                    placeholder="Buscar curso o precio..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    size="small"
-                                    fullWidth
-                                    slotProps={{
-                                        input: {
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <SearchIcon fontSize="small" color="action" />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
-                                />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                            <Avatar
+                                sx={{
+                                    bgcolor: 'primary.main',
+                                    color: '#ffffff',
+                                    width: 42,
+                                    height: 42,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
+                                }}
+                            >
+                                <MenuBookIcon fontSize="medium" />
+                            </Avatar>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                        }}
+                                    >
+                                        Cursos y Talleres
+                                    </Typography>
+                                    <Chip
+                                        label={`${cursos.length} REGISTROS`}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                    : 'rgba(12, 67, 163, 0.08)',
+                                            color: 'primary.main',
+                                            fontWeight: 800,
+                                            fontSize: '0.68rem',
+                                            height: 20,
+                                            borderRadius: 1,
+                                            border: '1px solid',
+                                            borderColor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.4)'
+                                                    : 'rgba(12, 67, 163, 0.2)',
+                                        }}
+                                    />
+                                </Box>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2, fontSize: '0.82rem' }}>
+                                    Gestión de cursos tradicionales y especializados, brochures, flyers, videos y enlaces Drive.
+                                </Typography>
                             </Box>
-                        </Grid>
+                        </Box>
 
-                        <Grid size={{ xs: 12, sm: 4, md: 3 }}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel id="filter-comercio-label">Comercio / Instituto</InputLabel>
-                                <Select
-                                    labelId="filter-comercio-label"
-                                    value={selectedComercio}
-                                    label="Comercio / Instituto"
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        setSelectedComercio(val);
-                                        applyFilters({ comercio_id: val });
-                                    }}
-                                >
-                                    <MenuItem value="all">Todos los Comercios</MenuItem>
-                                    {comercios.map((c) => (
-                                        <MenuItem key={c.id} value={String(c.id)}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Box
-                                                    sx={{
-                                                        width: 8,
-                                                        height: 8,
-                                                        borderRadius: '50%',
-                                                        bgcolor: c.color_hex || '#3b82f6',
-                                                    }}
-                                                />
-                                                <span>{c.nombre}</span>
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 3, md: 3 }}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel id="filter-tipo-label">Tipo de Curso</InputLabel>
-                                <Select
-                                    labelId="filter-tipo-label"
-                                    value={selectedTipo}
-                                    label="Tipo de Curso"
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        setSelectedTipo(val);
-                                        applyFilters({ tipo: val });
-                                    }}
-                                >
-                                    <MenuItem value="all">Todos los Tipos</MenuItem>
-                                    <MenuItem value="sin_categoria">🎓 Sin Tipo / Libre (Matpel)</MenuItem>
-                                    <MenuItem value="tradicional">Tradicional</MenuItem>
-                                    <MenuItem value="especializado">Especializado</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 12, md: 2 }}>
-                            {(selectedComercio !== 'all' || selectedTipo !== 'all' || search) && (
-                                <Button
-                                    size="small"
-                                    color="inherit"
-                                    onClick={() => {
-                                        setSelectedComercio('all');
-                                        setSelectedTipo('all');
-                                        setSearch('');
-                                        applyFilters({ comercio_id: 'all', tipo: 'all', search: '' });
-                                    }}
-                                >
-                                    Limpiar Filtros
-                                </Button>
-                            )}
-                        </Grid>
-                    </Grid>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={handleCreate}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                px: 2.5,
+                                py: 0.8,
+                                borderRadius: 1,
+                                boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
+                                alignSelf: { xs: 'stretch', sm: 'auto' },
+                            }}
+                        >
+                            Nuevo Curso
+                        </Button>
+                    </Box>
                 </Paper>
 
-                {/* Table */}
-                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                    <Table size="medium">
-                        <TableHead>
-                            {/* Super Header azul Capsur */}
-                            <TableRow sx={{ bgcolor: '#0c43a3' }}>
-                                <TableCell
-                                    colSpan={10}
-                                    align="center"
-                                    sx={{
-                                        color: '#ffffff',
-                                        fontWeight: 900,
-                                        fontSize: '1rem',
-                                        letterSpacing: 2,
-                                        textTransform: 'uppercase',
-                                        py: 1.2,
-                                    }}
-                                >
-                                    LISTADO DE CURSOS Y TALLERES CAPSUR
+                {/* BARRA DE HERRAMIENTAS CRUD */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 1.8,
+                        borderRadius: 1.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'stretch', sm: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Box component="form" onSubmit={handleSearchSubmit} sx={{ flex: 1, maxWidth: { xs: '100%', sm: 380 } }}>
+                        <TextField
+                            placeholder="Buscar curso, tema o precio..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            fullWidth
+                            size="small"
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon fontSize="small" color="action" />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: search ? (
+                                        <InputAdornment position="end">
+                                            <IconButton size="small" onClick={handleClearSearch}>
+                                                <ClearIcon fontSize="small" />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ) : null,
+                                },
+                            }}
+                        />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap' }}>
+                        <FormControl size="small" sx={{ minWidth: 200 }}>
+                            <InputLabel id="filter-comercio-label">Filtrar por Comercio</InputLabel>
+                            <Select
+                                labelId="filter-comercio-label"
+                                value={selectedComercio}
+                                label="Filtrar por Comercio"
+                                onChange={(e) => {
+                                    setSelectedComercio(e.target.value);
+                                    applyFilters({ comercio_id: e.target.value });
+                                }}
+                            >
+                                <MenuItem value="all">🏬 Todos los comercios</MenuItem>
+                                {comercios.map((c) => (
+                                    <MenuItem key={c.id} value={String(c.id)}>
+                                        {c.nombre}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl size="small" sx={{ minWidth: 190 }}>
+                            <InputLabel id="filter-tipo-label">Tipo de Curso</InputLabel>
+                            <Select
+                                labelId="filter-tipo-label"
+                                value={selectedTipo}
+                                label="Tipo de Curso"
+                                onChange={(e) => {
+                                    setSelectedTipo(e.target.value);
+                                    applyFilters({ tipo: e.target.value });
+                                }}
+                            >
+                                <MenuItem value="all">Todos los Tipos</MenuItem>
+                                <MenuItem value="sin_categoria">Libre / Sin Tipo</MenuItem>
+                                <MenuItem value="tradicional">Tradicional</MenuItem>
+                                <MenuItem value="especializado">Especializado</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </Paper>
+
+                {/* TABLA CRUD */}
+                <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    sx={{
+                        borderRadius: 1.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        overflow: 'hidden',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Table>
+                        <TableHead
+                            sx={{
+                                bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.04)'
+                                        : '#f8fafc',
+                                borderBottom: '2px solid',
+                                borderColor: 'divider',
+                            }}
+                        >
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
+                                    CURSO / TALLER FORMATIVO
                                 </TableCell>
-                            </TableRow>
-                            <TableRow sx={{ bgcolor: '#152844' }}>
-                                <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', width: 50 }}>
-                                    N°
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 150 }}>
+                                    COMERCIO
                                 </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Comercio
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 130 }}>
+                                    TIPO
                                 </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Tipo
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
+                                    RECURSOS MULTIMEDIA
                                 </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Nombre del Curso
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 120, textAlign: 'center' }}>
+                                    PRECIO
                                 </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Flyer
-                                </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Brochure
-                                </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    YouTube
-                                </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Precio
-                                </TableCell>
-                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                    Actualizado Drive
-                                </TableCell>
-                                <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', width: 140 }}>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 130, textAlign: 'right' }}>
                                     ACCIONES
                                 </TableCell>
                             </TableRow>
@@ -315,38 +385,98 @@ export default function CursosIndex({
                         <TableBody>
                             {cursos.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={10} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                                        No se encontraron cursos registrados.
+                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
+                                        <MenuBookIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                            No se encontraron cursos registrados
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
+                                            {search || selectedComercio !== 'all' || selectedTipo !== 'all'
+                                                ? 'No hay registros que coincidan con los filtros aplicados.'
+                                                : 'Aún no se han registrado cursos.'}
+                                        </Typography>
+                                        {search || selectedComercio !== 'all' || selectedTipo !== 'all' ? (
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                startIcon={<ClearIcon />}
+                                                onClick={() => {
+                                                    setSearch('');
+                                                    setSelectedComercio('all');
+                                                    setSelectedTipo('all');
+                                                    applyFilters({ comercio_id: 'all', tipo: 'all', search: '' });
+                                                }}
+                                                sx={{ borderRadius: 1 }}
+                                            >
+                                                Limpiar filtros
+                                            </Button>
+                                        ) : (
+                                            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={handleCreate} sx={{ borderRadius: 1 }}>
+                                                Crear Curso
+                                            </Button>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                cursos.map((curso, index) => {
-                                    const brandColor = curso.comercio?.color_hex || '#3b82f6';
+                                cursos.map((curso) => {
+                                    const brandColor = curso.comercio?.color_hex || '#0284c7';
                                     const isEspecializado = curso.tipo === 'especializado';
 
                                     return (
                                         <TableRow
                                             key={curso.id}
                                             hover
-                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            sx={{
+                                                transition: 'background-color 0.15s ease',
+                                                '&:hover': { bgcolor: 'action.hover' },
+                                            }}
                                         >
-                                            {/* NRO */}
-                                            <TableCell align="center" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
-                                                {index + 1}
+                                            {/* Columna 1: Nombre */}
+                                            <TableCell sx={{ py: 1.8 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                                                    <Avatar
+                                                        sx={{
+                                                            bgcolor: `${brandColor}18`,
+                                                            color: brandColor,
+                                                            fontWeight: 900,
+                                                            fontSize: '0.8rem',
+                                                            width: 38,
+                                                            height: 38,
+                                                            borderRadius: 1,
+                                                            border: `1px solid ${brandColor}35`,
+                                                        }}
+                                                    >
+                                                        <MenuBookIcon fontSize="small" />
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.92rem' }}>
+                                                            {curso.nombre}
+                                                        </Typography>
+                                                        {curso.carrera && (
+                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.1 }}>
+                                                                <SchoolIcon sx={{ fontSize: 12 }} />
+                                                                <span>Carrera: {curso.carrera.nombre}</span>
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
                                             </TableCell>
 
-                                            {/* COMERCIO */}
+                                            {/* Columna 2: Comercio */}
                                             <TableCell>
                                                 {curso.comercio ? (
                                                     <Chip
+                                                        icon={<StorefrontIcon sx={{ fontSize: '13px !important' }} />}
                                                         label={curso.comercio.nombre}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: brandColor,
-                                                            color: '#ffffff',
-                                                            fontWeight: 'bold',
+                                                            bgcolor: `${brandColor}18`,
+                                                            color: brandColor,
+                                                            border: `1px solid ${brandColor}35`,
+                                                            fontWeight: 700,
                                                             fontSize: '0.72rem',
-                                                            textTransform: 'uppercase',
+                                                            height: 24,
+                                                            borderRadius: 0.8,
                                                         }}
                                                     />
                                                 ) : (
@@ -354,144 +484,147 @@ export default function CursosIndex({
                                                 )}
                                             </TableCell>
 
-                                            {/* TIPO */}
+                                            {/* Columna 3: Tipo */}
                                             <TableCell>
                                                 {!curso.tipo ? (
                                                     <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
-                                                        Libre / Sin tipo
+                                                        Libre / General
                                                     </Typography>
                                                 ) : (
                                                     <Chip
                                                         label={isEspecializado ? 'Especializado' : 'Tradicional'}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: isEspecializado ? '#f3e8ff' : '#e0f2fe',
-                                                            color: isEspecializado ? '#6b21a8' : '#0369a1',
+                                                            bgcolor: isEspecializado ? 'rgba(124, 58, 237, 0.12)' : 'rgba(2, 132, 199, 0.12)',
+                                                            color: isEspecializado ? '#7c3aed' : '#0284c7',
                                                             fontWeight: 700,
-                                                            fontSize: '0.75rem',
-                                                            border: `1px solid ${isEspecializado ? '#d8b4fe' : '#bae6fd'}`,
+                                                            fontSize: '0.72rem',
+                                                            height: 22,
+                                                            borderRadius: 0.8,
+                                                            border: `1px solid ${isEspecializado ? 'rgba(124, 58, 237, 0.3)' : 'rgba(2, 132, 199, 0.3)'}`,
                                                         }}
                                                     />
                                                 )}
                                             </TableCell>
 
-                                            {/* NOMBRE */}
-                                            <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                                                <div>{curso.nombre}</div>
-                                                {curso.carrera && (
-                                                    <Box sx={{ mt: 0.5 }}>
-                                                        <Chip
+                                            {/* Columna 4: Recursos */}
+                                            <TableCell>
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, alignItems: 'center' }}>
+                                                    {curso.brochure && (
+                                                        <Button
+                                                            href={curso.brochure}
+                                                            target="_blank"
+                                                            rel="noreferrer"
                                                             size="small"
-                                                            icon={<SchoolIcon sx={{ fontSize: '13px !important' }} />}
-                                                            label={`Carrera: ${curso.carrera.nombre}`}
                                                             variant="outlined"
-                                                            sx={{ fontSize: '0.7rem', height: 20, borderColor: 'primary.light', color: 'primary.main', fontWeight: 600 }}
-                                                        />
-                                                    </Box>
-                                                )}
+                                                            startIcon={<DescriptionIcon sx={{ fontSize: 13 }} />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                        >
+                                                            Brochure
+                                                        </Button>
+                                                    )}
+                                                    {curso.flyer && (
+                                                        <Button
+                                                            href={curso.flyer}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="warning"
+                                                            startIcon={<ImageIcon sx={{ fontSize: 13 }} />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                        >
+                                                            Flyer
+                                                        </Button>
+                                                    )}
+                                                    {curso.youtube && (
+                                                        <Button
+                                                            href={curso.youtube}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="error"
+                                                            startIcon={<YouTubeIcon sx={{ fontSize: 13 }} />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                        >
+                                                            YouTube
+                                                        </Button>
+                                                    )}
+                                                    {curso.actualizado_drive && (
+                                                        <Button
+                                                            href={curso.actualizado_drive}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="success"
+                                                            startIcon={<CloudDoneIcon sx={{ fontSize: 13 }} />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                        >
+                                                            Drive
+                                                        </Button>
+                                                    )}
+                                                </Box>
                                             </TableCell>
 
-                                            {/* FLYER */}
-                                            <TableCell>
-                                                {curso.flyer ? (
-                                                    <Button
-                                                        href={curso.flyer}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 600 }}
-                                                    >
-                                                        Flyer
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* BROCHURE */}
-                                            <TableCell>
-                                                {curso.brochure ? (
-                                                    <Button
-                                                        href={curso.brochure}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 600 }}
-                                                    >
-                                                        Brochure
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* YOUTUBE */}
-                                            <TableCell>
-                                                {curso.youtube ? (
-                                                    <Button
-                                                        href={curso.youtube}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 600 }}
-                                                    >
-                                                        YouTube
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* PRECIO */}
-                                            <TableCell>
+                                            {/* Columna 5: Precio */}
+                                            <TableCell sx={{ textAlign: 'center' }}>
                                                 {curso.precio ? (
                                                     <Chip
                                                         label={curso.precio}
                                                         size="small"
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
+                                                        sx={{
+                                                            bgcolor: (theme) =>
+                                                                theme.palette.mode === 'dark'
+                                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                                    : 'rgba(12, 67, 163, 0.08)',
+                                                            color: 'primary.main',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.74rem',
+                                                            height: 22,
+                                                            borderRadius: 0.8,
+                                                        }}
                                                     />
                                                 ) : (
                                                     <Typography variant="caption" color="text.disabled">-</Typography>
                                                 )}
                                             </TableCell>
 
-                                            {/* ACTUALIZADO DRIVE */}
-                                            <TableCell>
-                                                {curso.actualizado_drive ? (
-                                                    <Button
-                                                        href={curso.actualizado_drive}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 600, color: '#059669' }}
-                                                    >
-                                                        Drive
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* ACCIONES */}
-                                            <TableCell align="center">
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                                                    <Tooltip title="Editar Curso">
-                                                        <IconButton size="small" onClick={() => handleEdit(curso)}>
+                                            {/* Columna 6: Acciones */}
+                                            <TableCell sx={{ textAlign: 'right' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
+                                                    <Tooltip title="Editar Curso" arrow>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleEdit(curso)}
+                                                            sx={{
+                                                                border: '1px solid',
+                                                                borderColor: 'divider',
+                                                                borderRadius: 1,
+                                                                '&:hover': { bgcolor: 'action.hover' },
+                                                            }}
+                                                        >
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
                                                     </Tooltip>
-                                                    <Tooltip title="Eliminar Curso">
-                                                        <IconButton size="small" color="error" onClick={() => handleDeletePrompt(curso)}>
+
+                                                    <Tooltip title="Eliminar Curso" arrow>
+                                                        <IconButton
+                                                            size="small"
+                                                            color="error"
+                                                            onClick={() => handleDeletePrompt(curso)}
+                                                            sx={{
+                                                                border: '1px solid',
+                                                                borderColor: 'divider',
+                                                                borderRadius: 1,
+                                                                '&:hover': { bgcolor: 'error.lighter' },
+                                                            }}
+                                                        >
                                                             <DeleteIcon fontSize="small" />
                                                         </IconButton>
                                                     </Tooltip>
@@ -503,10 +636,31 @@ export default function CursosIndex({
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* Footer de la Tabla */}
+                    <Box
+                        sx={{
+                            p: 1.8,
+                            px: 2.5,
+                            borderTop: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.02)'
+                                    : '#f8fafc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                            Mostrando <strong>{cursos.length}</strong> cursos y talleres
+                        </Typography>
+                    </Box>
                 </TableContainer>
             </Box>
 
-            {/* Create / Edit Dialog */}
+            {/* MODALES Y DIÁLOGOS CRUD */}
             <CursoDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
@@ -515,16 +669,6 @@ export default function CursosIndex({
                 carreras={carreras}
                 currentTeamSlug={currentTeamSlug}
             />
-
-            {/* Delete Confirmation Dialog */}
-            <DeleteConfirmDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-                title="¿Eliminar Curso?"
-                description={`¿Estás seguro de que deseas eliminar permanentemente el curso "${cursoToDelete?.nombre}"? Esta acción no se puede deshacer.`}
-                onConfirm={confirmDelete}
-                processing={isDeleting}
-            />
         </>
     );
 }
@@ -532,7 +676,7 @@ export default function CursosIndex({
 CursosIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'Panel Principal',
             href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
         },
         {

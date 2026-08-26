@@ -16,8 +16,11 @@ import {
     CircularProgress,
     ListSubheader,
     FormHelperText,
+    Typography,
 } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNotification } from '@/hooks/use-notification';
+import { isMinLength } from '@/lib/validation';
 import type { Diplomado, Comercio } from '@/types';
 
 interface DiplomadoDialogProps {
@@ -42,6 +45,8 @@ export function DiplomadoDialog({
     currentTeamSlug,
 }: DiplomadoDialogProps) {
     const isEditing = !!diplomado;
+    const { notify } = useNotification();
+    const [clientErrors, setClientErrors] = useState<{ comercio_id?: string; nombre?: string }>({});
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm<{
@@ -102,29 +107,59 @@ export function DiplomadoDialog({
             }
         }
 
+        setClientErrors({});
         clearErrors();
     }, [diplomado, open, defaultComercioId, defaultCarreraId, comercios]);
 
     const selectedComercioObj = comercios.find(c => String(c.id) === String(data.comercio_id));
     const isCecavaMin = selectedComercioObj?.slug === 'cecava-min' || selectedComercioObj?.codigo === 'CECAVA-MIN';
 
+    const validate = (): boolean => {
+        const newErrors: { comercio_id?: string; nombre?: string } = {};
+
+        if (!data.comercio_id) {
+            newErrors.comercio_id = 'Debes seleccionar un comercio o sede responsable.';
+        }
+        if (!isMinLength(data.nombre, 3)) {
+            newErrors.nombre = 'El nombre del diplomado debe tener al menos 3 caracteres.';
+        } else if (data.nombre.trim().length > 255) {
+            newErrors.nombre = 'El nombre no puede superar los 255 caracteres.';
+        }
+
+        setClientErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validate()) {
+            notify.warning('Corrige los campos obligatorios antes de guardar.');
+            return;
+        }
 
         if (isEditing && diplomado) {
             put(`/${currentTeamSlug}/admin/diplomados/${diplomado.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Diplomado "${data.nombre}" actualizado con éxito.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al actualizar el diplomado.');
                 },
             });
         } else {
             post(`/${currentTeamSlug}/admin/diplomados`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Diplomado "${data.nombre}" registrado exitosamente.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al registrar el diplomado.');
                 },
             });
         }
@@ -137,7 +172,7 @@ export function DiplomadoDialog({
             maxWidth="sm"
             fullWidth
         >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
                     <WorkspacePremiumIcon color="primary" />
                     <span>{isEditing ? 'Editar Diplomado' : 'Nuevo Diplomado'}</span>
@@ -146,7 +181,7 @@ export function DiplomadoDialog({
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, sm: 6 }}>
-                                <FormControl fullWidth size="small" error={!!errors.comercio_id}>
+                                <FormControl fullWidth size="small" error={!!(clientErrors.comercio_id || errors.comercio_id)}>
                                     <InputLabel id="select-comercio-label">Comercio / Instituto *</InputLabel>
                                     <Select
                                         labelId="select-comercio-label"
@@ -159,6 +194,9 @@ export function DiplomadoDialog({
                                                 comercio_id: newId,
                                                 carrera_id: '',
                                             }));
+                                            if (clientErrors.comercio_id) {
+                                                setClientErrors(prev => ({ ...prev, comercio_id: undefined }));
+                                            }
                                             const cObj = comercios.find(c => String(c.id) === String(newId));
                                             if (cObj?.slug === 'cecava-min' || cObj?.codigo === 'CECAVA-MIN') {
                                                 setData('tipo', '');
@@ -181,6 +219,11 @@ export function DiplomadoDialog({
                                             </MenuItem>
                                         ))}
                                     </Select>
+                                    {(clientErrors.comercio_id || errors.comercio_id) && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                                            {clientErrors.comercio_id || errors.comercio_id}
+                                        </Typography>
+                                    )}
                                 </FormControl>
                             </Grid>
 
@@ -254,10 +297,15 @@ export function DiplomadoDialog({
                         <TextField
                             label="Nombre del Diplomado *"
                             value={data.nombre}
-                            onChange={(e) => setData('nombre', e.target.value)}
+                            onChange={(e) => {
+                                setData('nombre', e.target.value);
+                                if (clientErrors.nombre) {
+                                    setClientErrors(prev => ({ ...prev, nombre: undefined }));
+                                }
+                            }}
                             placeholder="Ej. Diplomado en Gestión Integral de Operaciones Mineras..."
-                            error={!!errors.nombre}
-                            helperText={errors.nombre}
+                            error={!!(clientErrors.nombre || errors.nombre)}
+                            helperText={clientErrors.nombre || errors.nombre || 'Mínimo 3 caracteres requeridos'}
                             fullWidth
                             required
                             size="small"
@@ -270,6 +318,8 @@ export function DiplomadoDialog({
                                     value={data.flyer}
                                     onChange={(e) => setData('flyer', e.target.value)}
                                     placeholder="https://.../flyer-diplomado.jpg"
+                                    error={!!errors.flyer}
+                                    helperText={errors.flyer}
                                     fullWidth
                                     size="small"
                                 />
@@ -280,6 +330,8 @@ export function DiplomadoDialog({
                                     value={data.brochure}
                                     onChange={(e) => setData('brochure', e.target.value)}
                                     placeholder="https://.../brochure-diplomado.pdf"
+                                    error={!!errors.brochure}
+                                    helperText={errors.brochure}
                                     fullWidth
                                     size="small"
                                 />
@@ -290,6 +342,8 @@ export function DiplomadoDialog({
                                     value={data.youtube}
                                     onChange={(e) => setData('youtube', e.target.value)}
                                     placeholder="https://youtube.com/watch?v=..."
+                                    error={!!errors.youtube}
+                                    helperText={errors.youtube}
                                     fullWidth
                                     size="small"
                                 />
@@ -300,6 +354,8 @@ export function DiplomadoDialog({
                                     value={data.precio}
                                     onChange={(e) => setData('precio', e.target.value)}
                                     placeholder="Ej. S/ 390, S/ 450"
+                                    error={!!errors.precio}
+                                    helperText={errors.precio}
                                     fullWidth
                                     size="small"
                                 />
@@ -310,9 +366,10 @@ export function DiplomadoDialog({
                                     value={data.actualizado_drive}
                                     onChange={(e) => setData('actualizado_drive', e.target.value)}
                                     placeholder="https://drive.google.com/drive/folders/..."
+                                    error={!!errors.actualizado_drive}
+                                    helperText={errors.actualizado_drive || 'Enlace a la carpeta o archivo actualizado en Google Drive'}
                                     fullWidth
                                     size="small"
-                                    helperText="Enlace a la carpeta o archivo actualizado en Google Drive"
                                 />
                             </Grid>
                         </Grid>

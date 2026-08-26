@@ -1,20 +1,21 @@
-import { usePage } from '@inertiajs/react';
+import type { HTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
 
-import AppLogoIcon from '@/components/app-logo-icon';
-
-export default function AppLogo() {
-    const { name } = usePage().props;
-
+export default function AppLogo({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
     return (
-        <>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
-            </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="mb-0.5 truncate leading-tight font-semibold">
-                    {name}
-                </span>
-            </div>
-        </>
+        <div className={cn('flex items-center', className)} {...props}>
+            {/* Logo oficial para Modo Claro */}
+            <img
+                src="/images/logo-light.png"
+                alt="Grupo Capsur"
+                className="h-8 w-auto max-w-[165px] object-contain dark:hidden"
+            />
+            {/* Logo oficial para Modo Oscuro */}
+            <img
+                src="/images/logo-dark.png"
+                alt="Grupo Capsur"
+                className="hidden h-8 w-auto max-w-[165px] object-contain dark:block"
+            />
+        </div>
     );
 }

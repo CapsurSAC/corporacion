@@ -19,6 +19,10 @@ class GrupoController extends Controller
     public function index(): Response
     {
         $grupos = Grupo::query()
+            ->with(['comercios' => function ($q) {
+                $q->select('id', 'grupo_id', 'nombre', 'sigla', 'color_hex', 'activo')
+                  ->orderBy('nombre');
+            }])
             ->withCount(['comercios', 'carreras'])
             ->orderBy('id')
             ->get();
@@ -34,13 +38,18 @@ class GrupoController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'nombre' => ['required', 'string', 'max:255', 'unique:grupos,nombre'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255', 'unique:grupos,nombre'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'activo' => ['boolean'],
+        ], [
+            'nombre.required' => 'El nombre del grupo comercial es obligatorio.',
+            'nombre.min' => 'El nombre del grupo debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del grupo no puede superar los 255 caracteres.',
+            'nombre.unique' => 'Ya existe un grupo comercial registrado con este nombre.',
+            'descripcion.max' => 'La descripción no puede exceder los 1000 caracteres.',
         ]);
 
         $slug = Str::slug($validated['nombre']);
-        // Ensure slug uniqueness
         $originalSlug = $slug;
         $counter = 1;
         while (Grupo::where('slug', $slug)->exists()) {
@@ -49,9 +58,9 @@ class GrupoController extends Controller
         }
 
         Grupo::create([
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'descripcion' => $validated['descripcion'] ?? null,
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
             'activo' => $request->boolean('activo', true),
         ]);
 
@@ -71,9 +80,15 @@ class GrupoController extends Controller
         $grupoModel = $grupo instanceof Grupo ? $grupo : Grupo::findOrFail($grupo);
 
         $validated = $request->validate([
-            'nombre' => ['required', 'string', 'max:255', Rule::unique('grupos', 'nombre')->ignore($grupoModel->id)],
+            'nombre' => ['required', 'string', 'min:3', 'max:255', Rule::unique('grupos', 'nombre')->ignore($grupoModel->id)],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'activo' => ['boolean'],
+        ], [
+            'nombre.required' => 'El nombre del grupo comercial es obligatorio.',
+            'nombre.min' => 'El nombre del grupo debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del grupo no puede superar los 255 caracteres.',
+            'nombre.unique' => 'Ya existe otro grupo comercial con este nombre.',
+            'descripcion.max' => 'La descripción no puede exceder los 1000 caracteres.',
         ]);
 
         $slug = $grupoModel->slug;
@@ -88,9 +103,9 @@ class GrupoController extends Controller
         }
 
         $grupoModel->update([
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'descripcion' => $validated['descripcion'] ?? null,
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
             'activo' => $request->boolean('activo', true),
         ]);
 
@@ -113,7 +128,7 @@ class GrupoController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El grupo \"{$nombre}\" ha sido eliminado.",
+            'message' => "El grupo \"{$nombre}\" ha sido eliminado correctamente.",
         ]);
 
         return back();

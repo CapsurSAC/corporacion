@@ -1,24 +1,41 @@
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { dashboard } from '@/routes';
+import { useNotification } from '@/hooks/use-notification';
+import { confirmDeleteAlert } from '@/lib/swal';
+import { isMinLength, isValidHexColor } from '@/lib/validation';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BusinessIcon from '@mui/icons-material/Business';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DomainIcon from '@mui/icons-material/Domain';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ImageIcon from '@mui/icons-material/Image';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
+import LinkIcon from '@mui/icons-material/Link';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import PaletteIcon from '@mui/icons-material/Palette';
+import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SaveIcon from '@mui/icons-material/Save';
 import SchoolIcon from '@mui/icons-material/School';
+import SearchIcon from '@mui/icons-material/Search';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import TuneIcon from '@mui/icons-material/Tune';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Avatar,
+    Badge,
     Box,
     Button,
     Card,
@@ -26,6 +43,9 @@ import {
     CardHeader,
     Chip,
     CircularProgress,
+    Dialog,
+    DialogContent,
+    DialogTitle,
     Divider,
     FormControl,
     FormControlLabel,
@@ -37,16 +57,19 @@ import {
     Paper,
     Select,
     Switch,
+    Tab,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Tabs,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Comercio, Grupo, Carrera, Curso, Diplomado } from '@/types';
 
 interface EditComercioPageProps {
@@ -55,24 +78,39 @@ interface EditComercioPageProps {
 }
 
 const COLOR_PRESETS = [
-    '#0c43a3',
-    '#1d4ed8',
-    '#0284c7',
-    '#059669',
-    '#16a34a',
-    '#d97706',
-    '#ea580c',
-    '#dc2626',
-    '#7c3aed',
-    '#4b5563',
+    { name: 'Azul Institucional', hex: '#0c43a3' },
+    { name: 'Azul Real', hex: '#1d4ed8' },
+    { name: 'Celeste Océano', hex: '#0284c7' },
+    { name: 'Verde Esmeralda', hex: '#059669' },
+    { name: 'Verde Forestal', hex: '#16a34a' },
+    { name: 'Ámbar Cálido', hex: '#d97706' },
+    { name: 'Naranja Fuego', hex: '#ea580c' },
+    { name: 'Rojo Carmesí', hex: '#dc2626' },
+    { name: 'Púrpura Imperial', hex: '#7c3aed' },
+    { name: 'Gris Grafito', hex: '#4b5563' },
 ];
 
 export default function EditComercioPage({ comercio, grupos }: EditComercioPageProps) {
     const { currentTeam } = usePage<{ currentTeam?: { slug: string; name: string } }>().props;
     const currentTeamSlug = currentTeam?.slug || 'default';
+    const { notify } = useNotification();
 
+    // Tabs state
+    const [currentTab, setCurrentTab] = useState(0);
+
+    // YouTube & Photo addition states
     const [nuevoYoutube, setNuevoYoutube] = useState('');
     const [nuevaFoto, setNuevaFoto] = useState('');
+
+    // Image preview modal state
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+
+    // Search filters for academic offer
+    const [searchCarrera, setSearchCarrera] = useState('');
+    const [searchDiplomado, setSearchDiplomado] = useState('');
+    const [filterDiplomadoTipo, setFilterDiplomadoTipo] = useState('all');
+    const [searchCurso, setSearchCurso] = useState('');
+    const [filterCursoTipo, setFilterCursoTipo] = useState('all');
 
     const { data, setData, put, processing, errors } = useForm({
         grupo_id: String(comercio.grupo_id),
@@ -136,20 +174,64 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
         comercio.slug === 'matpel' ||
         comercio.codigo === 'MATPEL';
 
-    const isAvanti =
-        comercio.slug === 'istp-avanti' ||
-        comercio.codigo === 'AVANTI';
-
     const isDiplomadoLibre = isCecavaMin || isMatpel;
 
-    const standaloneDiplomados = comercio.diplomados?.filter((d) => !d.carrera_id) || [];
-    const standaloneCursos = comercio.cursos?.filter((c) => !c.carrera_id) || [];
+    const standaloneDiplomados = useMemo(
+        () => comercio.diplomados?.filter((d) => !d.carrera_id) || [],
+        [comercio.diplomados]
+    );
+
+    const standaloneCursos = useMemo(
+        () => comercio.cursos?.filter((c) => !c.carrera_id) || [],
+        [comercio.cursos]
+    );
 
     const showStandaloneDiplomados =
         (hasDiplomados && !isAcademic) || (isAcademic && standaloneDiplomados.length > 0);
 
     const showStandaloneCursos =
         (hasCursos && !isAcademic) || (isAcademic && standaloneCursos.length > 0);
+
+    const totalCarreras = comercio.carreras?.length || 0;
+    const totalDiplomados = comercio.diplomados?.length || 0;
+    const totalCursos = comercio.cursos?.length || 0;
+    const totalOferta = totalCarreras + totalDiplomados + totalCursos;
+
+    // Filtered lists
+    const filteredCarreras = useMemo(() => {
+        if (!comercio.carreras) return [];
+        if (!searchCarrera.trim()) return comercio.carreras;
+        const q = searchCarrera.toLowerCase();
+        return comercio.carreras.filter(
+            (c) => c.nombre.toLowerCase().includes(q) || c.codigo?.toLowerCase().includes(q)
+        );
+    }, [comercio.carreras, searchCarrera]);
+
+    const filteredStandaloneDiplomados = useMemo(() => {
+        return standaloneDiplomados.filter((d) => {
+            const matchesSearch =
+                !searchDiplomado.trim() ||
+                d.nombre.toLowerCase().includes(searchDiplomado.toLowerCase());
+            const matchesTipo =
+                filterDiplomadoTipo === 'all' || d.tipo === filterDiplomadoTipo;
+            return matchesSearch && matchesTipo;
+        });
+    }, [standaloneDiplomados, searchDiplomado, filterDiplomadoTipo]);
+
+    const filteredStandaloneCursos = useMemo(() => {
+        return standaloneCursos.filter((c) => {
+            const matchesSearch =
+                !searchCurso.trim() ||
+                c.nombre.toLowerCase().includes(searchCurso.toLowerCase());
+            const matchesTipo =
+                filterCursoTipo === 'all' ||
+                (filterCursoTipo === 'especializado' && c.tipo === 'especializado') ||
+                (filterCursoTipo === 'tradicional' && c.tipo !== 'especializado');
+            return matchesSearch && matchesTipo;
+        });
+    }, [standaloneCursos, searchCurso, filterCursoTipo]);
+
+    const selectedGrupo = grupos.find((g) => String(g.id) === String(data.grupo_id));
 
     const getDiplomadoChip = (tipo?: string | null) => {
         if (!tipo || tipo === 'general' || tipo === 'libre' || tipo === 'sin_categoria') {
@@ -160,136 +242,122 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
             );
         }
 
-        switch (tipo) {
-            case 'ambientales':
-                return (
-                    <Chip
-                        label="Ambientales"
-                        size="small"
-                        sx={{ bgcolor: '#ecfdf5', color: '#065f46', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #a7f3d0' }}
-                    />
-                );
-            case 'calidad_isos':
-                return (
-                    <Chip
-                        label="Calidad ISOs"
-                        size="small"
-                        sx={{ bgcolor: '#eff6ff', color: '#1e40af', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #bfdbfe' }}
-                    />
-                );
-            case 'mineros':
-                return (
-                    <Chip
-                        label="Mineros"
-                        size="small"
-                        sx={{ bgcolor: '#fff7ed', color: '#9a3412', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #fed7aa' }}
-                    />
-                );
-            case 'administracion':
-                return (
-                    <Chip
-                        label="Administración"
-                        size="small"
-                        sx={{ bgcolor: '#f0fdfa', color: '#115e59', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #99f6e4' }}
-                    />
-                );
-            case 'arquitectura_ingenieria':
-                return (
-                    <Chip
-                        label="Arq. e Ingeniería"
-                        size="small"
-                        sx={{ bgcolor: '#eef2ff', color: '#3730a3', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #c7d2fe' }}
-                    />
-                );
-            case 'osha':
-                return (
-                    <Chip
-                        label="OSHA"
-                        size="small"
-                        sx={{ bgcolor: '#fef2f2', color: '#991b1b', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #fecaca' }}
-                    />
-                );
-            case 'comercio_exterior':
-                return (
-                    <Chip
-                        label="Comex"
-                        size="small"
-                        sx={{ bgcolor: '#ecfeff', color: '#155e75', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #a5f3fc' }}
-                    />
-                );
-            case 'rubro_legal':
-                return (
-                    <Chip
-                        label="Rubro Legal"
-                        size="small"
-                        sx={{ bgcolor: '#f5f3ff', color: '#5b21b6', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #ddd6fe' }}
-                    />
-                );
-            case 'no_actualizados':
-                return (
-                    <Chip
-                        label="No Actualizado"
-                        size="small"
-                        sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #cbd5e1' }}
-                    />
-                );
-            case 'nombramiento':
-                return (
-                    <Chip
-                        label="Nombramiento"
-                        size="small"
-                        sx={{ bgcolor: '#ede9fe', color: '#5b21b6', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #c4b5fd' }}
-                    />
-                );
-            case 'secundaria':
-                return (
-                    <Chip
-                        label="Secundaria"
-                        size="small"
-                        sx={{ bgcolor: '#ecfdf5', color: '#065f46', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #a7f3d0' }}
-                    />
-                );
-            case 'generico':
-            default:
-                return (
-                    <Chip
-                        label="Genérico"
-                        size="small"
-                        sx={{ bgcolor: '#f0f9ff', color: '#0369a1', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #bae6fd' }}
-                    />
-                );
-        }
+        const map: Record<string, { label: string; bg: string; color: string; border: string }> = {
+            ambientales: { label: 'Ambientales', bg: '#ecfdf5', color: '#065f46', border: '#a7f3d0' },
+            calidad_isos: { label: 'Calidad ISOs', bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe' },
+            mineros: { label: 'Mineros', bg: '#fff7ed', color: '#9a3412', border: '#fed7aa' },
+            administracion: { label: 'Administración', bg: '#f0fdfa', color: '#115e59', border: '#99f6e4' },
+            arquitectura_ingenieria: { label: 'Arq. e Ingeniería', bg: '#eef2ff', color: '#3730a3', border: '#c7d2fe' },
+            osha: { label: 'OSHA', bg: '#fef2f2', color: '#991b1b', border: '#fecaca' },
+            comercio_exterior: { label: 'Comex', bg: '#ecfeff', color: '#155e75', border: '#a5f3fc' },
+            rubro_legal: { label: 'Rubro Legal', bg: '#f5f3ff', color: '#5b21b6', border: '#ddd6fe' },
+            no_actualizados: { label: 'No Actualizado', bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' },
+            nombramiento: { label: 'Nombramiento', bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+            secundaria: { label: 'Secundaria', bg: '#ecfdf5', color: '#065f46', border: '#a7f3d0' },
+            generico: { label: 'Genérico', bg: '#f0f9ff', color: '#0369a1', border: '#bae6fd' },
+        };
+
+        const config = map[tipo] || { label: tipo, bg: '#f8fafc', color: '#334155', border: '#cbd5e1' };
+
+        return (
+            <Chip
+                label={config.label}
+                size="small"
+                sx={{
+                    bgcolor: config.bg,
+                    color: config.color,
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    border: `1px solid ${config.border}`,
+                    height: 22,
+                }}
+            />
+        );
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/${currentTeamSlug}/admin/comercios/${comercio.id}`);
+
+        // Validaciones breves y uniformes
+        if (!isMinLength(data.nombre, 3)) {
+            setCurrentTab(0);
+            notify.error('El nombre institucional debe tener al menos 3 caracteres.');
+            return;
+        }
+
+        if (!data.grupo_id) {
+            setCurrentTab(0);
+            notify.error('Debes seleccionar el grupo comercial perteneciente.');
+            return;
+        }
+
+        if (data.color_hex && !isValidHexColor(data.color_hex)) {
+            setCurrentTab(0);
+            notify.error('El color corporativo debe ser un código hexadecimal válido (ej. #1d4ed8).');
+            return;
+        }
+
+        put(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                notify.success('Información institucional actualizada exitosamente.');
+            },
+            onError: () => {
+                notify.error('Ocurrió un error al guardar los cambios.');
+            },
+        });
     };
 
     const handleAddYoutube = () => {
-        if (!nuevoYoutube.trim()) return;
-        setData('canales_youtube', [...data.canales_youtube, nuevoYoutube.trim()]);
+        const trimmed = nuevoYoutube.trim();
+        if (!trimmed) {
+            notify.warning('Ingresa el enlace o URL del canal o video de YouTube.');
+            return;
+        }
+        setData('canales_youtube', [...data.canales_youtube, trimmed]);
         setNuevoYoutube('');
+        notify.success('Canal de YouTube agregado a la lista.');
     };
 
-    const handleRemoveYoutube = (index: number) => {
-        setData(
-            'canales_youtube',
-            data.canales_youtube.filter((_, i) => i !== index)
-        );
+    const handleRemoveYoutube = async (index: number) => {
+        const confirmed = await confirmDeleteAlert({
+            title: '¿Remover canal de YouTube?',
+            text: 'Se eliminará este enlace de la lista de canales del comercio.',
+            confirmButtonText: 'Sí, remover',
+        });
+        if (confirmed) {
+            setData(
+                'canales_youtube',
+                data.canales_youtube.filter((_, i) => i !== index)
+            );
+            notify.info('Canal removido de la lista.');
+        }
     };
 
     const handleAddFoto = () => {
-        if (!nuevaFoto.trim()) return;
-        setData('fotos', [...data.fotos, nuevaFoto.trim()]);
+        const trimmed = nuevaFoto.trim();
+        if (!trimmed) {
+            notify.warning('Ingresa el enlace o URL de la fotografía.');
+            return;
+        }
+        setData('fotos', [...data.fotos, trimmed]);
         setNuevaFoto('');
+        notify.success('Fotografía agregada a la galería.');
     };
 
-    const handleRemoveFoto = (index: number) => {
-        setData(
-            'fotos',
-            data.fotos.filter((_, i) => i !== index)
-        );
+    const handleRemoveFoto = async (index: number) => {
+        const confirmed = await confirmDeleteAlert({
+            title: '¿Remover fotografía?',
+            text: 'Se eliminará esta imagen de la galería del comercio.',
+            confirmButtonText: 'Sí, remover',
+        });
+        if (confirmed) {
+            setData(
+                'fotos',
+                data.fotos.filter((_, i) => i !== index)
+            );
+            notify.info('Fotografía removida de la galería.');
+        }
     };
 
     return (
@@ -303,1521 +371,1780 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                     p: { xs: 2, sm: 3, md: 4 },
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 3.5,
-                    maxWidth: 1400,
-                    mx: 'auto',
+                    gap: 2.5,
+                    width: '100%',
+                    boxSizing: 'border-box',
                 }}
             >
-                {/* Cabecera Principal */}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
-                            <Button
-                                variant="outlined"
-                                color="inherit"
-                                size="small"
-                                startIcon={<ArrowBackIcon />}
-                                sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                {/* HERO HEADER MODERNO */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    {/* Borde superior de acento con el color del comercio */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: 5,
+                            bgcolor: data.color_hex || '#0c43a3',
+                        }}
+                    />
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: { xs: 'flex-start', md: 'center' },
+                            justifyContent: 'space-between',
+                            gap: 2.5,
+                        }}
+                    >
+                        {/* Identidad izquierda */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flex: 1, minWidth: 0 }}>
+                            <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
+                                <Tooltip title="Volver al listado de comercios" arrow>
+                                    <IconButton
+                                        sx={{
+                                            bgcolor: 'action.hover',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            '&:hover': { bgcolor: 'action.selected' },
+                                        }}
+                                    >
+                                        <ArrowBackIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </Link>
+
+                            {/* Avatar de marca con el color corporativo */}
+                            <Avatar
+                                sx={{
+                                    bgcolor: data.color_hex || '#0c43a3',
+                                    color: '#ffffff',
+                                    fontWeight: 900,
+                                    fontSize: '1.2rem',
+                                    width: 52,
+                                    height: 52,
+                                    boxShadow: `0 4px 14px ${data.color_hex || '#0c43a3'}40`,
+                                    border: '2px solid #ffffff',
+                                }}
                             >
-                                Volver al Listado
-                            </Button>
-                        </Link>
-                        <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-                                <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                                    {data.nombre || comercio.nombre}
+                                {(data.sigla || data.nombre || 'C').substring(0, 3).toUpperCase()}
+                            </Avatar>
+
+                            <Box sx={{ minWidth: 0 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                        }}
+                                    >
+                                        {data.nombre || comercio.nombre}
+                                    </Typography>
+
+                                    <Chip
+                                        label={data.sigla || comercio.codigo || 'COMERCIO'}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: data.color_hex || '#0c43a3',
+                                            color: '#ffffff',
+                                            fontWeight: 800,
+                                            fontSize: '0.72rem',
+                                            height: 22,
+                                        }}
+                                    />
+
+                                    {selectedGrupo && (
+                                        <Chip
+                                            icon={<DomainIcon sx={{ fontSize: '13px !important' }} />}
+                                            label={selectedGrupo.nombre}
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ fontWeight: 600, fontSize: '0.72rem', height: 22 }}
+                                        />
+                                    )}
+
+                                    <Chip
+                                        label={data.activo ? 'ACTIVO' : 'INACTIVO'}
+                                        color={data.activo ? 'success' : 'default'}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 800,
+                                            fontSize: '0.68rem',
+                                            height: 22,
+                                        }}
+                                    />
+                                </Box>
+
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
+                                    Edita la ficha técnica, acreditaciones, presencia digital y oferta académica de este comercio.
                                 </Typography>
-                                <Chip
-                                    label={data.sigla || comercio.codigo || 'COMERCIO'}
-                                    sx={{
-                                        bgcolor: data.color_hex || '#0c43a3',
-                                        color: '#ffffff',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.75rem',
-                                    }}
-                                />
-                                {isAcademic && (
-                                    <Chip
-                                        icon={<SchoolIcon sx={{ fontSize: '14px !important' }} />}
-                                        label="Instituto Oficial"
-                                        size="small"
-                                        color="primary"
-                                        variant="outlined"
-                                        sx={{ fontWeight: 'bold' }}
-                                    />
-                                )}
-                                {hasCursos && (
-                                    <Chip
-                                        icon={<MenuBookIcon sx={{ fontSize: '14px !important' }} />}
-                                        label="Cursos Online"
-                                        size="small"
-                                        color="secondary"
-                                        variant="outlined"
-                                        sx={{ fontWeight: 'bold' }}
-                                    />
-                                )}
-                                {hasDiplomados && (
-                                    <Chip
-                                        icon={<WorkspacePremiumIcon sx={{ fontSize: '14px !important' }} />}
-                                        label="Diplomados y Posgrados"
-                                        size="small"
-                                        color="info"
-                                        variant="outlined"
-                                        sx={{ fontWeight: 'bold' }}
-                                    />
-                                )}
-                                <Chip
-                                    label={data.activo ? 'ACTIVO' : 'INACTIVO'}
-                                    color={data.activo ? 'success' : 'default'}
-                                    size="small"
-                                    sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
-                                />
                             </Box>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                Edición de información general, enlaces institucionales, acreditación MINEDU y oferta formativa.
-                            </Typography>
+                        </Box>
+
+                        {/* Botón de Guardado Superior Rápido */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, alignSelf: { xs: 'stretch', md: 'auto' }, justifyContent: { xs: 'flex-end', md: 'auto' } }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={processing}
+                                startIcon={processing ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+                                sx={{
+                                    bgcolor: data.color_hex || '#0c43a3',
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    px: 2.8,
+                                    py: 0.9,
+                                    borderRadius: 2,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                                    '&:hover': { filter: 'brightness(0.92)' },
+                                }}
+                            >
+                                {processing ? 'Guardando...' : 'Guardar Cambios'}
+                            </Button>
                         </Box>
                     </Box>
-                </Box>
+                </Paper>
 
-                {/* BLOQUE 1: INFORMACIÓN GENERAL E IDENTIDAD */}
-                <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                    <CardHeader
-                        avatar={<BusinessIcon color="primary" />}
-                        title="1. Información General e Identidad Institucional"
-                        subheader="Configuración de nombres, marcas, siglas y estado operativo en el catálogo"
-                        titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                    />
-                    <Divider />
-                    <CardContent sx={{ p: 3 }}>
-                        <Grid container spacing={3}>
-                            <Grid size={{ xs: 12, sm: 8, md: 5 }}>
-                                <TextField
-                                    label="Nombre Institucional *"
-                                    value={data.nombre}
-                                    onChange={(e) => setData('nombre', e.target.value)}
-                                    placeholder="Ej. ISTP SIS, ISTP AVANTI, NEXT-ONLINE..."
-                                    error={!!errors.nombre}
-                                    helperText={errors.nombre}
-                                    fullWidth
-                                    required
-                                    size="small"
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4, md: 2 }}>
-                                <TextField
-                                    label="Sigla / Código Corto"
-                                    value={data.sigla}
-                                    onChange={(e) => setData('sigla', e.target.value)}
-                                    placeholder="Ej. SIS, CEI, NXT"
-                                    error={!!errors.sigla}
-                                    helperText={errors.sigla}
-                                    fullWidth
-                                    size="small"
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                <FormControl fullWidth size="small" error={!!errors.grupo_id}>
-                                    <InputLabel id="grupo-select-label">Grupo Comercial *</InputLabel>
-                                    <Select
-                                        labelId="grupo-select-label"
-                                        value={data.grupo_id}
-                                        label="Grupo Comercial *"
-                                        onChange={(e) => setData('grupo_id', e.target.value)}
-                                    >
-                                        {grupos.map((g) => (
-                                            <MenuItem key={g.id} value={String(g.id)}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <DomainIcon fontSize="small" color="action" />
-                                                    <span>{g.nombre}</span>
-                                                </Box>
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={data.activo}
-                                            onChange={(e) => setData('activo', e.target.checked)}
-                                            color="primary"
-                                        />
-                                    }
-                                    label={data.activo ? 'Comercio Activo' : 'Inactivo'}
-                                    sx={{ mt: 0.5 }}
-                                />
-                            </Grid>
-
-                            {/* Selector de Color de Marca */}
-                            <Grid size={{ xs: 12 }}>
-                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1 }}>
-                                    COLOR DISTINTIVO DE MARCA (HEX)
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <input
-                                            type="color"
-                                            value={data.color_hex}
-                                            onChange={(e) => setData('color_hex', e.target.value)}
-                                            style={{
-                                                width: 38,
-                                                height: 38,
-                                                padding: 0,
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: 6,
-                                                cursor: 'pointer',
-                                            }}
-                                        />
-                                        <TextField
-                                            size="small"
-                                            value={data.color_hex}
-                                            onChange={(e) => setData('color_hex', e.target.value)}
-                                            sx={{ width: 120 }}
-                                            placeholder="#0c43a3"
-                                        />
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
-                                        <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
-                                            Predefinidos:
-                                        </Typography>
-                                        {COLOR_PRESETS.map((color) => (
-                                            <Box
-                                                key={color}
-                                                onClick={() => setData('color_hex', color)}
-                                                sx={{
-                                                    width: 26,
-                                                    height: 26,
-                                                    borderRadius: '50%',
-                                                    bgcolor: color,
-                                                    cursor: 'pointer',
-                                                    border: data.color_hex === color ? '2px solid #000000' : '1px solid rgba(0,0,0,0.1)',
-                                                    transform: data.color_hex === color ? 'scale(1.15)' : 'scale(1)',
-                                                    transition: 'all 0.15s ease-in-out',
-                                                    '&:hover': { transform: 'scale(1.2)' },
-                                                }}
-                                            />
-                                        ))}
-                                    </Box>
-                                </Box>
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                <TextField
-                                    label="Descripción Institucional / Resumen"
-                                    value={data.descripcion}
-                                    onChange={(e) => setData('descripcion', e.target.value)}
-                                    placeholder="Breve reseña sobre el comercio o instituto..."
-                                    error={!!errors.descripcion}
-                                    helperText={errors.descripcion}
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                    size="small"
-                                />
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
-
-                {/* BLOQUE 2: ENLACES Y PRESENCIA DIGITAL */}
-                <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                    <CardHeader
-                        avatar={<LanguageIcon color="primary" />}
-                        title="2. Enlaces y Presencia Digital"
-                        subheader="Accesos web oficiales, portales de consulta y recursos multimedia"
-                        titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                    />
-                    <Divider />
-                    <CardContent sx={{ p: 3 }}>
-                        <Grid container spacing={3}>
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Página Web Oficial (URL)"
-                                    value={data.pagina_web}
-                                    onChange={(e) => setData('pagina_web', e.target.value)}
-                                    placeholder="https://..."
-                                    error={!!errors.pagina_web}
-                                    helperText={errors.pagina_web}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.pagina_web ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.pagina_web} target="_blank" size="small">
-                                                        <LaunchIcon fontSize="inherit" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Certificado Digital (URL PDF)"
-                                    value={data.certificado_url}
-                                    onChange={(e) => setData('certificado_url', e.target.value)}
-                                    placeholder="https://.../certificado.pdf"
-                                    error={!!errors.certificado_url}
-                                    helperText={errors.certificado_url}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.certificado_url ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.certificado_url} target="_blank" size="small">
-                                                        <PictureAsPdfIcon fontSize="inherit" color="primary" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Catálogo Institucional (URL PDF / Enlace)"
-                                    value={data.catalogo_url}
-                                    onChange={(e) => setData('catalogo_url', e.target.value)}
-                                    placeholder="https://.../catalogo.pdf"
-                                    error={!!errors.catalogo_url}
-                                    helperText={errors.catalogo_url}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.catalogo_url ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.catalogo_url} target="_blank" size="small">
-                                                        <LaunchIcon fontSize="inherit" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Promoción Vigente (Texto o Enlace Informativo)"
-                                    value={data.promocion_vigente}
-                                    onChange={(e) => setData('promocion_vigente', e.target.value)}
-                                    placeholder="Ej. Beca 50% de descuento en matrícula de verano"
-                                    error={!!errors.promocion_vigente}
-                                    helperText={errors.promocion_vigente}
-                                    fullWidth
-                                    size="small"
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Tutorial / ¿Cómo ingresar a la plataforma? (Video o Guía)"
-                                    value={data.como_ingresar_plataforma}
-                                    onChange={(e) => setData('como_ingresar_plataforma', e.target.value)}
-                                    placeholder="https://youtube.com/watch?v=..."
-                                    error={!!errors.como_ingresar_plataforma}
-                                    helperText={errors.como_ingresar_plataforma}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.como_ingresar_plataforma ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.como_ingresar_plataforma} target="_blank" size="small">
-                                                        <YouTubeIcon fontSize="inherit" color="error" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            {/* Canales y Videos de YouTube */}
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <YouTubeIcon color="error" fontSize="small" />
-                                    <span>Videos y Canales de YouTube</span>
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
-                                    <TextField
-                                        size="small"
-                                        placeholder="Pegar URL de YouTube..."
-                                        value={nuevoYoutube}
-                                        onChange={(e) => setNuevoYoutube(e.target.value)}
-                                        fullWidth
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                handleAddYoutube();
-                                            }
-                                        }}
-                                    />
-                                    <Button variant="contained" size="small" onClick={handleAddYoutube} sx={{ minWidth: 40, px: 2 }}>
-                                        <AddIcon fontSize="small" />
-                                    </Button>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    {data.canales_youtube.map((url, index) => (
-                                        <Paper key={index} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                                            <Typography variant="body2" sx={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {url}
-                                            </Typography>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                                                <IconButton href={url} target="_blank" size="small">
-                                                    <LaunchIcon fontSize="inherit" />
-                                                </IconButton>
-                                                <IconButton size="small" color="error" onClick={() => handleRemoveYoutube(index)}>
-                                                    <DeleteIcon fontSize="inherit" />
-                                                </IconButton>
-                                            </Box>
-                                        </Paper>
-                                    ))}
-                                    {data.canales_youtube.length === 0 && (
-                                        <Typography variant="caption" color="text.secondary">
-                                            No se han agregado canales ni videos de YouTube aún.
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Grid>
-
-                            {/* Galería de Fotos / Sedes */}
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <ImageIcon color="primary" fontSize="small" />
-                                    <span>Galería de Fotos Institucionales / Sedes</span>
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
-                                    <TextField
-                                        size="small"
-                                        placeholder="Pegar URL de Imagen / Foto..."
-                                        value={nuevaFoto}
-                                        onChange={(e) => setNuevaFoto(e.target.value)}
-                                        fullWidth
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                handleAddFoto();
-                                            }
-                                        }}
-                                    />
-                                    <Button variant="contained" size="small" onClick={handleAddFoto} sx={{ minWidth: 40, px: 2 }}>
-                                        <AddIcon fontSize="small" />
-                                    </Button>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    {data.fotos.map((url, index) => (
-                                        <Paper key={index} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                                            <Typography variant="body2" sx={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {url}
-                                            </Typography>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                                                <IconButton href={url} target="_blank" size="small">
-                                                    <LaunchIcon fontSize="inherit" />
-                                                </IconButton>
-                                                <IconButton size="small" color="error" onClick={() => handleRemoveFoto(index)}>
-                                                    <DeleteIcon fontSize="inherit" />
-                                                </IconButton>
-                                            </Box>
-                                        </Paper>
-                                    ))}
-                                    {data.fotos.length === 0 && (
-                                        <Typography variant="caption" color="text.secondary">
-                                            No se han registrado fotografías aún.
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
-
-                {/* BLOQUE 3: ACREDITACIÓN INSTITUCIONAL Y REGISTRO MINEDU */}
-                <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                    <CardHeader
-                        avatar={<VerifiedUserIcon color="primary" />}
-                        title="3. Acreditación Institucional y Registro MINEDU"
-                        subheader="Resoluciones oficiales, registros ESCALE, plataforma educativa y reconocimientos"
-                        titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                    />
-                    <Divider />
-                    <CardContent sx={{ p: 3 }}>
-                        <Grid container spacing={3}>
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Resolución de Creación (PDF / Documento)"
-                                    value={data.resolucion_creacion}
-                                    onChange={(e) => setData('resolucion_creacion', e.target.value)}
-                                    placeholder="https://.../resolucion-creacion.pdf"
-                                    error={!!errors.resolucion_creacion}
-                                    helperText={errors.resolucion_creacion}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.resolucion_creacion ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.resolucion_creacion} target="_blank" size="small">
-                                                        <PictureAsPdfIcon fontSize="inherit" color="primary" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Resolución de Revalidación (PDF / Documento)"
-                                    value={data.resolucion_revalidacion}
-                                    onChange={(e) => setData('resolucion_revalidacion', e.target.value)}
-                                    placeholder="https://.../resolucion-revalidacion.pdf"
-                                    error={!!errors.resolucion_revalidacion}
-                                    helperText={errors.resolucion_revalidacion}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.resolucion_revalidacion ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.resolucion_revalidacion} target="_blank" size="small">
-                                                        <PictureAsPdfIcon fontSize="inherit" color="secondary" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Código / Padrón ESCALE - MINEDU"
-                                    value={data.escale_minedu}
-                                    onChange={(e) => setData('escale_minedu', e.target.value)}
-                                    placeholder="https://escale.minedu.gob.pe/... o Código modular"
-                                    error={!!errors.escale_minedu}
-                                    helperText={errors.escale_minedu}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.escale_minedu ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.escale_minedu} target="_blank" size="small">
-                                                        <LaunchIcon fontSize="inherit" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Link Directo Consulta ESCALE"
-                                    value={data.link_directo_escale}
-                                    onChange={(e) => setData('link_directo_escale', e.target.value)}
-                                    placeholder="https://escale.minedu.gob.pe/padron-ce?..."
-                                    error={!!errors.link_directo_escale}
-                                    helperText={errors.link_directo_escale}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.link_directo_escale ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.link_directo_escale} target="_blank" size="small">
-                                                        <LaunchIcon fontSize="inherit" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                                <TextField
-                                    label="Brochure Malla Curricular General"
-                                    value={data.malla_curricular_url}
-                                    onChange={(e) => setData('malla_curricular_url', e.target.value)}
-                                    placeholder="https://.../malla-curricular.pdf"
-                                    error={!!errors.malla_curricular_url}
-                                    helperText={errors.malla_curricular_url}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.malla_curricular_url ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.malla_curricular_url} target="_blank" size="small">
-                                                        <PictureAsPdfIcon fontSize="inherit" color="primary" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Plataforma Virtual / Aula Virtual de Carrera"
-                                    value={data.plataforma_carrera}
-                                    onChange={(e) => setData('plataforma_carrera', e.target.value)}
-                                    placeholder="https://aula.comercio.edu.pe"
-                                    error={!!errors.plataforma_carrera}
-                                    helperText={errors.plataforma_carrera}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.plataforma_carrera ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.plataforma_carrera} target="_blank" size="small">
-                                                        <LaunchIcon fontSize="inherit" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Reconocimiento de Director (PDF / Documento)"
-                                    value={data.reconocimiento_director}
-                                    onChange={(e) => setData('reconocimiento_director', e.target.value)}
-                                    placeholder="https://.../reconocimiento-director.pdf"
-                                    error={!!errors.reconocimiento_director}
-                                    helperText={errors.reconocimiento_director}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: data.reconocimiento_director ? (
-                                                <InputAdornment position="end">
-                                                    <IconButton href={data.reconocimiento_director} target="_blank" size="small">
-                                                        <WorkspacePremiumIcon fontSize="inherit" color="primary" />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) : null,
-                                        },
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Seminarios / Talleres Especiales (Enlace)"
-                                    value={data.seminario}
-                                    onChange={(e) => setData('seminario', e.target.value)}
-                                    placeholder="https://.../seminarios"
-                                    error={!!errors.seminario}
-                                    helperText={errors.seminario}
-                                    fullWidth
-                                    size="small"
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                                <TextField
-                                    label="Convenios Institucionales (Alianzas / Redes)"
-                                    value={data.convenio}
-                                    onChange={(e) => setData('convenio', e.target.value)}
-                                    placeholder="Convenios con universidades, empresas, colegios profesionales..."
-                                    error={!!errors.convenio}
-                                    helperText={errors.convenio}
-                                    fullWidth
-                                    size="small"
-                                />
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
-
-                {/* BLOQUE: OFERTA FORMATIVA */}
-                {/* 1. CARRERAS PROFESIONALES CON DIPLOMADOS Y CURSOS ASOCIADOS (AVANTI / SIS) */}
-                {isAcademic && (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                        <CardHeader
-                            avatar={<SchoolIcon color="primary" />}
-                            title="4. Carreras Profesionales, Diplomados y Cursos Registrados"
-                            subheader={`Planes de estudio oficiales registrados para ${comercio.nombre}, junto con sus diplomados y cursos especializados.`}
-                            titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                            action={
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/carreras?comercio_id=${comercio.id}`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        color="primary"
-                                        startIcon={<SchoolIcon />}
-                                        endIcon={<LaunchIcon sx={{ fontSize: '12px !important' }} />}
-                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
-                                    >
-                                        Administrar Carreras
-                                    </Button>
-                                </Link>
-                            }
+                {/* NAVEGACIÓN POR PESTAÑAS (TABS) */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        borderRadius: 3,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        overflow: 'hidden',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Tabs
+                        value={currentTab}
+                        onChange={(_, newValue) => setCurrentTab(newValue)}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        sx={{
+                            px: 2,
+                            borderBottom: 1,
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
+                            '& .MuiTab-root': {
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                minHeight: 52,
+                                gap: 1,
+                                px: 2.5,
+                            },
+                        }}
+                    >
+                        <Tab
+                            icon={<BusinessIcon sx={{ fontSize: 18 }} />}
+                            iconPosition="start"
+                            label="Datos & Marca"
                         />
-                        <Divider />
-                        <CardContent sx={{ p: 3 }}>
-                            {comercio.carreras && comercio.carreras.length > 0 ? (
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                    {comercio.carreras.map((carrera) => (
-                                        <Paper
-                                            key={carrera.id}
-                                            variant="outlined"
-                                            sx={{
-                                                p: 2.5,
-                                                borderRadius: 2.5,
-                                                borderColor: '#cbd5e1',
-                                                bgcolor: '#f8fafc',
-                                            }}
-                                        >
-                                            {/* Carrera Header & Document Buttons */}
+                        <Tab
+                            icon={
+                                <Badge
+                                    badgeContent={data.canales_youtube.length + data.fotos.length}
+                                    color="primary"
+                                    sx={{ '& .MuiBadge-badge': { fontSize: '0.65rem', height: 16, minWidth: 16 } }}
+                                >
+                                    <LanguageIcon sx={{ fontSize: 18 }} />
+                                </Badge>
+                            }
+                            iconPosition="start"
+                            label="Presencia Digital & Medios"
+                        />
+                        <Tab
+                            icon={<VerifiedUserIcon sx={{ fontSize: 18 }} />}
+                            iconPosition="start"
+                            label="Acreditación & MINEDU"
+                        />
+                        <Tab
+                            icon={
+                                <Badge
+                                    badgeContent={totalOferta}
+                                    color="secondary"
+                                    sx={{ '& .MuiBadge-badge': { fontSize: '0.65rem', height: 16, minWidth: 16 } }}
+                                >
+                                    <SchoolIcon sx={{ fontSize: 18 }} />
+                                </Badge>
+                            }
+                            iconPosition="start"
+                            label={`Oferta Formativa (${totalOferta})`}
+                        />
+                    </Tabs>
+
+                    {/* CONTENIDO DE PESTAÑAS */}
+                    <Box sx={{ p: { xs: 2.5, sm: 3.5 }, width: '100%', boxSizing: 'border-box' }}>
+                        {/* ========================================================================= */}
+                        {/* PESTAÑA 0: DATOS INSTITUCIONALES Y MARCA */}
+                        {/* ========================================================================= */}
+                        {currentTab === 0 && (
+                            <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
+                                {/* Subcard 1: Datos Principales */}
+                                <Grid size={{ xs: 12, md: 7 }}>
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%' }}>
+                                        <CardHeader
+                                            avatar={<StorefrontIcon color="primary" />}
+                                            title="1. Identidad Institucional"
+                                            subheader="Configuración de nombres oficiales, siglas y grupo de pertenencia"
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                            <TextField
+                                                label="Nombre Institucional *"
+                                                value={data.nombre}
+                                                onChange={(e) => setData('nombre', e.target.value)}
+                                                placeholder="Ej. ISTP SIS, ISTP AVANTI, NEXT-ONLINE..."
+                                                error={!!errors.nombre}
+                                                helperText={errors.nombre || 'Nombre legal o comercial que figurará en el catálogo'}
+                                                fullWidth
+                                                required
+                                                size="small"
+                                            />
+
+                                            <Grid container spacing={2}>
+                                                <Grid size={{ xs: 12, sm: 6 }}>
+                                                    <TextField
+                                                        label="Sigla / Código Corto"
+                                                        value={data.sigla}
+                                                        onChange={(e) => setData('sigla', e.target.value)}
+                                                        placeholder="Ej. SIS, AVANTI, NXT"
+                                                        error={!!errors.sigla}
+                                                        helperText={errors.sigla || 'Identificador corto en badges y etiquetas'}
+                                                        fullWidth
+                                                        size="small"
+                                                    />
+                                                </Grid>
+
+                                                <Grid size={{ xs: 12, sm: 6 }}>
+                                                    <FormControl fullWidth size="small" error={!!errors.grupo_id}>
+                                                        <InputLabel id="grupo-select-label">Grupo Comercial *</InputLabel>
+                                                        <Select
+                                                            labelId="grupo-select-label"
+                                                            value={data.grupo_id}
+                                                            label="Grupo Comercial *"
+                                                            onChange={(e) => setData('grupo_id', e.target.value)}
+                                                        >
+                                                            {grupos.map((g) => (
+                                                                <MenuItem key={g.id} value={String(g.id)}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                        <DomainIcon fontSize="small" color="action" />
+                                                                        <span>{g.nombre}</span>
+                                                                    </Box>
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+
                                             <Box
                                                 sx={{
+                                                    p: 2,
+                                                    borderRadius: 2,
+                                                    bgcolor: data.activo ? 'rgba(46, 125, 50, 0.05)' : 'action.hover',
+                                                    border: '1px solid',
+                                                    borderColor: data.activo ? 'rgba(46, 125, 50, 0.2)' : 'divider',
                                                     display: 'flex',
-                                                    flexDirection: { xs: 'column', md: 'row' },
+                                                    alignItems: 'center',
                                                     justifyContent: 'space-between',
-                                                    alignItems: { xs: 'flex-start', md: 'center' },
-                                                    gap: 1.5,
-                                                    mb: 2,
                                                 }}
                                             >
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <SchoolIcon color="primary" sx={{ fontSize: 28 }} />
-                                                    <Box>
-                                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                                                            {carrera.nombre}
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                        Estado Operativo del Comercio
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {data.activo
+                                                            ? 'Visible públicamente en el catálogo y filtros de búsqueda'
+                                                            : 'Oculto temporalmente del catálogo público'}
+                                                    </Typography>
+                                                </Box>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            checked={data.activo}
+                                                            onChange={(e) => setData('activo', e.target.checked)}
+                                                            color="success"
+                                                        />
+                                                    }
+                                                    label={
+                                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                            {data.activo ? 'Activo' : 'Inactivo'}
                                                         </Typography>
-                                                        {carrera.codigo && (
-                                                            <Chip
-                                                                label={carrera.codigo}
-                                                                size="small"
-                                                                sx={{ fontSize: '0.7rem', height: 20, bgcolor: '#e2e8f0', fontWeight: 700, mt: 0.3 }}
-                                                            />
-                                                        )}
-                                                    </Box>
+                                                    }
+                                                    sx={{ m: 0 }}
+                                                />
+                                            </Box>
+
+                                            <TextField
+                                                label="Descripción Institucional / Resumen"
+                                                value={data.descripcion}
+                                                onChange={(e) => setData('descripcion', e.target.value)}
+                                                placeholder="Breve reseña sobre el comercio o instituto, áreas de formación o servicios..."
+                                                error={!!errors.descripcion}
+                                                helperText={errors.descripcion}
+                                                fullWidth
+                                                multiline
+                                                rows={3}
+                                                size="small"
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+
+                                {/* Subcard 2: Identidad Visual y Paleta de Color */}
+                                <Grid size={{ xs: 12, md: 5 }}>
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%' }}>
+                                        <CardHeader
+                                            avatar={<PaletteIcon color="primary" />}
+                                            title="Color Corporativo"
+                                            subheader="Personalización visual del badge y detalles de marca"
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                            {/* Selector Input y Previsualizador */}
+                                            <Box
+                                                sx={{
+                                                    p: 2.5,
+                                                    borderRadius: 2.5,
+                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
+                                                    border: '1px solid',
+                                                    borderColor: 'divider',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 2,
+                                                }}
+                                            >
+                                                <Box sx={{ position: 'relative' }}>
+                                                    <input
+                                                        type="color"
+                                                        value={data.color_hex}
+                                                        onChange={(e) => setData('color_hex', e.target.value)}
+                                                        style={{
+                                                            width: 48,
+                                                            height: 48,
+                                                            padding: 0,
+                                                            border: 'none',
+                                                            borderRadius: '50%',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    />
                                                 </Box>
 
-                                                {/* Action Buttons for Carrera Docs */}
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                    {carrera.url_malla_curricular ? (
-                                                        <Button
-                                                            href={carrera.url_malla_curricular}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<PictureAsPdfIcon fontSize="small" color="primary" />}
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ textTransform: 'none', fontSize: '0.75rem', bgcolor: '#ffffff', border: '1px solid #cbd5e1', fontWeight: 600 }}
-                                                        >
-                                                            Malla Curricular
-                                                        </Button>
-                                                    ) : null}
-                                                    {carrera.url_declaracion_jurada ? (
-                                                        <Button
-                                                            href={carrera.url_declaracion_jurada}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<DescriptionIcon fontSize="small" color="secondary" />}
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ textTransform: 'none', fontSize: '0.75rem', bgcolor: '#ffffff', border: '1px solid #cbd5e1', fontWeight: 600 }}
-                                                        >
-                                                            Declaración Jurada
-                                                        </Button>
-                                                    ) : null}
-                                                    {carrera.modelo_certificado ? (
-                                                        <Button
-                                                            href={carrera.modelo_certificado}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<WorkspacePremiumIcon fontSize="small" color="success" />}
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ textTransform: 'none', fontSize: '0.75rem', bgcolor: '#ffffff', border: '1px solid #cbd5e1', fontWeight: 600 }}
-                                                        >
-                                                            Modelo Certificado
-                                                        </Button>
-                                                    ) : null}
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.5 }}>
+                                                        CÓDIGO HEXADECIMAL
+                                                    </Typography>
+                                                    <TextField
+                                                        size="small"
+                                                        value={data.color_hex}
+                                                        onChange={(e) => setData('color_hex', e.target.value)}
+                                                        fullWidth
+                                                        placeholder="#0c43a3"
+                                                        error={!!errors.color_hex}
+                                                        helperText={errors.color_hex}
+                                                        slotProps={{
+                                                            input: {
+                                                                startAdornment: (
+                                                                    <InputAdornment position="start">
+                                                                        <Box
+                                                                            sx={{
+                                                                                width: 14,
+                                                                                height: 14,
+                                                                                borderRadius: '50%',
+                                                                                bgcolor: data.color_hex || '#0c43a3',
+                                                                            }}
+                                                                        />
+                                                                    </InputAdornment>
+                                                                ),
+                                                            },
+                                                        }}
+                                                    />
                                                 </Box>
                                             </Box>
 
-                                            <Divider sx={{ my: 2 }} />
-
-                                            {/* DIPLOMADOS DE LA CARRERA */}
-                                            <Box sx={{ mb: 3 }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e40af', display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                                                        <WorkspacePremiumIcon fontSize="small" sx={{ color: '#1e40af' }} />
-                                                        Diplomados de {carrera.nombre} ({carrera.diplomados?.length || 0})
-                                                    </Typography>
-                                                    <Link
-                                                        href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`}
-                                                        style={{ textDecoration: 'none' }}
-                                                    >
-                                                        <Button size="small" sx={{ fontSize: '0.72rem', textTransform: 'none', py: 0.2 }}>
-                                                            + Administrar Diplomados
-                                                        </Button>
-                                                    </Link>
-                                                </Box>
-
-                                                {carrera.diplomados && carrera.diplomados.length > 0 ? (
-                                                    <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: '#ffffff', borderRadius: 1.5 }}>
-                                                        <Table size="small">
-                                                            <TableHead>
-                                                                <TableRow sx={{ bgcolor: '#1e3a8a' }}>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase' }}>
-                                                                        Nombre del Diplomado
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        Flyer
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        Brochure
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        YouTube
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 85 }}>
-                                                                        Precio
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 100 }}>
-                                                                        Actualizado Drive
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {carrera.diplomados.map((dip) => (
-                                                                    <TableRow key={dip.id} hover>
-                                                                        <TableCell sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                                                                            {dip.nombre}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {dip.flyer ? (
-                                                                                <Button
-                                                                                    href={dip.flyer}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    Flyer
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {dip.brochure ? (
-                                                                                <Button
-                                                                                    href={dip.brochure}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    Brochure
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {dip.youtube ? (
-                                                                                <Button
-                                                                                    href={dip.youtube}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    YouTube
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {dip.precio ? (
-                                                                                <Chip
-                                                                                    label={dip.precio}
-                                                                                    size="small"
-                                                                                    variant="outlined"
-                                                                                    color="primary"
-                                                                                    sx={{ fontWeight: 'bold', fontSize: '0.72rem', height: 22 }}
-                                                                                />
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {dip.actualizado_drive ? (
-                                                                                <Button
-                                                                                    href={dip.actualizado_drive}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600, color: '#059669' }}
-                                                                                >
-                                                                                    Drive
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', pl: 1 }}>
-                                                        Sin diplomados registrados para esta carrera.
-                                                    </Typography>
-                                                )}
-                                            </Box>
-
-                                            {/* CURSOS DE LA CARRERA */}
+                                            {/* Paleta de Colores Predefinidos */}
                                             <Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                                                        <MenuBookIcon fontSize="small" sx={{ color: '#0f766e' }} />
-                                                        Cursos de {carrera.nombre} ({carrera.cursos?.length || 0})
-                                                    </Typography>
-                                                    <Link
-                                                        href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`}
-                                                        style={{ textDecoration: 'none' }}
-                                                    >
-                                                        <Button size="small" sx={{ fontSize: '0.72rem', textTransform: 'none', py: 0.2, color: '#0f766e' }}>
-                                                            + Administrar Cursos
-                                                        </Button>
-                                                    </Link>
-                                                </Box>
-
-                                                {carrera.cursos && carrera.cursos.length > 0 ? (
-                                                    <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: '#ffffff', borderRadius: 1.5 }}>
-                                                        <Table size="small">
-                                                            <TableHead>
-                                                                <TableRow sx={{ bgcolor: '#0f766e' }}>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase' }}>
-                                                                        Nombre del Curso
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        Flyer
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        Brochure
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 90 }}>
-                                                                        YouTube
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 85 }}>
-                                                                        Precio
-                                                                    </TableCell>
-                                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.72rem', textTransform: 'uppercase', width: 100 }}>
-                                                                        Actualizado Drive
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {carrera.cursos.map((cur) => (
-                                                                    <TableRow key={cur.id} hover>
-                                                                        <TableCell sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                                                                            {cur.nombre}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {cur.flyer ? (
-                                                                                <Button
-                                                                                    href={cur.flyer}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    Flyer
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {cur.brochure ? (
-                                                                                <Button
-                                                                                    href={cur.brochure}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    Brochure
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {cur.youtube ? (
-                                                                                <Button
-                                                                                    href={cur.youtube}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600 }}
-                                                                                >
-                                                                                    YouTube
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {cur.precio ? (
-                                                                                <Chip
-                                                                                    label={cur.precio}
-                                                                                    size="small"
-                                                                                    variant="outlined"
-                                                                                    color="primary"
-                                                                                    sx={{ fontWeight: 'bold', fontSize: '0.72rem', height: 22 }}
-                                                                                />
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {cur.actualizado_drive ? (
-                                                                                <Button
-                                                                                    href={cur.actualizado_drive}
-                                                                                    target="_blank"
-                                                                                    rel="noreferrer"
-                                                                                    size="small"
-                                                                                    startIcon={<CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />}
-                                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                                    sx={{ textTransform: 'none', fontSize: '0.72rem', p: 0.2, fontWeight: 600, color: '#059669' }}
-                                                                                >
-                                                                                    Drive
-                                                                                </Button>
-                                                                            ) : (
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            )}
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', pl: 1 }}>
-                                                        Sin cursos registrados para esta carrera.
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        </Paper>
-                                    ))}
-                                </Box>
-                            ) : (
-                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: 'action.hover', borderRadius: 2 }}>
-                                    <SchoolIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                                    <Typography variant="body2" color="text.secondary">
-                                        Este instituto oficial aún no tiene carreras registradas.
-                                    </Typography>
-                                    <Link
-                                        href={`/${currentTeamSlug}/admin/carreras?comercio_id=${comercio.id}`}
-                                        style={{ textDecoration: 'none' }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            startIcon={<AddIcon />}
-                                            sx={{ mt: 1.5, bgcolor: '#0c43a3', textTransform: 'none', fontWeight: 700 }}
-                                        >
-                                            Registrar Primera Carrera
-                                        </Button>
-                                    </Link>
-                                </Paper>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* 2. DIPLOMADOS Y ESPECIALIZACIONES GENERALES / LIBRES */}
-                {showStandaloneDiplomados && (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                        <CardHeader
-                            avatar={<WorkspacePremiumIcon color="primary" />}
-                            title={isDiplomadoLibre ? "Diplomados Registrados (Libres / Sin Categoría)" : "Diplomados y Especializaciones Registrados"}
-                            subheader={isDiplomadoLibre ? `Oferta de diplomados libres para ${comercio.nombre} con Brochure, Flyer, YouTube, Precio y Drive` : `Oferta de diplomados por rubros técnicos para ${comercio.nombre} con Brochure, Flyer, YouTube, Precio y Drive`}
-                            titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                            action={
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        color="primary"
-                                        startIcon={<WorkspacePremiumIcon />}
-                                        endIcon={<LaunchIcon sx={{ fontSize: '12px !important' }} />}
-                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
-                                    >
-                                        Administrar Diplomados
-                                    </Button>
-                                </Link>
-                            }
-                        />
-                        <Divider />
-                        <CardContent sx={{ p: 3 }}>
-                            {comercio.diplomados && comercio.diplomados.length > 0 ? (
-                                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ bgcolor: '#152844' }}>
-                                                {!isDiplomadoLibre && (
-                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 120 }}>
-                                                        Rubro / Categoría
-                                                    </TableCell>
-                                                )}
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 200 }}>
-                                                    Nombre del Diplomado
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    Flyer
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    Brochure
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    YouTube
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 90 }}>
-                                                    Precio
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 120 }}>
-                                                    Actualizado Drive
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {comercio.diplomados.map((diplomado) => (
-                                                <TableRow key={diplomado.id} hover>
-                                                    {!isDiplomadoLibre && (
-                                                        <TableCell>
-                                                            {getDiplomadoChip(diplomado.tipo)}
-                                                        </TableCell>
-                                                    )}
-                                                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.85rem' }}>
-                                                        {diplomado.nombre}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {diplomado.flyer ? (
-                                                            <Button
-                                                                href={diplomado.flyer}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
-                                                            >
-                                                                Flyer
-                                                            </Button>
-                                                        ) : (
-                                                            <Typography variant="caption" color="text.disabled">-</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {diplomado.brochure ? (
-                                                            <Button
-                                                                href={diplomado.brochure}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
-                                                            >
-                                                                Brochure
-                                                            </Button>
-                                                        ) : (
-                                                            <Typography variant="caption" color="text.disabled">-</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {diplomado.youtube ? (
-                                                            <Button
-                                                                href={diplomado.youtube}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
-                                                            >
-                                                                YouTube
-                                                            </Button>
-                                                        ) : (
-                                                            <Typography variant="caption" color="text.disabled">-</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {diplomado.precio ? (
-                                                            <Chip
-                                                                label={diplomado.precio}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                color="primary"
-                                                                sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
-                                                            />
-                                                        ) : (
-                                                            <Typography variant="caption" color="text.disabled">-</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {diplomado.actualizado_drive ? (
-                                                            <Button
-                                                                href={diplomado.actualizado_drive}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600, color: '#059669' }}
-                                                            >
-                                                                Drive
-                                                            </Button>
-                                                        ) : (
-                                                            <Typography variant="caption" color="text.disabled">-</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            ) : (
-                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: 'action.hover', borderRadius: 2 }}>
-                                    <WorkspacePremiumIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                                    <Typography variant="body2" color="text.secondary">
-                                        Este comercio aún no tiene diplomados registrados.
-                                    </Typography>
-                                    <Link
-                                        href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`}
-                                        style={{ textDecoration: 'none' }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            startIcon={<AddIcon />}
-                                            sx={{ mt: 1.5, bgcolor: '#0c43a3', textTransform: 'none', fontWeight: 700 }}
-                                        >
-                                            Registrar Primer Diplomado
-                                        </Button>
-                                    </Link>
-                                </Paper>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* 3. CURSOS Y TALLERES GENERALES / LIBRES */}
-                {showStandaloneCursos && (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                        <CardHeader
-                            avatar={<MenuBookIcon color="primary" />}
-                            title={isMatpel ? "Cursos Registrados (Libres / Sin Categoría)" : "Cursos y Talleres Registrados"}
-                            subheader={isMatpel ? `Oferta de cursos libres para ${comercio.nombre} con Brochure, Flyer, YouTube, Precio y Drive` : `Oferta de cursos para ${comercio.nombre} con Brochure, Flyer, YouTube, Precio y Drive`}
-                            titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                            action={
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        color="primary"
-                                        startIcon={<MenuBookIcon />}
-                                        endIcon={<LaunchIcon sx={{ fontSize: '12px !important' }} />}
-                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
-                                    >
-                                        Administrar Cursos
-                                    </Button>
-                                </Link>
-                            }
-                        />
-                        <Divider />
-                        <CardContent sx={{ p: 3 }}>
-                            {comercio.cursos && comercio.cursos.length > 0 ? (
-                                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ bgcolor: '#152844' }}>
-                                                {!isMatpel && (
-                                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 120 }}>
-                                                        Tipo
-                                                    </TableCell>
-                                                )}
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 200 }}>
-                                                    Nombre del Curso
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    Flyer
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    Brochure
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 100 }}>
-                                                    YouTube
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 90 }}>
-                                                    Precio
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 120 }}>
-                                                    Actualizado Drive
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {comercio.cursos.map((curso) => {
-                                                const isEsp = curso.tipo === 'especializado';
-                                                return (
-                                                    <TableRow key={curso.id} hover>
-                                                        {!isMatpel && (
-                                                            <TableCell>
-                                                                {!curso.tipo ? (
-                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.72rem' }}>
-                                                                        Sin tipo
-                                                                    </Typography>
-                                                                ) : (
-                                                                    <Chip
-                                                                        label={isEsp ? 'Especializado' : 'Tradicional'}
-                                                                        size="small"
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1.5 }}>
+                                                    PALETAS RECOMENDADAS:
+                                                </Typography>
+                                                <Grid container spacing={1}>
+                                                    {COLOR_PRESETS.map((preset) => {
+                                                        const isSelected = data.color_hex.toLowerCase() === preset.hex.toLowerCase();
+                                                        return (
+                                                            <Grid size={{ xs: 6 }} key={preset.hex}>
+                                                                <Box
+                                                                    onClick={() => setData('color_hex', preset.hex)}
+                                                                    sx={{
+                                                                        p: 1,
+                                                                        borderRadius: 2,
+                                                                        border: '1px solid',
+                                                                        borderColor: (theme) =>
+                                                                            isSelected
+                                                                                ? preset.hex
+                                                                                : theme.palette.mode === 'dark'
+                                                                                  ? 'rgba(255, 255, 255, 0.1)'
+                                                                                  : '#e2e8f0',
+                                                                        bgcolor: (theme) =>
+                                                                            isSelected
+                                                                                ? theme.palette.mode === 'dark'
+                                                                                    ? `${preset.hex}25`
+                                                                                    : `${preset.hex}15`
+                                                                                : theme.palette.mode === 'dark'
+                                                                                  ? 'rgba(255, 255, 255, 0.04)'
+                                                                                  : '#ffffff',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: 1.2,
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.15s ease',
+                                                                        '&:hover': {
+                                                                            borderColor: preset.hex,
+                                                                            bgcolor: (theme) =>
+                                                                                theme.palette.mode === 'dark'
+                                                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                                                    : '#f8fafc',
+                                                                            transform: 'translateY(-1px)',
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    <Box
                                                                         sx={{
-                                                                            bgcolor: isEsp ? '#f3e8ff' : '#e0f2fe',
-                                                                            color: isEsp ? '#6b21a8' : '#0369a1',
-                                                                            fontWeight: 700,
-                                                                            fontSize: '0.72rem',
-                                                                            border: `1px solid ${isEsp ? '#d8b4fe' : '#bae6fd'}`,
+                                                                            width: 20,
+                                                                            height: 20,
+                                                                            borderRadius: '50%',
+                                                                            bgcolor: preset.hex,
+                                                                            flexShrink: 0,
+                                                                            boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
                                                                         }}
                                                                     />
-                                                                )}
-                                                            </TableCell>
-                                                        )}
-                                                        <TableCell sx={{ fontWeight: 'bold', fontSize: '0.85rem' }}>
-                                                            {curso.nombre}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {curso.flyer ? (
-                                                                <Button
-                                                                    href={curso.flyer}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    size="small"
-                                                                    startIcon={<ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />}
-                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                    sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
+                                                                    <Typography
+                                                                        variant="caption"
+                                                                        sx={{
+                                                                            fontWeight: isSelected ? 800 : 600,
+                                                                            fontSize: '0.75rem',
+                                                                            lineHeight: 1.1,
+                                                                            color: (theme) =>
+                                                                                isSelected
+                                                                                    ? theme.palette.mode === 'dark'
+                                                                                        ? '#ffffff'
+                                                                                        : preset.hex
+                                                                                    : 'text.primary',
+                                                                        }}
+                                                                    >
+                                                                        {preset.name}
+                                                                    </Typography>
+                                                                </Box>
+                                                            </Grid>
+                                                        );
+                                                    })}
+                                                </Grid>
+                                            </Box>
+
+                                            {/* Previsualización en Vivo de la Ficha */}
+                                            <Box sx={{ mt: 1 }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1 }}>
+                                                    VISTA PREVIA EN CATÁLOGO:
+                                                </Typography>
+                                                <Paper
+                                                    variant="outlined"
+                                                    sx={{
+                                                        p: 2,
+                                                        borderRadius: 2,
+                                                        borderLeft: `5px solid ${data.color_hex || '#0c43a3'}`,
+                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#fafafa',
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                                            {data.nombre || 'Nombre del Comercio'}
+                                                        </Typography>
+                                                        <Chip
+                                                            label={data.sigla || 'SIGLA'}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: data.color_hex || '#0c43a3',
+                                                                color: '#ffffff',
+                                                                fontWeight: 800,
+                                                                fontSize: '0.68rem',
+                                                                height: 20,
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: '-webkit-box', WebKitLineClamp: 2, WebKitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                        {data.descripcion || 'Sin descripción registrada actualmente...'}
+                                                    </Typography>
+                                                </Paper>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                        )}
+
+                        {/* ========================================================================= */}
+                        {/* PESTAÑA 1: PRESENCIA DIGITAL Y MEDIOS MULTIMEDIA */}
+                        {/* ========================================================================= */}
+                        {currentTab === 1 && (
+                            <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
+                                {/* Subcard 1: Enlaces Oficiales y Plataformas */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%' }}>
+                                        <CardHeader
+                                            avatar={<LanguageIcon color="primary" />}
+                                            title="Portales y Accesos Oficiales"
+                                            subheader="Enlaces principales a la web institucional, aulas virtuales y catálogos"
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                            <TextField
+                                                label="Página Web Oficial (URL)"
+                                                value={data.pagina_web}
+                                                onChange={(e) => setData('pagina_web', e.target.value)}
+                                                placeholder="https://..."
+                                                error={!!errors.pagina_web}
+                                                helperText={errors.pagina_web || 'Portal web institucional principal'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.pagina_web ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Abrir enlace en nueva pestaña" arrow>
+                                                                    <IconButton href={data.pagina_web} target="_blank" size="small">
+                                                                        <LaunchIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Plataforma Virtual / Aula de Carrera (URL)"
+                                                value={data.plataforma_carrera}
+                                                onChange={(e) => setData('plataforma_carrera', e.target.value)}
+                                                placeholder="https://aula.comercio.edu.pe"
+                                                error={!!errors.plataforma_carrera}
+                                                helperText={errors.plataforma_carrera || 'Campus o aula virtual para estudiantes'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.plataforma_carrera ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Abrir aula virtual" arrow>
+                                                                    <IconButton href={data.plataforma_carrera} target="_blank" size="small">
+                                                                        <LaunchIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Catálogo Institucional (URL PDF)"
+                                                value={data.catalogo_url}
+                                                onChange={(e) => setData('catalogo_url', e.target.value)}
+                                                placeholder="https://.../catalogo-2026.pdf"
+                                                error={!!errors.catalogo_url}
+                                                helperText={errors.catalogo_url || 'Brochure o catálogo corporativo en PDF'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.catalogo_url ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver catálogo PDF" arrow>
+                                                                    <IconButton href={data.catalogo_url} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Promoción Vigente (Texto Informativo / Oferta)"
+                                                value={data.promocion_vigente}
+                                                onChange={(e) => setData('promocion_vigente', e.target.value)}
+                                                placeholder="Ej. Matrícula con 50% de descuento y certificación gratuita"
+                                                error={!!errors.promocion_vigente}
+                                                helperText={errors.promocion_vigente || 'Texto promocional destacado en el catálogo'}
+                                                fullWidth
+                                                size="small"
+                                            />
+
+                                            <TextField
+                                                label="Tutorial / ¿Cómo ingresar a la plataforma? (Video o Guía)"
+                                                value={data.como_ingresar_plataforma}
+                                                onChange={(e) => setData('como_ingresar_plataforma', e.target.value)}
+                                                placeholder="https://youtube.com/watch?v=..."
+                                                error={!!errors.como_ingresar_plataforma}
+                                                helperText={errors.como_ingresar_plataforma || 'Enlace directo al tutorial de acceso'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.como_ingresar_plataforma ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver tutorial" arrow>
+                                                                    <IconButton href={data.como_ingresar_plataforma} target="_blank" size="small">
+                                                                        <YouTubeIcon fontSize="small" color="error" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+
+                                {/* Subcard 2: Gestor de YouTube y Fotos */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                        {/* Gestor de Canales y Videos de YouTube */}
+                                        <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                            <CardHeader
+                                                avatar={<YouTubeIcon color="error" />}
+                                                title={`Canales y Videos de YouTube (${data.canales_youtube.length})`}
+                                                subheader="Registra enlaces directos a canales o videos promocionales"
+                                                titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                            />
+                                            <Divider />
+                                            <CardContent sx={{ p: 2.5 }}>
+                                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                                    <TextField
+                                                        size="small"
+                                                        placeholder="Pegar URL de YouTube..."
+                                                        value={nuevoYoutube}
+                                                        onChange={(e) => setNuevoYoutube(e.target.value)}
+                                                        fullWidth
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                handleAddYoutube();
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        variant="contained"
+                                                        size="small"
+                                                        onClick={handleAddYoutube}
+                                                        sx={{ minWidth: 44, px: 2, bgcolor: '#dc2626', '&:hover': { bgcolor: '#b91c1c' } }}
+                                                    >
+                                                        <AddIcon fontSize="small" />
+                                                    </Button>
+                                                </Box>
+
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxHeight: 180, overflowY: 'auto', pr: 0.5 }}>
+                                                    {data.canales_youtube.map((url, index) => (
+                                                        <Paper
+                                                            key={index}
+                                                            variant="outlined"
+                                                            sx={{
+                                                                p: 1,
+                                                                px: 1.5,
+                                                                borderRadius: 1.5,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'space-between',
+                                                                gap: 1,
+                                                                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#f8fafc',
+                                                                borderColor: 'divider',
+                                                            }}
+                                                        >
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                                                                <YouTubeIcon color="error" sx={{ fontSize: 18, flexShrink: 0 }} />
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{
+                                                                        fontSize: '0.78rem',
+                                                                        fontWeight: 600,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap',
+                                                                    }}
                                                                 >
-                                                                    Flyer
-                                                                </Button>
-                                                            ) : (
-                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {curso.brochure ? (
-                                                                <Button
-                                                                    href={curso.brochure}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    size="small"
-                                                                    startIcon={<DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />}
-                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                    sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
-                                                                >
-                                                                    Brochure
-                                                                </Button>
-                                                            ) : (
-                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {curso.youtube ? (
-                                                                <Button
-                                                                    href={curso.youtube}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    size="small"
-                                                                    startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                    sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600 }}
-                                                                >
-                                                                    YouTube
-                                                                </Button>
-                                                            ) : (
-                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {curso.precio ? (
-                                                                <Chip
-                                                                    label={curso.precio}
-                                                                    size="small"
-                                                                    variant="outlined"
-                                                                    color="primary"
-                                                                    sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
+                                                                    {url}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                                                                <IconButton href={url} target="_blank" size="small">
+                                                                    <LaunchIcon sx={{ fontSize: 16 }} />
+                                                                </IconButton>
+                                                                <IconButton size="small" color="error" onClick={() => handleRemoveYoutube(index)}>
+                                                                    <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                </IconButton>
+                                                            </Box>
+                                                        </Paper>
+                                                    ))}
+                                                    {data.canales_youtube.length === 0 && (
+                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 1 }}>
+                                                            No hay canales ni videos agregados.
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+
+                                        {/* Gestor de Fotos / Galería */}
+                                        <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                            <CardHeader
+                                                avatar={<PhotoLibraryIcon color="primary" />}
+                                                title={`Galería Fotográfica y Sedes (${data.fotos.length})`}
+                                                subheader="Imágenes de infraestructura, eventos y sedes institucionales"
+                                                titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                            />
+                                            <Divider />
+                                            <CardContent sx={{ p: 2.5 }}>
+                                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                                    <TextField
+                                                        size="small"
+                                                        placeholder="Pegar URL de Imagen / Foto..."
+                                                        value={nuevaFoto}
+                                                        onChange={(e) => setNuevaFoto(e.target.value)}
+                                                        fullWidth
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                handleAddFoto();
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        variant="contained"
+                                                        size="small"
+                                                        onClick={handleAddFoto}
+                                                        sx={{ minWidth: 44, px: 2 }}
+                                                    >
+                                                        <AddIcon fontSize="small" />
+                                                    </Button>
+                                                </Box>
+
+                                                {/* Cuadrícula de fotos con thumbnails */}
+                                                <Grid container spacing={1.5}>
+                                                    {data.fotos.map((url, index) => (
+                                                        <Grid size={{ xs: 6, sm: 4 }} key={index}>
+                                                            <Box
+                                                                sx={{
+                                                                    position: 'relative',
+                                                                    borderRadius: 2,
+                                                                    overflow: 'hidden',
+                                                                    border: '1px solid',
+                                                                    borderColor: 'divider',
+                                                                    height: 90,
+                                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f1f5f9',
+                                                                    '&:hover .photo-actions': { opacity: 1 },
+                                                                }}
+                                                            >
+                                                                <Box
+                                                                    component="img"
+                                                                    src={url}
+                                                                    alt={`Foto ${index + 1}`}
+                                                                    onError={(e: any) => {
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                    sx={{
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        objectFit: 'cover',
+                                                                    }}
                                                                 />
-                                                            ) : (
-                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {curso.actualizado_drive ? (
-                                                                <Button
-                                                                    href={curso.actualizado_drive}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    size="small"
-                                                                    startIcon={<CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />}
-                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                    sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2, fontWeight: 600, color: '#059669' }}
+                                                                {/* Acciones flotantes en hover */}
+                                                                <Box
+                                                                    className="photo-actions"
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        inset: 0,
+                                                                        bgcolor: 'rgba(0,0,0,0.5)',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        gap: 1,
+                                                                        opacity: { xs: 1, sm: 0 },
+                                                                        transition: 'opacity 0.2s',
+                                                                    }}
                                                                 >
-                                                                    Drive
-                                                                </Button>
-                                                            ) : (
-                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            ) : (
-                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: 'action.hover', borderRadius: 2 }}>
-                                    <MenuBookIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                                    <Typography variant="body2" color="text.secondary">
-                                        Este comercio aún no tiene cursos registrados.
-                                    </Typography>
-                                    <Link
-                                        href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`}
-                                        style={{ textDecoration: 'none' }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            startIcon={<AddIcon />}
-                                            sx={{ mt: 1.5, bgcolor: '#0c43a3', textTransform: 'none', fontWeight: 700 }}
-                                        >
-                                            Registrar Primer Curso
-                                        </Button>
-                                    </Link>
-                                </Paper>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => setPreviewImageUrl(url)}
+                                                                        sx={{ color: '#ffffff', bgcolor: 'rgba(255,255,255,0.2)' }}
+                                                                    >
+                                                                        <VisibilityIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => handleRemoveFoto(index)}
+                                                                        sx={{ color: '#ff6b6b', bgcolor: 'rgba(255,255,255,0.2)' }}
+                                                                    >
+                                                                        <DeleteIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Box>
+                                                            </Box>
+                                                        </Grid>
+                                                    ))}
+                                                    {data.fotos.length === 0 && (
+                                                        <Grid size={{ xs: 12 }}>
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', display: 'block', py: 1 }}>
+                                                                No se han añadido fotos a la galería.
+                                                            </Typography>
+                                                        </Grid>
+                                                    )}
+                                                </Grid>
+                                            </CardContent>
+                                        </Card>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        )}
 
-                {/* 4. SIN OFERTA EDUCATIVA/CURSOS (COMERCIOS CORPORATIVOS DIRECTOS) */}
-                {!isAcademic && !hasDiplomados && !hasCursos && (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                        <CardHeader
-                            avatar={<CheckCircleIcon color="primary" />}
-                            title="4. Oferta Formativa y Servicios"
-                            subheader="Información sobre la actividad comercial directa del comercio"
-                            titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
-                        />
-                        <Divider />
-                        <CardContent sx={{ p: 3 }}>
-                            <Paper variant="outlined" sx={{ p: 2.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <CheckCircleIcon color="action" />
-                                <Typography variant="body2" color="text.secondary">
-                                    Este comercio pertenece al rubro corporativo o de servicios comerciales directos y no cuenta con carreras ni cursos técnicos registrados.
-                                </Typography>
-                            </Paper>
-                        </CardContent>
-                    </Card>
-                )}
+                        {/* ========================================================================= */}
+                        {/* PESTAÑA 2: ACREDITACIÓN INSTITUCIONAL Y REGISTRO MINEDU */}
+                        {/* ========================================================================= */}
+                        {currentTab === 2 && (
+                            <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
+                                {/* Subcard 1: Resoluciones y Documentación Legal */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%' }}>
+                                        <CardHeader
+                                            avatar={<PictureAsPdfIcon color="primary" />}
+                                            title="Resoluciones y Documentos Oficiales"
+                                            subheader="Documentación de creación, revalidación ministerial y directiva"
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                            <TextField
+                                                label="Resolución de Creación (PDF / Documento)"
+                                                value={data.resolucion_creacion}
+                                                onChange={(e) => setData('resolucion_creacion', e.target.value)}
+                                                placeholder="https://.../resolucion-creacion.pdf"
+                                                error={!!errors.resolucion_creacion}
+                                                helperText={errors.resolucion_creacion || 'Resolución ministerial o directiva de fundación'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.resolucion_creacion ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver documento PDF" arrow>
+                                                                    <IconButton href={data.resolucion_creacion} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
 
-                {/* Barra Inferior de Guardado */}
+                                            <TextField
+                                                label="Resolución de Revalidación (PDF / Documento)"
+                                                value={data.resolucion_revalidacion}
+                                                onChange={(e) => setData('resolucion_revalidacion', e.target.value)}
+                                                placeholder="https://.../resolucion-revalidacion.pdf"
+                                                error={!!errors.resolucion_revalidacion}
+                                                helperText={errors.resolucion_revalidacion || 'Resolución de renovación o licenciamiento institucional'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.resolucion_revalidacion ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver documento PDF" arrow>
+                                                                    <IconButton href={data.resolucion_revalidacion} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="secondary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Certificado Digital / Acreditación (PDF)"
+                                                value={data.certificado_url}
+                                                onChange={(e) => setData('certificado_url', e.target.value)}
+                                                placeholder="https://.../certificado.pdf"
+                                                error={!!errors.certificado_url}
+                                                helperText={errors.certificado_url || 'Certificado oficial o acreditación de calidad'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.certificado_url ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver certificado" arrow>
+                                                                    <IconButton href={data.certificado_url} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Reconocimiento de Director (PDF / Documento)"
+                                                value={data.reconocimiento_director}
+                                                onChange={(e) => setData('reconocimiento_director', e.target.value)}
+                                                placeholder="https://.../reconocimiento-director.pdf"
+                                                error={!!errors.reconocimiento_director}
+                                                helperText={errors.reconocimiento_director || 'Documento de reconocimiento de dirección general'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.reconocimiento_director ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver reconocimiento" arrow>
+                                                                    <IconButton href={data.reconocimiento_director} target="_blank" size="small">
+                                                                        <WorkspacePremiumIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+
+                                {/* Subcard 2: ESCALE MINEDU y Convenios */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%' }}>
+                                        <CardHeader
+                                            avatar={<VerifiedUserIcon color="primary" />}
+                                            title="Registro ESCALE y Alianzas"
+                                            subheader="Padrón oficial del Ministerio de Educación y convenios interinstitucionales"
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                            <TextField
+                                                label="Código / Padrón ESCALE - MINEDU"
+                                                value={data.escale_minedu}
+                                                onChange={(e) => setData('escale_minedu', e.target.value)}
+                                                placeholder="https://escale.minedu.gob.pe/... o Código modular"
+                                                error={!!errors.escale_minedu}
+                                                helperText={errors.escale_minedu || 'Código modular o enlace al portal ESCALE'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.escale_minedu ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Consultar ESCALE" arrow>
+                                                                    <IconButton href={data.escale_minedu} target="_blank" size="small">
+                                                                        <LaunchIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Link Directo Consulta ESCALE"
+                                                value={data.link_directo_escale}
+                                                onChange={(e) => setData('link_directo_escale', e.target.value)}
+                                                placeholder="https://escale.minedu.gob.pe/padron-ce?..."
+                                                error={!!errors.link_directo_escale}
+                                                helperText={errors.link_directo_escale || 'URL con parámetros directos de búsqueda en ESCALE'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.link_directo_escale ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Abrir enlace directo ESCALE" arrow>
+                                                                    <IconButton href={data.link_directo_escale} target="_blank" size="small">
+                                                                        <LaunchIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Malla Curricular General (Brochure PDF)"
+                                                value={data.malla_curricular_url}
+                                                onChange={(e) => setData('malla_curricular_url', e.target.value)}
+                                                placeholder="https://.../malla-curricular.pdf"
+                                                error={!!errors.malla_curricular_url}
+                                                helperText={errors.malla_curricular_url || 'Brochure general del plan de estudios institucional'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.malla_curricular_url ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver malla curricular" arrow>
+                                                                    <IconButton href={data.malla_curricular_url} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Convenios Institucionales (Alianzas / Redes)"
+                                                value={data.convenio}
+                                                onChange={(e) => setData('convenio', e.target.value)}
+                                                placeholder="Convenios con universidades, empresas, colegios profesionales..."
+                                                error={!!errors.convenio}
+                                                helperText={errors.convenio || 'Alianzas estratégicas vigentes'}
+                                                fullWidth
+                                                size="small"
+                                            />
+
+                                            <TextField
+                                                label="Seminarios / Talleres Especiales (Enlace)"
+                                                value={data.seminario}
+                                                onChange={(e) => setData('seminario', e.target.value)}
+                                                placeholder="https://.../seminarios"
+                                                error={!!errors.seminario}
+                                                helperText={errors.seminario || 'Página o landing de conferencias y masterclasses'}
+                                                fullWidth
+                                                size="small"
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                        )}
+
+                        {/* ========================================================================= */}
+                        {/* PESTAÑA 3: OFERTA FORMATIVA (CARRERAS, DIPLOMADOS Y CURSOS) */}
+                        {/* ========================================================================= */}
+                        {currentTab === 3 && (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5, width: '100%', boxSizing: 'border-box' }}>
+                                {/* 1. CARRERAS PROFESIONALES ACADÉMICAS */}
+                                {isAcademic && (
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                        <CardHeader
+                                            avatar={<SchoolIcon color="primary" />}
+                                            title="1. Carreras Profesionales Registradas"
+                                            subheader={`Planes de estudio oficiales registrados para ${comercio.nombre}, junto con sus diplomados y cursos.`}
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                            action={
+                                                <Link
+                                                    href={`/${currentTeamSlug}/admin/carreras?comercio_id=${comercio.id}`}
+                                                    style={{ textDecoration: 'none' }}
+                                                >
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        startIcon={<SchoolIcon />}
+                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                                    >
+                                                        Administrar Carreras
+                                                    </Button>
+                                                </Link>
+                                            }
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3 }}>
+                                            {/* Buscador de Carreras */}
+                                            {totalCarreras > 2 && (
+                                                <Box sx={{ mb: 2.5 }}>
+                                                    <TextField
+                                                        size="small"
+                                                        placeholder="Buscar carrera por nombre o código..."
+                                                        value={searchCarrera}
+                                                        onChange={(e) => setSearchCarrera(e.target.value)}
+                                                        sx={{ maxWidth: 380 }}
+                                                        slotProps={{
+                                                            input: {
+                                                                startAdornment: (
+                                                                    <InputAdornment position="start">
+                                                                        <SearchIcon fontSize="small" color="action" />
+                                                                    </InputAdornment>
+                                                                ),
+                                                            },
+                                                        }}
+                                                    />
+                                                </Box>
+                                            )}
+
+                                            {filteredCarreras.length > 0 ? (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                    {filteredCarreras.map((carrera) => (
+                                                        <Accordion
+                                                            key={carrera.id}
+                                                            defaultExpanded
+                                                            variant="outlined"
+                                                            sx={{
+                                                                borderRadius: '12px !important',
+                                                                '&:before': { display: 'none' },
+                                                                overflow: 'hidden',
+                                                                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#152844' : '#fafafa',
+                                                            }}
+                                                        >
+                                                            <AccordionSummary
+                                                                expandIcon={<ExpandMoreIcon />}
+                                                                sx={{
+                                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#f1f5f9',
+                                                                    px: 2.5,
+                                                                    minHeight: 56,
+                                                                }}
+                                                            >
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2, flexWrap: 'wrap', gap: 1 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                        <SchoolIcon color="primary" sx={{ fontSize: 22 }} />
+                                                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                                                            {carrera.nombre}
+                                                                        </Typography>
+                                                                        {carrera.codigo && (
+                                                                            <Chip
+                                                                                label={carrera.codigo}
+                                                                                size="small"
+                                                                                sx={{ fontSize: '0.68rem', height: 20, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0', fontWeight: 800 }}
+                                                                            />
+                                                                        )}
+                                                                    </Box>
+
+                                                                    {/* Badges de documentos de carrera */}
+                                                                    <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                                                                        {carrera.url_malla_curricular && (
+                                                                            <Button
+                                                                                href={carrera.url_malla_curricular}
+                                                                                target="_blank"
+                                                                                size="small"
+                                                                                startIcon={<PictureAsPdfIcon fontSize="small" color="primary" />}
+                                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#ffffff', border: '1px solid', borderColor: 'divider', py: 0.2 }}
+                                                                            >
+                                                                                Malla
+                                                                            </Button>
+                                                                        )}
+                                                                        {carrera.url_declaracion_jurada && (
+                                                                            <Button
+                                                                                href={carrera.url_declaracion_jurada}
+                                                                                target="_blank"
+                                                                                size="small"
+                                                                                startIcon={<DescriptionIcon fontSize="small" color="secondary" />}
+                                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#ffffff', border: '1px solid', borderColor: 'divider', py: 0.2 }}
+                                                                            >
+                                                                                DJ
+                                                                            </Button>
+                                                                        )}
+                                                                        {carrera.modelo_certificado && (
+                                                                            <Button
+                                                                                href={carrera.modelo_certificado}
+                                                                                target="_blank"
+                                                                                size="small"
+                                                                                startIcon={<WorkspacePremiumIcon fontSize="small" color="success" />}
+                                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#ffffff', border: '1px solid', borderColor: 'divider', py: 0.2 }}
+                                                                            >
+                                                                                Certificado
+                                                                            </Button>
+                                                                        )}
+                                                                    </Box>
+                                                                </Box>
+                                                            </AccordionSummary>
+
+                                                            <AccordionDetails sx={{ p: 2.5, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#152844' : '#ffffff' }}>
+                                                                {/* Diplomados de la Carrera */}
+                                                                <Box sx={{ mb: 2.5 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                            <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
+                                                                            DIPLOMADOS DE LA CARRERA ({carrera.diplomados?.length || 0})
+                                                                        </Typography>
+                                                                        <Link href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
+                                                                                + Administrar Diplomados
+                                                                            </Typography>
+                                                                        </Link>
+                                                                    </Box>
+
+                                                                    {carrera.diplomados && carrera.diplomados.length > 0 ? (
+                                                                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5 }}>
+                                                                            <Table size="small">
+                                                                                <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
+                                                                                    <TableRow>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Flyer</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Brochure</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>YouTube</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85 }}>Precio</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Drive</TableCell>
+                                                                                    </TableRow>
+                                                                                </TableHead>
+                                                                                <TableBody>
+                                                                                    {carrera.diplomados.map((dip) => (
+                                                                                        <TableRow key={dip.id} hover>
+                                                                                            <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{dip.nombre}</TableCell>
+                                                                                            <TableCell>
+                                                                                                {dip.flyer ? (
+                                                                                                    <IconButton href={dip.flyer} target="_blank" size="small" color="primary">
+                                                                                                        <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {dip.brochure ? (
+                                                                                                    <IconButton href={dip.brochure} target="_blank" size="small" color="primary">
+                                                                                                        <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {dip.youtube ? (
+                                                                                                    <IconButton href={dip.youtube} target="_blank" size="small">
+                                                                                                        <YouTubeIcon fontSize="small" color="error" />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {dip.precio ? <Chip label={dip.precio} size="small" variant="outlined" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /> : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {dip.actualizado_drive ? (
+                                                                                                    <IconButton href={dip.actualizado_drive} target="_blank" size="small">
+                                                                                                        <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                        </TableRow>
+                                                                                    ))}
+                                                                                </TableBody>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    ) : (
+                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                                            Sin diplomados asociados.
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+
+                                                                {/* Cursos de la Carrera */}
+                                                                <Box>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                            <MenuBookIcon sx={{ fontSize: 16 }} />
+                                                                            CURSOS DE LA CARRERA ({carrera.cursos?.length || 0})
+                                                                        </Typography>
+                                                                        <Link href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                            <Typography variant="caption" sx={{ color: '#0f766e', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
+                                                                                + Administrar Cursos
+                                                                            </Typography>
+                                                                        </Link>
+                                                                    </Box>
+
+                                                                    {carrera.cursos && carrera.cursos.length > 0 ? (
+                                                                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5 }}>
+                                                                            <Table size="small">
+                                                                                <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
+                                                                                    <TableRow>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Flyer</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Brochure</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>YouTube</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85 }}>Precio</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Drive</TableCell>
+                                                                                    </TableRow>
+                                                                                </TableHead>
+                                                                                <TableBody>
+                                                                                    {carrera.cursos.map((cur) => (
+                                                                                        <TableRow key={cur.id} hover>
+                                                                                            <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{cur.nombre}</TableCell>
+                                                                                            <TableCell>
+                                                                                                {cur.flyer ? (
+                                                                                                    <IconButton href={cur.flyer} target="_blank" size="small">
+                                                                                                        <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {cur.brochure ? (
+                                                                                                    <IconButton href={cur.brochure} target="_blank" size="small">
+                                                                                                        <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {cur.youtube ? (
+                                                                                                    <IconButton href={cur.youtube} target="_blank" size="small">
+                                                                                                        <YouTubeIcon fontSize="small" color="error" />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {cur.precio ? <Chip label={cur.precio} size="small" variant="outlined" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /> : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                {cur.actualizado_drive ? (
+                                                                                                    <IconButton href={cur.actualizado_drive} target="_blank" size="small">
+                                                                                                        <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                                    </IconButton>
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
+                                                                                        </TableRow>
+                                                                                    ))}
+                                                                                </TableBody>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    ) : (
+                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                                            Sin cursos asociados.
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+                                                            </AccordionDetails>
+                                                        </Accordion>
+                                                    ))}
+                                                </Box>
+                                            ) : (
+                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <SchoolIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {searchCarrera ? 'No se encontraron carreras con ese criterio de búsqueda.' : 'No hay carreras registradas para este comercio.'}
+                                                    </Typography>
+                                                </Paper>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {/* 2. DIPLOMADOS INDEPENDIENTES / POR RUBRO */}
+                                {showStandaloneDiplomados && (
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                        <CardHeader
+                                            avatar={<WorkspacePremiumIcon color="primary" />}
+                                            title={isDiplomadoLibre ? "2. Diplomados Registrados (Libres / Sin Categoría)" : "2. Diplomados y Especializaciones por Rubro"}
+                                            subheader={`Oferta de diplomados registrados para ${comercio.nombre}`}
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                            action={
+                                                <Link
+                                                    href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`}
+                                                    style={{ textDecoration: 'none' }}
+                                                >
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        startIcon={<WorkspacePremiumIcon />}
+                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                                    >
+                                                        Administrar Diplomados
+                                                    </Button>
+                                                </Link>
+                                            }
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3 }}>
+                                            {/* Filtro y Buscador de Diplomados */}
+                                            <Box sx={{ display: 'flex', gap: 2, mb: 2.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                                                <TextField
+                                                    size="small"
+                                                    placeholder="Buscar diplomado..."
+                                                    value={searchDiplomado}
+                                                    onChange={(e) => setSearchDiplomado(e.target.value)}
+                                                    sx={{ minWidth: 260 }}
+                                                    slotProps={{
+                                                        input: {
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <SearchIcon fontSize="small" color="action" />
+                                                                </InputAdornment>
+                                                            ),
+                                                        },
+                                                    }}
+                                                />
+
+                                                {!isDiplomadoLibre && (
+                                                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                                                        <InputLabel id="filtro-dip-label">Filtrar por Rubro</InputLabel>
+                                                        <Select
+                                                            labelId="filtro-dip-label"
+                                                            value={filterDiplomadoTipo}
+                                                            label="Filtrar por Rubro"
+                                                            onChange={(e) => setFilterDiplomadoTipo(e.target.value)}
+                                                        >
+                                                            <MenuItem value="all">Todos los rubros</MenuItem>
+                                                            <MenuItem value="ambientales">Ambientales</MenuItem>
+                                                            <MenuItem value="calidad_isos">Calidad ISOs</MenuItem>
+                                                            <MenuItem value="mineros">Mineros</MenuItem>
+                                                            <MenuItem value="administracion">Administración</MenuItem>
+                                                            <MenuItem value="arquitectura_ingenieria">Arq. e Ingeniería</MenuItem>
+                                                            <MenuItem value="osha">OSHA</MenuItem>
+                                                            <MenuItem value="comercio_exterior">Comercio Exterior</MenuItem>
+                                                            <MenuItem value="rubro_legal">Rubro Legal</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                )}
+                                            </Box>
+
+                                            {filteredStandaloneDiplomados.length > 0 ? (
+                                                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+                                                    <Table size="small">
+                                                        <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
+                                                            <TableRow>
+                                                                {!isDiplomadoLibre && (
+                                                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 130 }}>Rubro / Tipo</TableCell>
+                                                                )}
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 220 }}>Nombre del Diplomado</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Flyer</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Brochure</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>YouTube</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Precio</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Drive</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {filteredStandaloneDiplomados.map((dip) => (
+                                                                <TableRow key={dip.id} hover>
+                                                                    {!isDiplomadoLibre && (
+                                                                        <TableCell>{getDiplomadoChip(dip.tipo)}</TableCell>
+                                                                    )}
+                                                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{dip.nombre}</TableCell>
+                                                                    <TableCell>
+                                                                        {dip.flyer ? (
+                                                                            <IconButton href={dip.flyer} target="_blank" size="small">
+                                                                                <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                            </IconButton>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {dip.brochure ? (
+                                                                            <IconButton href={dip.brochure} target="_blank" size="small">
+                                                                                <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                            </IconButton>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {dip.youtube ? (
+                                                                            <IconButton href={dip.youtube} target="_blank" size="small">
+                                                                                <YouTubeIcon fontSize="small" color="error" />
+                                                                            </IconButton>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {dip.precio ? <Chip label={dip.precio} size="small" variant="outlined" color="primary" sx={{ height: 22, fontWeight: 700 }} /> : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {dip.actualizado_drive ? (
+                                                                            <IconButton href={dip.actualizado_drive} target="_blank" size="small">
+                                                                                <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                            </IconButton>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            ) : (
+                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <WorkspacePremiumIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        No se encontraron diplomados registrados.
+                                                    </Typography>
+                                                </Paper>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {/* 3. CURSOS INDEPENDIENTES */}
+                                {showStandaloneCursos && (
+                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                        <CardHeader
+                                            avatar={<MenuBookIcon color="primary" />}
+                                            title="3. Cursos y Talleres Registrados"
+                                            subheader={`Oferta de cursos independientes para ${comercio.nombre}`}
+                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                            action={
+                                                <Link
+                                                    href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`}
+                                                    style={{ textDecoration: 'none' }}
+                                                >
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        startIcon={<MenuBookIcon />}
+                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                                    >
+                                                        Administrar Cursos
+                                                    </Button>
+                                                </Link>
+                                            }
+                                        />
+                                        <Divider />
+                                        <CardContent sx={{ p: 3 }}>
+                                            {/* Buscador y filtro de Cursos */}
+                                            <Box sx={{ display: 'flex', gap: 2, mb: 2.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                                                <TextField
+                                                    size="small"
+                                                    placeholder="Buscar curso..."
+                                                    value={searchCurso}
+                                                    onChange={(e) => setSearchCurso(e.target.value)}
+                                                    sx={{ minWidth: 260 }}
+                                                    slotProps={{
+                                                        input: {
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <SearchIcon fontSize="small" color="action" />
+                                                                </InputAdornment>
+                                                            ),
+                                                        },
+                                                    }}
+                                                />
+
+                                                {!isMatpel && (
+                                                    <FormControl size="small" sx={{ minWidth: 180 }}>
+                                                        <InputLabel id="filtro-cur-label">Tipo de Curso</InputLabel>
+                                                        <Select
+                                                            labelId="filtro-cur-label"
+                                                            value={filterCursoTipo}
+                                                            label="Tipo de Curso"
+                                                            onChange={(e) => setFilterCursoTipo(e.target.value)}
+                                                        >
+                                                            <MenuItem value="all">Todos los tipos</MenuItem>
+                                                            <MenuItem value="especializado">Especializado</MenuItem>
+                                                            <MenuItem value="tradicional">Tradicional</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                )}
+                                            </Box>
+
+                                            {filteredStandaloneCursos.length > 0 ? (
+                                                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+                                                    <Table size="small">
+                                                        <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
+                                                            <TableRow>
+                                                                {!isMatpel && (
+                                                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 130 }}>Tipo</TableCell>
+                                                                )}
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 220 }}>Nombre del Curso</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Flyer</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Brochure</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>YouTube</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Precio</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Drive</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {filteredStandaloneCursos.map((curso) => {
+                                                                const isEsp = curso.tipo === 'especializado';
+                                                                return (
+                                                                    <TableRow key={curso.id} hover>
+                                                                        {!isMatpel && (
+                                                                            <TableCell>
+                                                                                <Chip
+                                                                                    label={isEsp ? 'Especializado' : 'Tradicional'}
+                                                                                    size="small"
+                                                                                    sx={{
+                                                                                        bgcolor: isEsp ? '#f3e8ff' : '#e0f2fe',
+                                                                                        color: isEsp ? '#6b21a8' : '#0369a1',
+                                                                                        fontWeight: 700,
+                                                                                        fontSize: '0.7rem',
+                                                                                        height: 20,
+                                                                                    }}
+                                                                                />
+                                                                            </TableCell>
+                                                                        )}
+                                                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{curso.nombre}</TableCell>
+                                                                        <TableCell>
+                                                                            {curso.flyer ? (
+                                                                                <IconButton href={curso.flyer} target="_blank" size="small">
+                                                                                    <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                </IconButton>
+                                                                            ) : '-'}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {curso.brochure ? (
+                                                                                <IconButton href={curso.brochure} target="_blank" size="small">
+                                                                                    <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                </IconButton>
+                                                                            ) : '-'}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {curso.youtube ? (
+                                                                                <IconButton href={curso.youtube} target="_blank" size="small">
+                                                                                    <YouTubeIcon fontSize="small" color="error" />
+                                                                                </IconButton>
+                                                                            ) : '-'}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {curso.precio ? <Chip label={curso.precio} size="small" variant="outlined" color="primary" sx={{ height: 22, fontWeight: 700 }} /> : '-'}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {curso.actualizado_drive ? (
+                                                                                <IconButton href={curso.actualizado_drive} target="_blank" size="small">
+                                                                                    <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                </IconButton>
+                                                                            ) : '-'}
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                );
+                                                            })}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            ) : (
+                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <MenuBookIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        No se encontraron cursos registrados.
+                                                    </Typography>
+                                                </Paper>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {/* 4. SIN OFERTA EDUCATIVA/CURSOS (COMERCIOS CORPORATIVOS DIRECTOS) */}
+                                {!isAcademic && !hasDiplomados && !hasCursos && (
+                                    <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2.5 }}>
+                                        <CheckCircleIcon color="action" sx={{ fontSize: 44, mb: 1, color: '#94a3b8' }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
+                                            Comercio de Rubro Corporativo / Comercial Directo
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto' }}>
+                                            Este comercio no cuenta con programas académicos, carreras ni cursos técnicos registrados en el sistema.
+                                        </Typography>
+                                    </Paper>
+                                )}
+                            </Box>
+                        )}
+                    </Box>
+                </Paper>
+
+                {/* BARRA INFERIOR FLOTANTE DE GUARDADO */}
                 <Paper
-                    variant="outlined"
+                    elevation={3}
                     sx={{
-                        p: 2.5,
+                        p: 2,
+                        px: 3,
                         borderRadius: 3,
                         bgcolor: 'background.paper',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'flex-end',
+                        justifyContent: 'space-between',
                         gap: 2,
                         position: 'sticky',
                         bottom: 16,
                         boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                        border: '1px solid',
+                        borderColor: 'divider',
                         zIndex: 10,
+                        width: '100%',
+                        boxSizing: 'border-box',
                     }}
                 >
-                    <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
-                        <Button variant="outlined" color="inherit" sx={{ textTransform: 'none', fontWeight: 600, px: 2.5 }}>
-                            Cancelar
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            Modificando: <strong>{data.nombre || comercio.nombre}</strong>
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
+                            <Button variant="outlined" color="inherit" sx={{ textTransform: 'none', fontWeight: 600, px: 2.5, borderRadius: 2 }}>
+                                Cancelar
+                            </Button>
+                        </Link>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={processing}
+                            startIcon={processing ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />}
+                            sx={{
+                                bgcolor: data.color_hex || '#0c43a3',
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                px: 3.5,
+                                py: 1,
+                                borderRadius: 2,
+                                '&:hover': { filter: 'brightness(0.92)' },
+                            }}
+                        >
+                            {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
-                    </Link>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        disabled={processing}
-                        startIcon={processing ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />}
-                        sx={{
-                            bgcolor: '#0c43a3',
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            px: 3.5,
-                            py: 1,
-                            borderRadius: 2,
-                            '&:hover': { bgcolor: '#152844' },
-                        }}
-                    >
-                        Guardar Cambios
-                    </Button>
+                    </Box>
                 </Paper>
             </Box>
+
+            {/* DIÁLOGO MODAL PARA PREVISUALIZACIÓN DE FOTOS */}
+            <Dialog
+                open={Boolean(previewImageUrl)}
+                onClose={() => setPreviewImageUrl(null)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        Vista Previa de Imagen
+                    </Typography>
+                    <IconButton size="small" onClick={() => setPreviewImageUrl(null)}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 2, textAlign: 'center', bgcolor: '#0f172a' }}>
+                    {previewImageUrl && (
+                        <Box
+                            component="img"
+                            src={previewImageUrl}
+                            alt="Previsualización"
+                            sx={{
+                                maxWidth: '100%',
+                                maxHeight: '70vh',
+                                objectFit: 'contain',
+                                borderRadius: 1.5,
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
@@ -1830,7 +2157,7 @@ EditComercioPage.layout = (props: { currentTeam?: { slug: string } | null; comer
     return {
         breadcrumbs: [
             {
-                title: 'Dashboard',
+                title: 'Panel Principal',
                 href: dashboard(teamSlug),
             },
             {

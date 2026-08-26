@@ -1,58 +1,50 @@
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DomainIcon from '@mui/icons-material/Domain';
 import EditIcon from '@mui/icons-material/Edit';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
-import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import YouTubeIcon from '@mui/icons-material/YouTube';
 import {
+    Avatar,
     Box,
-    Grid,
-    Card,
-    CardContent,
-    Typography,
     Button,
-    IconButton,
     Chip,
-    TextField,
+    FormControl,
+    Grid,
+    IconButton,
     InputAdornment,
+    InputLabel,
+    MenuItem,
     Paper,
+    Popover,
+    Select,
     Table,
+    TableBody,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
-    TableCell,
-    TableBody,
-    TableContainer,
-    ToggleButtonGroup,
+    TextField,
     ToggleButton,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
+    ToggleButtonGroup,
     Tooltip,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Popover,
+    Typography,
 } from '@mui/material';
 import { useState } from 'react';
 import { CarreraDialog } from '@/components/admin/carrera-dialog';
 import { ComercioDialog } from '@/components/admin/comercio-dialog';
-import { DeleteConfirmDialog } from '@/components/admin/delete-confirm-dialog';
+import { useNotification } from '@/hooks/use-notification';
+import { confirmDeleteAlert, showSuccessToast } from '@/lib/swal';
 import { dashboard } from '@/routes';
 import type { Comercio, Grupo } from '@/types';
 
@@ -65,10 +57,11 @@ interface Props {
     };
 }
 
-export default function ComerciosIndex({ comercios = [], grupos = [], filters }: Props) {
+export default function ComerciosIndex({ comercios = [], grupos = [], filters = {} }: Props) {
     const page = usePage();
     const currentTeam = page.props.currentTeam as { slug: string } | undefined;
     const currentTeamSlug = currentTeam?.slug || 'default';
+    const { notify } = useNotification();
 
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
     const [selectedGrupoFilter, setSelectedGrupoFilter] = useState<string>(
@@ -83,15 +76,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
     // Dialog state for Quick Add Carrera
     const [carreraDialogOpen, setCarreraDialogOpen] = useState(false);
     const [quickComercioId, setQuickComercioId] = useState<number | null>(null);
-
-    // Dialog state for Detail / Preview
-    const [detailModalOpen, setDetailModalOpen] = useState(false);
-    const [previewComercio, setPreviewComercio] = useState<Comercio | null>(null);
-
-    // Dialog state for Delete
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [comercioToDelete, setComercioToDelete] = useState<Comercio | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
 
     // Popover state for Detail View
     const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -108,25 +92,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
     };
 
     const isPopoverOpen = Boolean(popoverAnchor);
-
-    const isComercioConCarreras = (c?: Comercio | null) => {
-        if (!c) return false;
-        const slug = c.slug?.toLowerCase() || '';
-        const codigo = c.codigo?.toUpperCase() || '';
-        const sigla = c.sigla?.toUpperCase() || '';
-        const nombre = c.nombre?.toUpperCase() || '';
-        return (
-            slug === 'istp-sis' ||
-            slug === 'istp-avanti' ||
-            codigo === 'SIS' ||
-            codigo === 'AVANTI' ||
-            sigla === 'AVANTI' ||
-            sigla === 'SIS' ||
-            nombre.includes('AVANTI') ||
-            nombre.includes('SIS') ||
-            (c.carreras_count !== undefined && c.carreras_count > 0)
-        );
-    };
 
     const handleFilterChange = (grupoId: string) => {
         setSelectedGrupoFilter(grupoId);
@@ -152,6 +117,17 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
         );
     };
 
+    const handleClearSearch = () => {
+        setSearch('');
+        router.get(
+            `/${currentTeamSlug}/admin/comercios`,
+            {
+                grupo_id: selectedGrupoFilter === 'all' ? undefined : selectedGrupoFilter,
+            },
+            { preserveState: true, replace: true }
+        );
+    };
+
     const handleCreate = () => {
         setSelectedComercio(null);
         setDialogOpen(true);
@@ -162,90 +138,175 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
         setDialogOpen(true);
     };
 
-    const handleViewDetail = (comercio: Comercio) => {
-        setPreviewComercio(comercio);
-        setDetailModalOpen(true);
-    };
-
-    const handleQuickAddCarrera = (comercio: Comercio) => {
-        setQuickComercioId(comercio.id);
-        setCarreraDialogOpen(true);
-    };
-
-    const handleDeletePrompt = (comercio: Comercio) => {
-        setComercioToDelete(comercio);
-        setDeleteDialogOpen(true);
-    };
-
-    const confirmDelete = () => {
-        if (!comercioToDelete) {
-            return;
-        }
-
-        setIsDeleting(true);
-
-        router.delete(`/${currentTeamSlug}/admin/comercios/${comercioToDelete.id}`, {
-            preserveScroll: true,
-            onFinish: () => {
-                setIsDeleting(false);
-                setDeleteDialogOpen(false);
-                setComercioToDelete(null);
-            },
+    const handleDeletePrompt = async (comercio: Comercio) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar comercio "${comercio.nombre}"?`,
+            text: 'Esta acción eliminará permanentemente el comercio y todos sus programas vinculados.',
+            confirmButtonText: 'Sí, eliminar comercio',
         });
+
+        if (confirmed) {
+            router.delete(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    notify.success(`Comercio "${comercio.nombre}" eliminado exitosamente.`);
+                },
+                onError: () => {
+                    notify.error('No se pudo eliminar el comercio.');
+                },
+            });
+        }
     };
 
     return (
         <>
             <Head title="Comercios e Institutos - Grupo Capsur" />
 
-            <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Header */}
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
-                    <Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 500 }}>
-                            <StorefrontIcon fontSize="small" />
-                            <span>Catálogo Capsur</span>
-                        </Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 0.5 }}>
-                            Comercios e Institutos
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Matriz de acreditaciones oficiales MINEDU, resoluciones y plataformas por comercio.
-                        </Typography>
+            <Box
+                sx={{
+                    p: { xs: 2, sm: 3, md: 4 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2.5,
+                    width: '100%',
+                    boxSizing: 'border-box',
+                }}
+            >
+                {/* CABECERA PRINCIPAL UNIFICADA */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                : '0 2px 10px rgba(0,0,0,0.03)',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: 'space-between',
+                            gap: 2,
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                            <Avatar
+                                sx={{
+                                    bgcolor: 'primary.main',
+                                    color: '#ffffff',
+                                    width: 42,
+                                    height: 42,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
+                                }}
+                            >
+                                <StorefrontIcon fontSize="small" />
+                            </Avatar>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                        }}
+                                    >
+                                        Comercios e Institutos
+                                    </Typography>
+                                    <Chip
+                                        label={`${comercios.length} MARCAS`}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                    : 'rgba(12, 67, 163, 0.08)',
+                                            color: 'primary.main',
+                                            fontWeight: 800,
+                                            fontSize: '0.68rem',
+                                            height: 20,
+                                            borderRadius: 1,
+                                            border: '1px solid',
+                                            borderColor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.4)'
+                                                    : 'rgba(12, 67, 163, 0.2)',
+                                        }}
+                                    />
+                                </Box>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2, fontSize: '0.82rem' }}>
+                                    Gestión centralizada de marcas comerciales, institutos, acreditaciones MINEDU y plataformas.
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                            <ToggleButtonGroup
+                                value={viewMode}
+                                exclusive
+                                onChange={(_, val) => val && setViewMode(val)}
+                                size="small"
+                                sx={{ bgcolor: 'background.paper' }}
+                            >
+                                <ToggleButton value="table" sx={{ px: 1.5, py: 0.5, fontWeight: 700, fontSize: '0.76rem', borderRadius: '4px 0 0 4px !important' }}>
+                                    <TableChartIcon fontSize="small" sx={{ mr: 0.6 }} />
+                                    Tabla
+                                </ToggleButton>
+                                <ToggleButton value="grid" sx={{ px: 1.5, py: 0.5, fontWeight: 700, fontSize: '0.76rem', borderRadius: '0 4px 4px 0 !important' }}>
+                                    <ViewModuleIcon fontSize="small" sx={{ mr: 0.6 }} />
+                                    Tarjetas
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<AddIcon />}
+                                onClick={handleCreate}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    px: 2.5,
+                                    py: 0.8,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
+                                }}
+                            >
+                                Nuevo Comercio
+                            </Button>
+                        </Box>
                     </Box>
+                </Paper>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <ToggleButtonGroup
-                            value={viewMode}
-                            exclusive
-                            onChange={(_, val) => val && setViewMode(val)}
-                            size="small"
-                        >
-                            <ToggleButton value="table">
-                                <TableChartIcon fontSize="small" sx={{ mr: { sm: 0.5 } }} />
-                                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Matriz</Box>
-                            </ToggleButton>
-                            <ToggleButton value="grid">
-                                <ViewModuleIcon fontSize="small" sx={{ mr: { sm: 0.5 } }} />
-                                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Tarjetas</Box>
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleCreate}
-                            sx={{ px: 2.5, py: 0.8 }}
-                        >
-                            Nuevo Comercio
-                        </Button>
-                    </Box>
-                </Box>
-
-                {/* Filters Toolbar */}
-                <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
-                    <Box component="form" onSubmit={handleSearchSubmit} sx={{ flex: 1, maxWidth: 450 }}>
+                {/* BARRA DE HERRAMIENTAS */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 1.8,
+                        borderRadius: 1.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'stretch', sm: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}
+                >
+                    <Box component="form" onSubmit={handleSearchSubmit} sx={{ flex: 1, maxWidth: { xs: '100%', sm: 420 } }}>
                         <TextField
                             placeholder="Buscar por nombre, código, sigla o resolución..."
                             value={search}
@@ -259,12 +320,19 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                                             <SearchIcon fontSize="small" color="action" />
                                         </InputAdornment>
                                     ),
+                                    endAdornment: search ? (
+                                        <InputAdornment position="end">
+                                            <IconButton size="small" onClick={handleClearSearch}>
+                                                <ClearIcon fontSize="small" />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ) : null,
                                 },
                             }}
                         />
                     </Box>
 
-                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                    <FormControl size="small" sx={{ minWidth: 220 }}>
                         <InputLabel id="filtro-grupo-label">Filtrar por Grupo</InputLabel>
                         <Select
                             labelId="filtro-grupo-label"
@@ -282,28 +350,49 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                     </FormControl>
                 </Paper>
 
-                {/* TABLE VIEW: CLEAN MATRIX TABLE WITH POPOVER FOR FULL ATTRIBUTES */}
+                {/* VISTA DE TABLA CRUD */}
                 {viewMode === 'table' && (
-                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden' }}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow sx={{ bgcolor: '#152844' }}>
-                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.5, minWidth: 160 }}>
-                                        COMERCIO
+                    <TableContainer
+                        component={Paper}
+                        elevation={0}
+                        sx={{
+                            borderRadius: 1.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
+                            overflow: 'hidden',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                        }}
+                    >
+                        <Table>
+                            <TableHead
+                                sx={{
+                                    bgcolor: (theme) =>
+                                        theme.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.04)'
+                                            : '#f8fafc',
+                                    borderBottom: '2px solid',
+                                    borderColor: 'divider',
+                                }}
+                            >
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 220, py: 1.5 }}>
+                                        COMERCIO / INSTITUTO
                                     </TableCell>
-                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 140 }}>
-                                        GRUPO
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 150 }}>
+                                        GRUPO CORPORATIVO
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 90 }}>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 110, textAlign: 'center' }}>
                                         SIGLA
                                     </TableCell>
-                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 130 }}>
-                                        CERTIFICADO
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 180 }}>
+                                        ACREDITACIÓN & PLATAFORMA
                                     </TableCell>
-                                    <TableCell sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 130 }}>
-                                        PAGINA WEB
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 120, textAlign: 'center' }}>
+                                        PROGRAMAS
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', minWidth: 160 }}>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 150, textAlign: 'right' }}>
                                         ACCIONES
                                     </TableCell>
                                 </TableRow>
@@ -311,8 +400,34 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                             <TableBody>
                                 {comercios.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                                            No se encontraron comercios registrados.
+                                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
+                                            <StorefrontIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                                No se encontraron comercios registrados
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
+                                                {search || selectedGrupoFilter !== 'all'
+                                                    ? 'No hay comercios que coincidan con los filtros aplicados.'
+                                                    : 'Aún no se han registrado comercios.'}
+                                            </Typography>
+                                            {search || selectedGrupoFilter !== 'all' ? (
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    startIcon={<ClearIcon />}
+                                                    onClick={() => {
+                                                        setSearch('');
+                                                        handleFilterChange('all');
+                                                    }}
+                                                    sx={{ borderRadius: 1 }}
+                                                >
+                                                    Limpiar filtros
+                                                </Button>
+                                            ) : (
+                                                <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={handleCreate} sx={{ borderRadius: 1 }}>
+                                                    Registrar Comercio
+                                                </Button>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
@@ -323,103 +438,195 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                                             <TableRow
                                                 key={comercio.id}
                                                 hover
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                sx={{
+                                                    transition: 'background-color 0.15s ease',
+                                                    '&:hover': { bgcolor: 'action.hover' },
+                                                }}
                                             >
-                                                {/* COMERCIO */}
+                                                {/* Columna 1: Comercio & Sigla */}
+                                                <TableCell sx={{ py: 1.8 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                                                        <Avatar
+                                                            sx={{
+                                                                bgcolor: brandColor,
+                                                                color: '#ffffff',
+                                                                fontWeight: 900,
+                                                                fontSize: '0.8rem',
+                                                                width: 38,
+                                                                height: 38,
+                                                                borderRadius: 1,
+                                                                boxShadow: `0 2px 6px ${brandColor}25`,
+                                                            }}
+                                                        >
+                                                            {(comercio.sigla || comercio.nombre.substring(0, 3)).substring(0, 3).toUpperCase()}
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.92rem' }}>
+                                                                {comercio.nombre}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="caption"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    display: 'block',
+                                                                    mt: 0.1,
+                                                                    maxWidth: 300,
+                                                                    lineHeight: 1.35,
+                                                                }}
+                                                            >
+                                                                {comercio.descripcion || 'Sin descripción corporativa.'}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                </TableCell>
+
+                                                {/* Columna 2: Grupo */}
                                                 <TableCell>
-                                                    <Chip
-                                                        label={comercio.nombre}
-                                                        size="small"
+                                                    {comercio.grupo ? (
+                                                        <Chip
+                                                            icon={<DomainIcon sx={{ fontSize: '13px !important' }} />}
+                                                            label={comercio.grupo.nombre}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24, borderRadius: 0.8 }}
+                                                        />
+                                                    ) : (
+                                                        <Typography variant="caption" color="text.disabled">-</Typography>
+                                                    )}
+                                                </TableCell>
+
+                                                {/* Columna 3: Sigla */}
+                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                    <Typography
+                                                        variant="caption"
                                                         sx={{
-                                                            bgcolor: brandColor,
-                                                            color: '#ffffff',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '0.75rem',
-                                                            textTransform: 'uppercase',
-                                                            width: 'fit-content',
+                                                            fontFamily: 'monospace',
+                                                            bgcolor: 'action.hover',
+                                                            px: 1,
+                                                            py: 0.3,
+                                                            borderRadius: 0.8,
+                                                            fontWeight: 800,
+                                                            fontSize: '0.74rem',
+                                                            color: 'text.primary',
+                                                            border: '1px solid',
+                                                            borderColor: 'divider',
                                                         }}
+                                                    >
+                                                        {comercio.sigla || comercio.codigo || '-'}
+                                                    </Typography>
+                                                </TableCell>
+
+                                                {/* Columna 4: Acreditación & Plataformas */}
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, alignItems: 'center' }}>
+                                                        {comercio.pagina_web && (
+                                                            <Button
+                                                                href={comercio.pagina_web}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                size="small"
+                                                                variant="outlined"
+                                                                startIcon={<LanguageIcon sx={{ fontSize: 13 }} />}
+                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                            >
+                                                                Web
+                                                            </Button>
+                                                        )}
+                                                        {comercio.certificado_url && (
+                                                            <Button
+                                                                href={comercio.certificado_url}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                startIcon={<PictureAsPdfIcon sx={{ fontSize: 13 }} />}
+                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
+                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
+                                                            >
+                                                                Certificado
+                                                            </Button>
+                                                        )}
+                                                        {comercio.resolucion_revalidacion && (
+                                                            <Chip
+                                                                label={comercio.resolucion_revalidacion}
+                                                                size="small"
+                                                                sx={{
+                                                                    bgcolor: (theme) =>
+                                                                        theme.palette.mode === 'dark'
+                                                                            ? 'rgba(255, 255, 255, 0.06)'
+                                                                            : 'rgba(0, 0, 0, 0.04)',
+                                                                    fontSize: '0.68rem',
+                                                                    height: 20,
+                                                                    borderRadius: 0.8,
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+
+                                                {/* Columna 5: Programas */}
+                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                    <Chip
+                                                        icon={<SchoolIcon sx={{ fontSize: '13px !important' }} />}
+                                                        label={`${comercio.carreras_count || 0}`}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 700, fontSize: '0.72rem', height: 22, borderRadius: 0.8 }}
                                                     />
                                                 </TableCell>
 
-                                                {/* GRUPO */}
-                                                <TableCell>
-                                                    {comercio.grupo ? (
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                fontWeight: 600,
-                                                                color: 'text.primary',
-                                                                display: 'inline-flex',
-                                                                alignItems: 'center',
-                                                                gap: 0.8,
-                                                            }}
-                                                        >
-                                                            <DomainIcon fontSize="small" sx={{ color: 'text.secondary', fontSize: '16px' }} />
-                                                            {comercio.grupo.nombre}
-                                                        </Typography>
-                                                    ) : (
-                                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
+                                                {/* Columna 6: Acciones */}
+                                                <TableCell sx={{ textAlign: 'right' }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
+                                                        <Tooltip title="Ficha Técnica Completa" arrow>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => handleOpenPopover(e, comercio)}
+                                                                sx={{
+                                                                    border: '1px solid',
+                                                                    borderColor: 'divider',
+                                                                    borderRadius: 1,
+                                                                    '&:hover': { bgcolor: 'action.hover' },
+                                                                }}
+                                                            >
+                                                                <InfoOutlinedIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
 
-                                                {/* SIGLA */}
-                                                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                                    {comercio.sigla || comercio.codigo || '-'}
-                                                </TableCell>
-
-                                                {/* CERTIFICADO */}
-                                                <TableCell>
-                                                    {comercio.certificado_url ? (
-                                                        <Button
-                                                            href={comercio.certificado_url}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<PictureAsPdfIcon fontSize="inherit" color="primary" />}
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 'bold' }}
-                                                        >
-                                                            Certificado
-                                                        </Button>
-                                                    ) : (
-                                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
-
-                                                {/* PAGINA WEB */}
-                                                <TableCell>
-                                                    {comercio.pagina_web ? (
-                                                        <Button
-                                                            href={comercio.pagina_web}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<LanguageIcon fontSize="inherit" color="info" />}
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ fontSize: '0.75rem', p: 0.5, textTransform: 'none', fontWeight: 'bold' }}
-                                                        >
-                                                            PaginaWeb
-                                                        </Button>
-                                                    ) : (
-                                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
-
-                                                {/* ACCIONES */}
-                                                <TableCell align="center">
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                                                        <Tooltip title="Editar Comercio">
+                                                        <Tooltip title="Editar Ficha de Comercio" arrow>
                                                             <Link
                                                                 href={`/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`}
-                                                                style={{ color: 'inherit', display: 'inline-flex' }}
+                                                                style={{ textDecoration: 'none' }}
                                                             >
-                                                                <IconButton size="small">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    sx={{
+                                                                        border: '1px solid',
+                                                                        borderColor: 'divider',
+                                                                        borderRadius: 1,
+                                                                        '&:hover': { bgcolor: 'action.hover' },
+                                                                    }}
+                                                                >
                                                                     <EditIcon fontSize="small" />
                                                                 </IconButton>
                                                             </Link>
                                                         </Tooltip>
-                                                        <Tooltip title="Eliminar Comercio">
-                                                            <IconButton size="small" color="error" onClick={() => handleDeletePrompt(comercio)}>
+
+                                                        <Tooltip title="Eliminar Comercio" arrow>
+                                                            <IconButton
+                                                                size="small"
+                                                                color="error"
+                                                                onClick={() => handleDeletePrompt(comercio)}
+                                                                sx={{
+                                                                    border: '1px solid',
+                                                                    borderColor: 'divider',
+                                                                    borderRadius: 1,
+                                                                    '&:hover': { bgcolor: 'error.lighter' },
+                                                                }}
+                                                            >
                                                                 <DeleteIcon fontSize="small" />
                                                             </IconButton>
                                                         </Tooltip>
@@ -431,1008 +638,196 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                                 )}
                             </TableBody>
                         </Table>
-                    </TableContainer>
-                )}
 
-                {/* GRID VIEW */}
-                {viewMode === 'grid' && (
-                    <Grid container spacing={2.5}>
-                        {comercios.length === 0 ? (
-                            <Grid size={{ xs: 12 }}>
-                                <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderStyle: 'dashed' }}>
-                                    <StorefrontIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        No se encontraron comercios
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                        No hay comercios que coincidan con los filtros aplicados.
-                                    </Typography>
-                                    <Button variant="outlined" startIcon={<AddIcon />} onClick={handleCreate}>
-                                        Registrar Comercio
-                                    </Button>
-                                </Paper>
-                            </Grid>
-                        ) : (
-                            comercios.map((comercio) => {
-                                const brandColor = comercio.color_hex || '#1d4ed8';
-
-                                return (
-                                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={comercio.id}>
-                                        <Card
-                                            variant="outlined"
-                                            sx={{
-                                                height: '100%',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                justifyContent: 'space-between',
-                                                borderRadius: 2.5,
-                                                overflow: 'hidden',
-                                                borderTop: `4px solid ${brandColor}`,
-                                                transition: 'all 0.2s ease',
-                                                '&:hover': {
-                                                    boxShadow: '0 8px 24px rgba(0,0,0,0.09)',
-                                                    transform: 'translateY(-2px)',
-                                                },
-                                            }}
-                                        >
-                                            <CardContent sx={{ p: 2.5 }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                                                    <Box>
-                                                        <Chip
-                                                            label={comercio.nombre}
-                                                            size="small"
-                                                            sx={{
-                                                                bgcolor: brandColor,
-                                                                color: '#ffffff',
-                                                                fontWeight: 'bold',
-                                                                fontSize: '0.75rem',
-                                                                textTransform: 'uppercase',
-                                                                mb: 0.5,
-                                                            }}
-                                                        />
-                                                        {comercio.sigla && (
-                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 'bold' }}>
-                                                                SIGLA: {comercio.sigla}
-                                                            </Typography>
-                                                        )}
-                                                        {comercio.grupo && (
-                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
-                                                                <DomainIcon fontSize="inherit" />
-                                                                {comercio.grupo.nombre}
-                                                            </Typography>
-                                                        )}
-                                                    </Box>
-
-                                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                                        <IconButton size="small" onClick={() => handleViewDetail(comercio)} title="Ver Ficha">
-                                                            <VisibilityIcon fontSize="small" />
-                                                        </IconButton>
-                                                        <Tooltip title="Editar comercio">
-                                                            <Link
-                                                                href={`/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`}
-                                                                style={{ color: 'inherit', display: 'inline-flex' }}
-                                                            >
-                                                                <IconButton size="small">
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Link>
-                                                        </Tooltip>
-                                                        <IconButton size="small" color="error" onClick={() => handleDeletePrompt(comercio)} title="Eliminar comercio">
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Box>
-                                                </Box>
-
-                                                <Typography variant="body2" color="text.secondary" sx={{ minHeight: 36, fontSize: '0.8125rem' }}>
-                                                    {comercio.descripcion || 'Sin descripción especificada.'}
-                                                </Typography>
-                                            </CardContent>
-
-                                            <Box sx={{ p: 2, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                                    Ficha Oficial Capsur
-                                                </Typography>
-                                                <Button
-                                                    size="small"
-                                                    variant="text"
-                                                    startIcon={<InfoOutlinedIcon fontSize="small" />}
-                                                    onClick={(e) => handleOpenPopover(e, comercio)}
-                                                    sx={{ fontSize: '0.75rem', textTransform: 'none', fontWeight: 'bold' }}
-                                                >
-                                                    Ver Detalle
-                                                </Button>
-                                            </Box>
-                                        </Card>
-                                    </Grid>
-                                );
-                            })
-                        )}
-                    </Grid>
-                )}
-            </Box>
-
-            {/* DETAIL MODAL PREVIEW */}
-            {previewComercio && (
-                <Dialog
-                    open={detailModalOpen}
-                    onClose={() => setDetailModalOpen(false)}
-                    maxWidth="md"
-                    fullWidth
-                >
-                    <DialogTitle sx={{ pb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Chip
-                                label={previewComercio.nombre}
-                                size="small"
-                                sx={{
-                                    bgcolor: previewComercio.color_hex || '#1d4ed8',
-                                    color: '#ffffff',
-                                    fontWeight: 'bold',
-                                    textTransform: 'uppercase',
-                                }}
-                            />
-                            {previewComercio.sigla && (
-                                <Chip label={`Sigla: ${previewComercio.sigla}`} size="small" variant="outlined" sx={{ fontWeight: 'bold' }} />
-                            )}
-                        </Box>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                            Ficha Institucional & Acreditaciones Oficiales
-                        </Typography>
-                    </DialogTitle>
-                    <DialogContent sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                        {/* MATRIZ DE ATRIBUTOS E INFORMACIÓN EXTRA (EXACTA DEL CUADRO INSTITUCIONAL) */}
-                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                            <Table size="small">
-                                {/* FILA 1: CERTIFICADO | RESOLUCIÓN REVALIDACIÓN | ESCALE MINEDU | MALLA CURRICULAR */}
-                                <TableHead>
-                                    <TableRow sx={{ bgcolor: '#152844' }}>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '25%' }}>
-                                            CERTIFICADO
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '25%' }}>
-                                            RESOLUCION REVALIDACION
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '25%' }}>
-                                            ESCALE MINEDU
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '25%' }}>
-                                            MALLA CURRICULAR - 2022-2023
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                        <TableCell align="center">
-                                            {previewComercio.certificado_url ? (
-                                                <Button
-                                                    href={previewComercio.certificado_url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    Certificado
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.resolucion_revalidacion ? (
-                                                <Button
-                                                    href={previewComercio.resolucion_revalidacion.startsWith('http') ? previewComercio.resolucion_revalidacion : '#'}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    RESOLUCIÓN REVALIDACIÓN
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.escale_minedu ? (
-                                                <Button
-                                                    href={previewComercio.escale_minedu.startsWith('http') ? previewComercio.escale_minedu : (previewComercio.link_directo_escale || 'https://escale.minedu.gob.pe/')}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    EscaleMinedu
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.malla_curricular_url ? (
-                                                <Button
-                                                    href={previewComercio.malla_curricular_url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    MALLA CURRICULAR BROCHURE
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        {/* FILA 2: PLATAFORMA CARRERA | PAGINA WEB | RESOLUCION CREACION | SIGLA | LINK DIRECTO ESCALE */}
-                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow sx={{ bgcolor: '#152844' }}>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            PLATAFORMA CARRERA
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            PAGINA WEB
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            RESOLUCION CREACION
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            SIGLA
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            LINK DIRECTO ESCALE
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                        <TableCell align="center">
-                                            {previewComercio.plataforma_carrera ? (
-                                                <Button
-                                                    href={previewComercio.plataforma_carrera}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    PlataformaCarrera
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.pagina_web ? (
-                                                <Button
-                                                    href={previewComercio.pagina_web}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    PaginaWeb
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.resolucion_creacion ? (
-                                                <Button
-                                                    href={previewComercio.resolucion_creacion.startsWith('http') ? previewComercio.resolucion_creacion : '#'}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    ResolucionCreacion
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                                {previewComercio.sigla || previewComercio.codigo || '-'}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.link_directo_escale ? (
-                                                <Button
-                                                    href={previewComercio.link_directo_escale}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    LinkDirectoEscale
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        {/* FILA 3: RECONOCIMIENTO DIRECTOR | SEMINARIO | CANAL DE YOUTUBE | CONVENIO | FOTOS */}
-                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow sx={{ bgcolor: '#152844' }}>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            RECONOCIMIENTO DIRECTOR
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            SEMINARIO
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            CANAL DE YOUTUBE
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            CONVENIO
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', py: 1.2, width: '20%' }}>
-                                            FOTOS
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                        <TableCell align="center">
-                                            {previewComercio.reconocimiento_director ? (
-                                                <Button
-                                                    href={previewComercio.reconocimiento_director.startsWith('http') ? previewComercio.reconocimiento_director : '#'}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    ReconocimientoDirector
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.seminario ? (
-                                                <Button
-                                                    href={previewComercio.seminario}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    size="small"
-                                                    endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                >
-                                                    Seminario
-                                                </Button>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.canales_youtube && previewComercio.canales_youtube.length > 0 ? (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-                                                    {previewComercio.canales_youtube.map((yt, idx) => (
-                                                        <Button
-                                                            key={idx}
-                                                            href={yt}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                            sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2 }}
-                                                        >
-                                                            Link_Youtube{idx + 1}
-                                                        </Button>
-                                                    ))}
-                                                </Box>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.convenio ? (
-                                                previewComercio.convenio.startsWith('http') ? (
-                                                    <Button
-                                                        href={previewComercio.convenio}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}
-                                                    >
-                                                        Convenio
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 140 }}>
-                                                        {previewComercio.convenio}
-                                                    </Typography>
-                                                )
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {previewComercio.fotos && previewComercio.fotos.length > 0 ? (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-                                                    {previewComercio.fotos.map((f, fidx) => (
-                                                        <Button
-                                                            key={fidx}
-                                                            href={f}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            startIcon={<PhotoLibraryIcon fontSize="small" color="primary" />}
-                                                            sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2 }}
-                                                        >
-                                                            Foto{fidx + 1}
-                                                        </Button>
-                                                    ))}
-                                                </Box>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        {/* Catálogo y Promoción Vigente si existen */}
-                        {(previewComercio.catalogo_url || previewComercio.promocion_vigente) && (
-                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
-                                <Grid container spacing={2}>
-                                    {previewComercio.catalogo_url && (
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                                CATÁLOGO OFICIAL:
-                                            </Typography>
-                                            <Button href={previewComercio.catalogo_url} target="_blank" size="small" sx={{ textTransform: 'none' }}>
-                                                Descargar Catálogo
-                                            </Button>
-                                        </Grid>
-                                    )}
-                                    {previewComercio.promocion_vigente && (
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                                PROMOCIÓN VIGENTE:
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                                {previewComercio.promocion_vigente}
-                                            </Typography>
-                                        </Grid>
-                                    )}
-                                </Grid>
-                            </Paper>
-                        )}
-                        {/* Banner de Carreras si es Avanti o SIS */}
-                        {isComercioConCarreras(previewComercio) && (
-                            <Paper
-                                variant="outlined"
-                                sx={{
-                                    p: 2,
-                                    bgcolor: 'rgba(12, 67, 163, 0.05)',
-                                    borderColor: '#0c43a3',
-                                    borderRadius: 2,
-                                    display: 'flex',
-                                    flexDirection: { xs: 'column', sm: 'row' },
-                                    alignItems: { xs: 'flex-start', sm: 'center' },
-                                    justifyContent: 'space-between',
-                                    gap: 2,
-                                }}
-                            >
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: '#0c43a3', color: '#fff', display: 'flex' }}>
-                                        <SchoolIcon fontSize="small" />
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#152844' }}>
-                                            Carreras Profesionales Oficiales de {previewComercio.nombre}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {previewComercio.carreras_count || 0} carreras con resolución, brochure y modelo de título registrados.
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/carreras?comercio_id=${previewComercio.id}`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        endIcon={<ArrowForwardIcon />}
-                                        sx={{ bgcolor: '#0c43a3', textTransform: 'none', fontWeight: 'bold', whiteSpace: 'nowrap' }}
-                                    >
-                                        Ver Carreras ({previewComercio.carreras_count || 0})
-                                    </Button>
-                                </Link>
-                            </Paper>
-                        )}
-                    </DialogContent>
-                </Dialog>
-            )}
-
-            {/* POPOVER INSTITUCIONAL "VER DETALLE" */}
-            <Popover
-                open={isPopoverOpen}
-                anchorEl={popoverAnchor}
-                onClose={handleClosePopover}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                slotProps={{
-                    paper: {
-                        sx: {
-                            width: 780,
-                            maxWidth: '95vw',
-                            borderRadius: 2.5,
-                            boxShadow: '0 16px 40px rgba(12, 67, 163, 0.22)',
-                            border: '1px solid rgba(21, 40, 68, 0.15)',
-                            overflow: 'hidden',
-                        },
-                    },
-                }}
-            >
-                {popoverComercio && (
-                    <Box>
-                        {/* Popover Header */}
+                        {/* Footer de la Tabla */}
                         <Box
                             sx={{
-                                bgcolor: '#152844',
-                                color: '#ffffff',
+                                p: 1.8,
                                 px: 2.5,
-                                py: 1.3,
+                                borderTop: '1px solid',
+                                borderColor: 'divider',
+                                bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.02)'
+                                        : '#f8fafc',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
                             }}
                         >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Chip
-                                    label={popoverComercio.nombre}
-                                    size="small"
-                                    sx={{
-                                        bgcolor: popoverComercio.color_hex || '#0c43a3',
-                                        color: '#ffffff',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.75rem',
-                                        textTransform: 'uppercase',
-                                    }}
-                                />
-                                {popoverComercio.sigla && (
-                                    <Chip
-                                        label={`SIGLA: ${popoverComercio.sigla}`}
-                                        size="small"
+                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                Mostrando <strong>{comercios.length}</strong> comercios e institutos
+                            </Typography>
+                        </Box>
+                    </TableContainer>
+                )}
+
+                {/* VISTA EN TARJETAS */}
+                {viewMode === 'grid' && (
+                    <Grid container spacing={2.5} sx={{ width: '100%', m: 0 }}>
+                        {comercios.map((comercio) => {
+                            const brandColor = comercio.color_hex || '#0c43a3';
+
+                            return (
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={comercio.id}>
+                                    <Paper
+                                        elevation={0}
                                         sx={{
-                                            bgcolor: 'rgba(255,255,255,0.15)',
-                                            color: '#54d8ee',
-                                            fontWeight: 'bold',
-                                            fontSize: '0.75rem',
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'space-between',
+                                            borderRadius: 1.5,
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            bgcolor: 'background.paper',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                                            '&:hover': {
+                                                borderColor: brandColor,
+                                                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                                            },
                                         }}
-                                    />
-                                )}
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', letterSpacing: 0.3 }}>
-                                    Ficha Institucional & Enlaces Oficiales
+                                    >
+                                        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, bgcolor: brandColor }} />
+
+                                        <Box sx={{ p: 2.2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.8 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                                                    <Avatar sx={{ bgcolor: brandColor, color: '#fff', fontWeight: 900, width: 34, height: 34, borderRadius: 1, fontSize: '0.72rem' }}>
+                                                        {(comercio.sigla || comercio.nombre.substring(0, 3)).substring(0, 3).toUpperCase()}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.9rem', lineHeight: 1.2 }}>
+                                                            {comercio.nombre}
+                                                        </Typography>
+                                                        {comercio.grupo && (
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                                                {comercio.grupo.nombre}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+
+                                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                    <Link href={`/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`} style={{ textDecoration: 'none' }}>
+                                                        <IconButton size="small" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 0.8 }}>
+                                                            <EditIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Link>
+                                                    <IconButton size="small" color="error" onClick={() => handleDeletePrompt(comercio)} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 0.8 }}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+
+                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.78rem', lineHeight: 1.45, flex: 1, mb: 1.8 }}>
+                                                {comercio.descripcion || 'Sin descripción corporativa registrada.'}
+                                            </Typography>
+
+                                            <Box sx={{ pt: 1.2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Chip
+                                                    icon={<SchoolIcon sx={{ fontSize: '12px !important' }} />}
+                                                    label={`${comercio.carreras_count || 0} carreras`}
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ height: 20, fontSize: '0.68rem', borderRadius: 0.8 }}
+                                                />
+
+                                                <Button
+                                                    size="small"
+                                                    variant="text"
+                                                    startIcon={<InfoOutlinedIcon fontSize="small" />}
+                                                    onClick={(e) => handleOpenPopover(e, comercio)}
+                                                    sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.74rem', borderRadius: 0.8 }}
+                                                >
+                                                    Ficha Técnica
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                )}
+            </Box>
+
+            {/* POPOVER DE FICHA TÉCNICA */}
+            <Popover
+                open={isPopoverOpen}
+                anchorEl={popoverAnchor}
+                onClose={handleClosePopover}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            p: 2.2,
+                            width: { xs: 340, sm: 500 },
+                            maxWidth: '95vw',
+                            borderRadius: 1.5,
+                            boxShadow: '0 8px 25px rgba(0,0,0,0.18)',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
+                        },
+                    },
+                }}
+            >
+                {popoverComercio && (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                                <Avatar sx={{ bgcolor: popoverComercio.color_hex || '#0c43a3', color: '#fff', width: 30, height: 30, fontWeight: 800, fontSize: '0.72rem', borderRadius: 0.8 }}>
+                                    {(popoverComercio.sigla || popoverComercio.nombre.substring(0, 3)).substring(0, 3).toUpperCase()}
+                                </Avatar>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.92rem' }}>
+                                    {popoverComercio.nombre}
                                 </Typography>
                             </Box>
-                            <IconButton size="small" onClick={handleClosePopover} sx={{ color: '#ffffff' }}>
+                            <IconButton size="small" onClick={handleClosePopover} sx={{ borderRadius: 0.8 }}>
                                 <CloseIcon fontSize="small" />
                             </IconButton>
                         </Box>
 
-                        {/* Popover Body: Matriz de 3 Filas */}
-                        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5, maxHeight: '70vh', overflowY: 'auto' }}>
-                            {/* FILA 1: CERTIFICADO | RESOLUCION REVALIDACION | ESCALE MINEDU | MALLA CURRICULAR */}
-                            <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow sx={{ bgcolor: '#152844' }}>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '25%' }}>
-                                                CERTIFICADO
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '25%' }}>
-                                                RESOLUCION REVALIDACION
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '25%' }}>
-                                                ESCALE MINEDU
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '25%' }}>
-                                                MALLA CURRICULAR - 2022-2023
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                            <TableCell align="center">
-                                                {popoverComercio.certificado_url ? (
-                                                    <Button
-                                                        href={popoverComercio.certificado_url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        Certificado
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.resolucion_revalidacion ? (
-                                                    <Button
-                                                        href={popoverComercio.resolucion_revalidacion.startsWith('http') ? popoverComercio.resolucion_revalidacion : '#'}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<PictureAsPdfIcon fontSize="inherit" color="error" />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        RESOLUCIÓN REVALIDACIÓN
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.escale_minedu ? (
-                                                    <Button
-                                                        href={popoverComercio.escale_minedu.startsWith('http') ? popoverComercio.escale_minedu : (popoverComercio.link_directo_escale || 'https://escale.minedu.gob.pe/')}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        startIcon={<LanguageIcon fontSize="inherit" color="info" />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        EscaleMinedu
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.malla_curricular_url ? (
-                                                    <Button
-                                                        href={popoverComercio.malla_curricular_url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        MALLA CURRICULAR BROCHURE
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                        <Grid container spacing={1.5}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                                    PÁGINA WEB:
+                                </Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-all', fontSize: '0.82rem' }}>
+                                    {popoverComercio.pagina_web ? (
+                                        <a href={popoverComercio.pagina_web} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+                                            {popoverComercio.pagina_web}
+                                        </a>
+                                    ) : 'No registrada'}
+                                </Typography>
+                            </Grid>
 
-                            {/* FILA 2: PLATAFORMA CARRERA | PAGINA WEB | RESOLUCION CREACION | SIGLA | LINK DIRECTO ESCALE */}
-                            <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow sx={{ bgcolor: '#152844' }}>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                PLATAFORMA CARRERA
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                PAGINA WEB
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                RESOLUCION CREACION
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                SIGLA
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                LINK DIRECTO ESCALE
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                            <TableCell align="center">
-                                                {popoverComercio.plataforma_carrera ? (
-                                                    <Button
-                                                        href={popoverComercio.plataforma_carrera}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        PlataformaCarrera
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.pagina_web ? (
-                                                    <Button
-                                                        href={popoverComercio.pagina_web}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        PaginaWeb
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.resolucion_creacion ? (
-                                                    <Button
-                                                        href={popoverComercio.resolucion_creacion.startsWith('http') ? popoverComercio.resolucion_creacion : '#'}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        ResolucionCreacion
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: '0.8rem' }}>
-                                                    {popoverComercio.sigla || popoverComercio.codigo || '-'}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.link_directo_escale ? (
-                                                    <Button
-                                                        href={popoverComercio.link_directo_escale}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        LinkDirectoEscale
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                                    RESOLUCIÓN / ESCALE:
+                                </Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                                    {popoverComercio.resolucion_revalidacion || popoverComercio.escale_minedu || 'No especificada'}
+                                </Typography>
+                            </Grid>
+                        </Grid>
 
-                            {/* FILA 3: RECONOCIMIENTO DIRECTOR | SEMINARIO | CANAL DE YOUTUBE | CONVENIO | FOTOS */}
-                            <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5, overflow: 'hidden' }}>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow sx={{ bgcolor: '#152844' }}>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                RECONOCIMIENTO DIRECTOR
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                SEMINARIO
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                CANAL DE YOUTUBE
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                CONVENIO
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', py: 0.8, width: '20%' }}>
-                                                FOTOS
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow sx={{ bgcolor: 'background.paper' }}>
-                                            <TableCell align="center">
-                                                {popoverComercio.reconocimiento_director ? (
-                                                    <Button
-                                                        href={popoverComercio.reconocimiento_director.startsWith('http') ? popoverComercio.reconocimiento_director : '#'}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        ReconocimientoDirector
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.seminario ? (
-                                                    <Button
-                                                        href={popoverComercio.seminario}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        size="small"
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                        sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                    >
-                                                        Seminario
-                                                    </Button>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.canales_youtube && popoverComercio.canales_youtube.length > 0 ? (
-                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3, alignItems: 'center' }}>
-                                                        {popoverComercio.canales_youtube.map((yt, idx) => (
-                                                            <Button
-                                                                key={idx}
-                                                                href={yt}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<YouTubeIcon fontSize="small" color="error" />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.7rem', p: 0.2 }}
-                                                            >
-                                                                Link_Youtube{idx + 1}
-                                                            </Button>
-                                                        ))}
-                                                    </Box>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.convenio ? (
-                                                    popoverComercio.convenio.startsWith('http') ? (
-                                                        <Button
-                                                            href={popoverComercio.convenio}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            size="small"
-                                                            endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                            sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', p: 0.3 }}
-                                                        >
-                                                            Convenio
-                                                        </Button>
-                                                    ) : (
-                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 130 }}>
-                                                            {popoverComercio.convenio}
-                                                        </Typography>
-                                                    )
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {popoverComercio.fotos && popoverComercio.fotos.length > 0 ? (
-                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3, alignItems: 'center' }}>
-                                                        {popoverComercio.fotos.map((f, fidx) => (
-                                                            <Button
-                                                                key={fidx}
-                                                                href={f}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                startIcon={<PhotoLibraryIcon fontSize="small" color="primary" />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.7rem', p: 0.2 }}
-                                                            >
-                                                                Foto{fidx + 1}
-                                                            </Button>
-                                                        ))}
-                                                    </Box>
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-
-                            {/* Catálogo y Promoción Vigente si existen */}
-                            {(popoverComercio.catalogo_url || popoverComercio.promocion_vigente) && (
-                                <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
-                                    <Grid container spacing={1.5}>
-                                        {popoverComercio.catalogo_url && (
-                                            <Grid size={{ xs: 12, sm: 6 }}>
-                                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                                    CATÁLOGO OFICIAL:
-                                                </Typography>
-                                                <Button href={popoverComercio.catalogo_url} target="_blank" size="small" sx={{ textTransform: 'none', fontSize: '0.75rem', p: 0.2 }}>
-                                                    Descargar Catálogo
-                                                </Button>
-                                            </Grid>
-                                        )}
-                                        {popoverComercio.promocion_vigente && (
-                                            <Grid size={{ xs: 12, sm: 6 }}>
-                                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', display: 'block' }}>
-                                                    PROMOCIÓN VIGENTE:
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: '0.8rem' }}>
-                                                    {popoverComercio.promocion_vigente}
-                                                </Typography>
-                                            </Grid>
-                                        )}
-                                    </Grid>
-                                </Paper>
-                            )}
-                            {/* Banner de Carreras en Popover si es Avanti o SIS */}
-                            {isComercioConCarreras(popoverComercio) && (
-                                <Paper
-                                    variant="outlined"
-                                    sx={{
-                                        p: 1.5,
-                                        bgcolor: 'rgba(12, 67, 163, 0.06)',
-                                        borderColor: '#0c43a3',
-                                        borderRadius: 1.5,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        gap: 1.5,
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <SchoolIcon fontSize="small" sx={{ color: '#0c43a3' }} />
-                                        <Box>
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#152844', fontSize: '0.8rem' }}>
-                                                Carreras Oficiales ({popoverComercio.carreras_count || 0})
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                                                Gestión académica y títulos oficiales
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                    <Link
-                                        href={`/${currentTeamSlug}/admin/carreras?comercio_id=${popoverComercio.id}`}
-                                        style={{ textDecoration: 'none' }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            endIcon={<ArrowForwardIcon sx={{ fontSize: '13px !important' }} />}
-                                            sx={{ bgcolor: '#0c43a3', textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem', py: 0.3 }}
-                                        >
-                                            Ver Carreras
-                                        </Button>
-                                    </Link>
-                                </Paper>
-                            )}
+                        <Box sx={{ pt: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                            <Link href={`/${currentTeamSlug}/admin/comercios/${popoverComercio.id}/edit`} style={{ textDecoration: 'none' }}>
+                                <Button variant="contained" size="small" startIcon={<EditIcon />} sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 1 }}>
+                                    Abrir Edición Completa
+                                </Button>
+                            </Link>
                         </Box>
                     </Box>
                 )}
             </Popover>
 
-            {/* Dialogs */}
+            {/* MODALES Y DIÁLOGOS CRUD */}
             <ComercioDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
@@ -1448,15 +843,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
                 defaultComercioId={quickComercioId}
                 currentTeamSlug={currentTeamSlug}
             />
-
-            <DeleteConfirmDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-                title={`¿Eliminar comercio "${comercioToDelete?.nombre}"?`}
-                description="Esta acción eliminará permanentemente el comercio y todas las carreras/programas asignados a él. ¿Deseas continuar?"
-                onConfirm={confirmDelete}
-                processing={isDeleting}
-            />
         </>
     );
 }
@@ -1464,7 +850,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters }:
 ComerciosIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'Panel Principal',
             href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
         },
         {

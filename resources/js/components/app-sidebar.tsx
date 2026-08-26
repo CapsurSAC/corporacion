@@ -31,7 +31,7 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = [
         {
-            title: 'Panel General',
+            title: 'Panel Principal',
             href: dashboardUrl,
             icon: LayoutGrid,
         },
@@ -41,7 +41,7 @@ export function AppSidebar() {
             icon: Building2,
         },
         {
-            title: 'Comercios e Institutos',
+            title: 'Comercios',
             href: `/${teamSlug}/admin/comercios`,
             icon: Store,
         },

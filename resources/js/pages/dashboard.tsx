@@ -1,45 +1,44 @@
 import { Head, usePage, Link } from '@inertiajs/react';
-import AddIcon from '@mui/icons-material/Add';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BusinessIcon from '@mui/icons-material/Business';
-import SchoolIcon from '@mui/icons-material/School';
+import LaunchIcon from '@mui/icons-material/Launch';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
+    Avatar,
     Box,
-    Grid,
-    Card,
-    CardContent,
-    Typography,
     Button,
     Chip,
+    Grid,
     Paper,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { CarreraDialog } from '@/components/admin/carrera-dialog';
-import { ComercioDialog } from '@/components/admin/comercio-dialog';
-import { GrupoDialog } from '@/components/admin/grupo-dialog';
 import PendingInvitationsModal from '@/components/pending-invitations-modal';
 import { dashboard } from '@/routes';
-import type { DashboardInvitation, Grupo, CapsurStats } from '@/types';
+import type { DashboardInvitation, Grupo } from '@/types';
 
 type Props = {
     pendingInvitations?: DashboardInvitation[];
     grupos?: Grupo[];
-    stats?: CapsurStats;
+};
+
+// Colores de acento corporativo por grupo
+const getGrupoColor = (slug: string): string => {
+    switch (slug) {
+        case 'escifor':
+            return '#0c43a3';
+        case 'multimarca':
+            return '#059669';
+        case 'globalex':
+            return '#0284c7';
+        default:
+            return '#4f46e5';
+    }
 };
 
 export default function Dashboard({
     pendingInvitations = [],
     grupos = [],
-    stats = {
-        totalGrupos: 0,
-        totalComercios: 0,
-        totalCarreras: 0,
-        carrerasActivas: 0,
-        carrerasEnConvocatoria: 0,
-    },
 }: Props) {
     const page = usePage();
     const currentTeam = page.props.currentTeam as { slug: string; name: string } | undefined;
@@ -49,17 +48,9 @@ export default function Dashboard({
         pendingInvitations.length > 0
     );
 
-    // Quick Creation Modals
-    const [grupoModalOpen, setGrupoModalOpen] = useState(false);
-    const [comercioModalOpen, setComercioModalOpen] = useState(false);
-    const [carreraModalOpen, setCarreraModalOpen] = useState(false);
-
-    // Extract all comercios for dropdown
-    const allComercios = grupos.flatMap((g) => g.comercios || []);
-
     return (
         <>
-            <Head title="Panel de Control - Grupo Capsur" />
+            <Head title="Panel Principal - Grupo Capsur" />
 
             <PendingInvitationsModal
                 invitations={pendingInvitations}
@@ -67,330 +58,345 @@ export default function Dashboard({
                 onOpenChange={setShowInvitations}
             />
 
-            <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 3.5 }}>
-                {/* Hero Header */}
+            <Box
+                sx={{
+                    p: { xs: 2, sm: 2.5, md: 3 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    gap: 2.5,
+                    width: '100%',
+                    flex: 1,
+                    minHeight: 'calc(100vh - 4.5rem)',
+                    boxSizing: 'border-box',
+                }}
+            >
+                {/* CABECERA COMPACTA */}
                 <Paper
+                    elevation={0}
                     sx={{
-                        position: 'relative',
-                        overflow: 'hidden',
-                        borderRadius: 4,
-                        p: { xs: 3, sm: 4 },
-                        color: '#ffffff',
-                        background: 'linear-gradient(135deg, #152844 0%, #0c43a3 60%, #0a1526 100%)',
-                        boxShadow: '0 10px 25px -5px rgba(21, 40, 68, 0.5)',
+                        p: { xs: 1.5, sm: 1.8 },
+                        px: { xs: 2, sm: 2.5 },
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                : '0 2px 10px rgba(0,0,0,0.03)',
+                        width: '100%',
+                        boxSizing: 'border-box',
                     }}
                 >
-                    <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 3 }}>
-                        <Box sx={{ maxWidth: 650 }}>
-                            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.5, borderRadius: 5, bgcolor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(8px)', mb: 1.5 }}>
-                                <AutoAwesomeIcon sx={{ fontSize: 16, color: '#fde047' }} />
-                                <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                                    Administración de Catálogo Empresarial
-                                </Typography>
-                            </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: '-0.02em', mb: 1 }}>
-                                GRUPO <Box component="span" sx={{ color: '#60a5fa' }}>CAPSUR</Box>
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.6 }}>
-                                Gestión centralizada de grupos corporativos, marcas formativas y catálogo de carreras profesionales, especializaciones y cursos.
-                            </Typography>
-                        </Box>
-
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                            <Button
-                                variant="contained"
-                                startIcon={<AddIcon />}
-                                onClick={() => setGrupoModalOpen(true)}
-                                sx={{ bgcolor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' } }}
-                            >
-                                Grupo
-                            </Button>
-                            <Button
-                                variant="contained"
-                                startIcon={<AddIcon />}
-                                onClick={() => setComercioModalOpen(true)}
-                                sx={{ bgcolor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' } }}
-                            >
-                                Comercio
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<AddIcon />}
-                                onClick={() => setCarreraModalOpen(true)}
-                                sx={{ bgcolor: '#2563eb', '&:hover': { bgcolor: '#1d4ed8' }, fontWeight: 'bold' }}
-                            >
-                                Programa
-                            </Button>
-                        </Box>
-                    </Box>
-                </Paper>
-
-                {/* KPI Metrics */}
-                <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Card variant="outlined">
-                            <CardContent>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                                        Grupos Registrados
-                                    </Typography>
-                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'primary.main', color: '#fff', display: 'flex' }}>
-                                        <BusinessIcon fontSize="small" />
-                                    </Box>
-                                </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                    {stats.totalGrupos}
-                                </Typography>
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/grupos`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Typography variant="caption" color="primary" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold', mt: 1 }}>
-                                        <span>Administrar grupos</span>
-                                        <ArrowForwardIcon sx={{ fontSize: 12 }} />
-                                    </Typography>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Card variant="outlined">
-                            <CardContent>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                                        Comercios e Institutos
-                                    </Typography>
-                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'success.main', color: '#fff', display: 'flex' }}>
-                                        <StorefrontIcon fontSize="small" />
-                                    </Box>
-                                </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                    {stats.totalComercios}
-                                </Typography>
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/comercios`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Typography variant="caption" color="success.main" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold', mt: 1 }}>
-                                        <span>Ver todas las marcas</span>
-                                        <ArrowForwardIcon sx={{ fontSize: 12 }} />
-                                    </Typography>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Card variant="outlined">
-                            <CardContent>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                                        Programas Académicos
-                                    </Typography>
-                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'info.main', color: '#fff', display: 'flex' }}>
-                                        <SchoolIcon fontSize="small" />
-                                    </Box>
-                                </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                    {stats.totalCarreras}
-                                </Typography>
-                                <Link
-                                    href={`/${currentTeamSlug}/admin/carreras`}
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    <Typography variant="caption" color="info.main" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold', mt: 1 }}>
-                                        <span>Explorar catálogo</span>
-                                        <ArrowForwardIcon sx={{ fontSize: 12 }} />
-                                    </Typography>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Card variant="outlined">
-                            <CardContent>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                                        Convocatorias Activas
-                                    </Typography>
-                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'warning.main', color: '#fff', display: 'flex' }}>
-                                        <TrendingUpIcon fontSize="small" />
-                                    </Box>
-                                </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                    {stats.carrerasActivas + stats.carrerasEnConvocatoria}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                                    {stats.carrerasEnConvocatoria} en periodo de inscripción
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                </Grid>
-
-                {/* NUESTROS COMERCIOS - Visual Organigram Map */}
-                <Paper variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden' }}>
-                    <Box sx={{ p: 2.5, px: 3, borderBottom: 1, borderColor: 'divider', bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                                NUESTROS COMERCIOS
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                Mapa organizativo interactivo de marcas e institutos de Grupo Capsur.
-                            </Typography>
-                        </Box>
-
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={() => setComercioModalOpen(true)}
-                        >
-                            Añadir Comercio
-                        </Button>
-                    </Box>
-
-                    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        {grupos.map((grupo) => (
-                            <Paper
-                                key={grupo.id}
-                                variant="outlined"
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 1.5,
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Avatar
                                 sx={{
-                                    p: 2.5,
-                                    borderRadius: 2.5,
-                                    bgcolor: 'background.paper',
-                                    transition: 'border-color 0.2s',
-                                    '&:hover': {
-                                        borderColor: 'primary.main',
-                                    },
+                                    bgcolor: 'primary.main',
+                                    color: '#ffffff',
+                                    width: 38,
+                                    height: 38,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
                                 }}
                             >
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 2, borderBottom: 1, borderColor: 'divider' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                        <BusinessIcon color="primary" fontSize="small" />
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                                            {grupo.nombre}
-                                        </Typography>
-                                        <Chip
-                                            label={`${grupo.comercios?.length || 0} marcas`}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ height: 20, fontSize: '0.7rem' }}
-                                        />
-                                    </Box>
-
-                                    <Link
-                                        href={`/${currentTeamSlug}/admin/comercios?grupo_id=${grupo.id}`}
-                                        style={{ textDecoration: 'none' }}
+                                <StorefrontIcon fontSize="small" />
+                            </Avatar>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                            fontSize: '1.05rem',
+                                            lineHeight: 1.2,
+                                        }}
                                     >
-                                        <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold', '&:hover': { textDecoration: 'underline' } }}>
-                                            Administrar
-                                        </Typography>
-                                    </Link>
+                                        Comercios e Institutos
+                                    </Typography>
+                                    <Chip
+                                        label="GRUPO CAPSUR"
+                                        size="small"
+                                        sx={{
+                                            bgcolor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                    : 'rgba(12, 67, 163, 0.08)',
+                                            color: 'primary.main',
+                                            fontWeight: 800,
+                                            fontSize: '0.65rem',
+                                            height: 20,
+                                            borderRadius: 1,
+                                            border: '1px solid',
+                                            borderColor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(12, 67, 163, 0.4)'
+                                                    : 'rgba(12, 67, 163, 0.2)',
+                                        }}
+                                    />
                                 </Box>
-
-                                {/* Buttons Grid */}
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, pt: 2.5 }}>
-                                    {grupo.comercios && grupo.comercios.length > 0 ? (
-                                        grupo.comercios.map((comercio) => {
-                                            const brandColor = comercio.color_hex || '#1d4ed8';
-                                            const isAcademic =
-                                                comercio.slug === 'istp-avanti' ||
-                                                comercio.slug === 'istp-sis' ||
-                                                comercio.codigo === 'AVANTI' ||
-                                                comercio.codigo === 'SIS' ||
-                                                (comercio.carreras_count !== undefined && comercio.carreras_count > 0);
-
-                                            const targetUrl = isAcademic
-                                                ? `/${currentTeamSlug}/admin/carreras?comercio_id=${comercio.id}`
-                                                : `/${currentTeamSlug}/admin/comercios?grupo_id=${grupo.id}`;
-
-                                            return (
-                                                <Link
-                                                    key={comercio.id}
-                                                    href={targetUrl}
-                                                    style={{ textDecoration: 'none' }}
-                                                >
-                                                    <Button
-                                                        variant="contained"
-                                                        sx={{
-                                                            bgcolor: brandColor,
-                                                            color: '#ffffff',
-                                                            fontWeight: 'bold',
-                                                            px: 2,
-                                                            py: 1,
-                                                            borderRadius: 2,
-                                                            textTransform: 'uppercase',
-                                                            letterSpacing: 0.5,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 1.5,
-                                                            '&:hover': {
-                                                                bgcolor: brandColor,
-                                                                filter: 'brightness(1.1)',
-                                                                transform: 'scale(1.04)',
-                                                            },
-                                                            transition: 'all 0.15s ease-in-out',
-                                                        }}
-                                                    >
-                                                        <span>{comercio.nombre}</span>
-                                                        {isAcademic && (
-                                                            <Box
-                                                                component="span"
-                                                                sx={{
-                                                                    display: 'inline-flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    px: 0.8,
-                                                                    py: 0.2,
-                                                                    borderRadius: 1,
-                                                                    bgcolor: 'rgba(0,0,0,0.3)',
-                                                                    fontSize: '0.68rem',
-                                                                    fontWeight: 'bold',
-                                                                }}
-                                                            >
-                                                                {comercio.carreras_count || 0} Carreras
-                                                            </Box>
-                                                        )}
-                                                    </Button>
-                                                </Link>
-                                            );
-                                        })
-                                    ) : (
-                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', py: 1 }}>
-                                            No hay comercios asignados a este grupo aún.
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Paper>
-                        ))}
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.78rem' }}>
+                                    Selecciona un comercio para consultar o editar su información institucional y oferta formativa.
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
                 </Paper>
+
+                {/* CUADRÍCULA DE DIVISIONES */}
+                <Grid
+                    container
+                    spacing={2.5}
+                    sx={{
+                        width: '100%',
+                        m: 0,
+                    }}
+                >
+                    {grupos.map((grupo) => {
+                        const brandColor = getGrupoColor(grupo.slug);
+                        const comercios = grupo.comercios || [];
+
+                        return (
+                            <Grid
+                                size={{ xs: 12, md: 4 }}
+                                key={grupo.id}
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}
+                            >
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        height: '100%',
+                                        p: { xs: 2, sm: 2.5 },
+                                        borderRadius: 1.5,
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        bgcolor: 'background.paper',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                                : '0 2px 10px rgba(0,0,0,0.02)',
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        boxSizing: 'border-box',
+                                        transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                                        '&:hover': {
+                                            borderColor: brandColor,
+                                            boxShadow: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? '0 4px 20px rgba(0,0,0,0.4)'
+                                                    : '0 4px 16px rgba(0,0,0,0.06)',
+                                        },
+                                    }}
+                                >
+                                    {/* Acento superior de color institucional */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: 3,
+                                            bgcolor: brandColor,
+                                        }}
+                                    />
+
+                                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                        {/* Cabecera del Grupo */}
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                pb: 1.5,
+                                                mb: 2,
+                                                borderBottom: '1px solid',
+                                                borderColor: 'divider',
+                                            }}
+                                        >
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                                                <Avatar
+                                                    sx={{
+                                                        bgcolor: `${brandColor}15`,
+                                                        color: brandColor,
+                                                        width: 32,
+                                                        height: 32,
+                                                        borderRadius: 1,
+                                                        fontSize: '0.8rem',
+                                                        fontWeight: 800,
+                                                    }}
+                                                >
+                                                    <BusinessIcon fontSize="small" />
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        sx={{
+                                                            fontWeight: 800,
+                                                            letterSpacing: 0.5,
+                                                            fontSize: '0.95rem',
+                                                            lineHeight: 1.2,
+                                                        }}
+                                                    >
+                                                        {grupo.nombre}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.72rem' }}>
+                                                        {comercios.length} {comercios.length === 1 ? 'comercio' : 'comercios'}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+
+                                            <Link
+                                                href={`/${currentTeamSlug}/admin/comercios?grupo_id=${grupo.id}`}
+                                                style={{ textDecoration: 'none' }}
+                                            >
+                                                <Tooltip title="Ver listado completo del grupo" arrow>
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            fontWeight: 700,
+                                                            color: brandColor,
+                                                            fontSize: '0.72rem',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.4,
+                                                            bgcolor: `${brandColor}10`,
+                                                            px: 1,
+                                                            py: 0.3,
+                                                            borderRadius: 1,
+                                                            '&:hover': { bgcolor: `${brandColor}20` },
+                                                        }}
+                                                    >
+                                                        <span>Ver todos</span>
+                                                        <LaunchIcon sx={{ fontSize: 11 }} />
+                                                    </Typography>
+                                                </Tooltip>
+                                            </Link>
+                                        </Box>
+
+                                        {/* Botones de Comercios con Esquinas Finas */}
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 1.2,
+                                                mb: 2,
+                                            }}
+                                        >
+                                            {comercios.length > 0 ? (
+                                                comercios.map((comercio) => {
+                                                    const comColor = comercio.color_hex || brandColor;
+                                                    const targetUrl = `/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`;
+
+                                                    return (
+                                                        <Link
+                                                            key={comercio.id}
+                                                            href={targetUrl}
+                                                            style={{ textDecoration: 'none' }}
+                                                        >
+                                                            <Button
+                                                                fullWidth
+                                                                variant="contained"
+                                                                sx={{
+                                                                    height: 50,
+                                                                    bgcolor: comColor,
+                                                                    color: '#ffffff',
+                                                                    fontWeight: 800,
+                                                                    fontSize: '0.84rem',
+                                                                    px: 1.8,
+                                                                    borderRadius: 1,
+                                                                    textTransform: 'uppercase',
+                                                                    letterSpacing: 0.5,
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'space-between',
+                                                                    boxShadow: `0 2px 8px ${comColor}25`,
+                                                                    transition: 'all 0.15s ease-in-out',
+                                                                    '&:hover': {
+                                                                        bgcolor: comColor,
+                                                                        filter: 'brightness(1.1)',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: `0 4px 12px ${comColor}40`,
+                                                                    },
+                                                                }}
+                                                            >
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, minWidth: 0 }}>
+                                                                    <Avatar
+                                                                        sx={{
+                                                                            bgcolor: 'rgba(255, 255, 255, 0.22)',
+                                                                            color: '#ffffff',
+                                                                            width: 28,
+                                                                            height: 28,
+                                                                            fontWeight: 900,
+                                                                            fontSize: '0.68rem',
+                                                                            borderRadius: 0.8,
+                                                                            flexShrink: 0,
+                                                                        }}
+                                                                    >
+                                                                        {(comercio.sigla || comercio.nombre.substring(0, 3)).substring(0, 3).toUpperCase()}
+                                                                    </Avatar>
+                                                                    <Typography sx={{ fontWeight: 800, fontSize: '0.84rem', letterSpacing: 0.4, color: '#ffffff', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                                                        {comercio.nombre}
+                                                                    </Typography>
+                                                                </Box>
+                                                                <LaunchIcon sx={{ fontSize: 14, opacity: 0.85, flexShrink: 0 }} />
+                                                            </Button>
+                                                        </Link>
+                                                    );
+                                                })
+                                            ) : (
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', py: 2, textAlign: 'center' }}>
+                                                    Sin comercios registrados.
+                                                </Typography>
+                                            )}
+                                        </Box>
+
+                                        {/* Descripción Corporativa al Pie */}
+                                        {grupo.descripcion && (
+                                            <Box
+                                                sx={{
+                                                    mt: 'auto',
+                                                    pt: 1.5,
+                                                    borderTop: '1px solid',
+                                                    borderColor: 'divider',
+                                                }}
+                                            >
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{
+                                                        fontSize: '0.75rem',
+                                                        lineHeight: 1.4,
+                                                        display: 'block',
+                                                    }}
+                                                >
+                                                    {grupo.descripcion}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
             </Box>
-
-            {/* Quick Modals */}
-            <GrupoDialog
-                open={grupoModalOpen}
-                onOpenChange={setGrupoModalOpen}
-                currentTeamSlug={currentTeamSlug}
-            />
-
-            <ComercioDialog
-                open={comercioModalOpen}
-                onOpenChange={setComercioModalOpen}
-                grupos={grupos}
-                currentTeamSlug={currentTeamSlug}
-            />
-
-            <CarreraDialog
-                open={carreraModalOpen}
-                onOpenChange={setCarreraModalOpen}
-                comercios={allComercios}
-                currentTeamSlug={currentTeamSlug}
-            />
         </>
     );
 }
@@ -398,7 +404,7 @@ export default function Dashboard({
 Dashboard.layout = (props: { currentTeam?: { slug: string } | null }) => ({
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'Panel Principal',
             href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
         },
     ],

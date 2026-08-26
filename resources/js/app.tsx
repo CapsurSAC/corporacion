@@ -1,7 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
+import { NotificationProvider } from '@/hooks/use-notification';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -28,10 +28,11 @@ createInertiaApp({
     withApp(app) {
         return (
             <CapsurMuiThemeProvider>
-                <TooltipProvider delayDuration={0}>
-                    {app}
-                    <Toaster />
-                </TooltipProvider>
+                <NotificationProvider>
+                    <TooltipProvider delayDuration={0}>
+                        {app}
+                    </TooltipProvider>
+                </NotificationProvider>
             </CapsurMuiThemeProvider>
         );
     },

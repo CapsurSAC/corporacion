@@ -13,7 +13,9 @@ import {
     CircularProgress,
     Box,
 } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNotification } from '@/hooks/use-notification';
+import { isMinLength } from '@/lib/validation';
 import type { Grupo } from '@/types';
 
 interface GrupoDialogProps {
@@ -30,6 +32,8 @@ export function GrupoDialog({
     currentTeamSlug,
 }: GrupoDialogProps) {
     const isEditing = !!grupo;
+    const { notify } = useNotification();
+    const [clientErrors, setClientErrors] = useState<{ nombre?: string }>({});
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
@@ -49,26 +53,51 @@ export function GrupoDialog({
             reset();
         }
 
+        setClientErrors({});
         clearErrors();
     }, [grupo, open]);
 
+    const validate = (): boolean => {
+        const newErrors: { nombre?: string } = {};
+
+        if (!isMinLength(data.nombre, 3)) {
+            newErrors.nombre = 'El nombre del grupo debe tener al menos 3 caracteres.';
+            notify.warning('Verifica el nombre del grupo comercial antes de continuar.');
+        } else if (data.nombre.trim().length > 255) {
+            newErrors.nombre = 'El nombre no puede superar los 255 caracteres.';
+        }
+
+        setClientErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validate()) return;
 
         if (isEditing && grupo) {
             put(`/${currentTeamSlug}/admin/grupos/${grupo.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Grupo "${data.nombre}" actualizado correctamente.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al actualizar el grupo.');
                 },
             });
         } else {
             post(`/${currentTeamSlug}/admin/grupos`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Grupo "${data.nombre}" creado exitosamente.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al registrar el grupo.');
                 },
             });
         }
@@ -81,7 +110,7 @@ export function GrupoDialog({
             maxWidth="sm"
             fullWidth
         >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 0.5 }}>
                     <BusinessIcon color="primary" />
                     <span>{isEditing ? 'Editar Grupo Comercial' : 'Nuevo Grupo Comercial'}</span>
@@ -97,10 +126,15 @@ export function GrupoDialog({
                         <TextField
                             label="Nombre del Grupo *"
                             value={data.nombre}
-                            onChange={(e) => setData('nombre', e.target.value)}
+                            onChange={(e) => {
+                                setData('nombre', e.target.value);
+                                if (clientErrors.nombre) {
+                                    setClientErrors((prev) => ({ ...prev, nombre: undefined }));
+                                }
+                            }}
                             placeholder="Ej. ESCIFOR, MULTIMARCA, GLOBALEX..."
-                            error={!!errors.nombre}
-                            helperText={errors.nombre}
+                            error={!!(clientErrors.nombre || errors.nombre)}
+                            helperText={clientErrors.nombre || errors.nombre || 'Mínimo 3 caracteres requeridos'}
                             fullWidth
                             autoFocus
                             required

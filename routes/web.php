@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\CarreraController;
 use App\Http\Controllers\Admin\ComercioController;
 use App\Http\Controllers\Admin\GrupoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', [PublicCatalogController::class, 'index'])->name('home');
+Route::get('catalogo/{comercio:slug}', [PublicCatalogController::class, 'show'])->name('catalogo.show');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])

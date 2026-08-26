@@ -77,7 +77,7 @@ class CarreraController extends Controller
     {
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'url_malla_curricular' => ['nullable', 'string', 'max:500'],
             'url_declaracion_jurada' => ['nullable', 'string', 'max:500'],
             'modelo_certificado' => ['nullable', 'string', 'max:500'],
@@ -91,6 +91,14 @@ class CarreraController extends Controller
             'flyer' => ['nullable', 'string', 'max:500'],
             'modelo_titulo' => ['nullable', 'string', 'max:500'],
             'estado' => ['nullable', 'string', 'in:activo,inactivo,en_convocatoria'],
+        ], [
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
+            'nombre.required' => 'El nombre del programa formativo es obligatorio.',
+            'nombre.min' => 'El nombre del programa debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del programa no puede superar los 255 caracteres.',
+            'tipo.in' => 'El tipo de programa seleccionado no es válido.',
+            'modalidad.in' => 'La modalidad seleccionada no es válida.',
         ]);
 
         $slug = Str::slug($validated['nombre']);
@@ -103,20 +111,20 @@ class CarreraController extends Controller
 
         Carrera::create([
             'comercio_id' => $validated['comercio_id'],
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'url_malla_curricular' => $validated['url_malla_curricular'] ?? null,
-            'url_declaracion_jurada' => $validated['url_declaracion_jurada'] ?? null,
-            'modelo_certificado' => $validated['modelo_certificado'] ?? null,
-            'codigo' => $validated['codigo'] ?? null,
+            'url_malla_curricular' => !empty($validated['url_malla_curricular']) ? trim($validated['url_malla_curricular']) : null,
+            'url_declaracion_jurada' => !empty($validated['url_declaracion_jurada']) ? trim($validated['url_declaracion_jurada']) : null,
+            'modelo_certificado' => !empty($validated['modelo_certificado']) ? trim($validated['modelo_certificado']) : null,
+            'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
             'tipo' => $validated['tipo'] ?? 'carrera',
             'modalidad' => $validated['modalidad'] ?? 'virtual',
-            'duracion' => $validated['duracion'] ?? '3 años',
-            'descripcion' => $validated['descripcion'] ?? null,
-            'resolucion' => $validated['resolucion'] ?? null,
-            'brochure' => $validated['brochure'] ?? null,
-            'flyer' => $validated['flyer'] ?? null,
-            'modelo_titulo' => $validated['modelo_titulo'] ?? null,
+            'duracion' => !empty($validated['duracion']) ? trim($validated['duracion']) : '3 años',
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
+            'resolucion' => !empty($validated['resolucion']) ? trim($validated['resolucion']) : null,
+            'brochure' => !empty($validated['brochure']) ? trim($validated['brochure']) : null,
+            'flyer' => !empty($validated['flyer']) ? trim($validated['flyer']) : null,
+            'modelo_titulo' => !empty($validated['modelo_titulo']) ? trim($validated['modelo_titulo']) : null,
             'estado' => $validated['estado'] ?? 'activo',
         ]);
 
@@ -137,7 +145,7 @@ class CarreraController extends Controller
 
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
-            'nombre' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'url_malla_curricular' => ['nullable', 'string', 'max:500'],
             'url_declaracion_jurada' => ['nullable', 'string', 'max:500'],
             'modelo_certificado' => ['nullable', 'string', 'max:500'],
@@ -151,6 +159,14 @@ class CarreraController extends Controller
             'flyer' => ['nullable', 'string', 'max:500'],
             'modelo_titulo' => ['nullable', 'string', 'max:500'],
             'estado' => ['nullable', 'string', 'in:activo,inactivo,en_convocatoria'],
+        ], [
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
+            'nombre.required' => 'El nombre del programa formativo es obligatorio.',
+            'nombre.min' => 'El nombre del programa debe tener al menos 3 caracteres.',
+            'nombre.max' => 'El nombre del programa no puede superar los 255 caracteres.',
+            'tipo.in' => 'El tipo de programa seleccionado no es válido.',
+            'modalidad.in' => 'La modalidad seleccionada no es válida.',
         ]);
 
         $slug = $carreraModel->slug;
@@ -166,20 +182,20 @@ class CarreraController extends Controller
 
         $carreraModel->update([
             'comercio_id' => $validated['comercio_id'],
-            'nombre' => $validated['nombre'],
+            'nombre' => trim($validated['nombre']),
             'slug' => $slug,
-            'url_malla_curricular' => $validated['url_malla_curricular'] ?? null,
-            'url_declaracion_jurada' => $validated['url_declaracion_jurada'] ?? null,
-            'modelo_certificado' => $validated['modelo_certificado'] ?? null,
-            'codigo' => $validated['codigo'] ?? null,
+            'url_malla_curricular' => !empty($validated['url_malla_curricular']) ? trim($validated['url_malla_curricular']) : null,
+            'url_declaracion_jurada' => !empty($validated['url_declaracion_jurada']) ? trim($validated['url_declaracion_jurada']) : null,
+            'modelo_certificado' => !empty($validated['modelo_certificado']) ? trim($validated['modelo_certificado']) : null,
+            'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
             'tipo' => $validated['tipo'] ?? $carreraModel->tipo,
             'modalidad' => $validated['modalidad'] ?? $carreraModel->modalidad,
-            'duracion' => $validated['duracion'] ?? $carreraModel->duracion,
-            'descripcion' => $validated['descripcion'] ?? $carreraModel->descripcion,
-            'resolucion' => $validated['resolucion'] ?? null,
-            'brochure' => $validated['brochure'] ?? null,
-            'flyer' => $validated['flyer'] ?? null,
-            'modelo_titulo' => $validated['modelo_titulo'] ?? null,
+            'duracion' => !empty($validated['duracion']) ? trim($validated['duracion']) : $carreraModel->duracion,
+            'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : $carreraModel->descripcion,
+            'resolucion' => !empty($validated['resolucion']) ? trim($validated['resolucion']) : null,
+            'brochure' => !empty($validated['brochure']) ? trim($validated['brochure']) : null,
+            'flyer' => !empty($validated['flyer']) ? trim($validated['flyer']) : null,
+            'modelo_titulo' => !empty($validated['modelo_titulo']) ? trim($validated['modelo_titulo']) : null,
             'estado' => $validated['estado'] ?? $carreraModel->estado,
         ]);
 
@@ -202,7 +218,7 @@ class CarreraController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El programa \"{$nombre}\" ha sido eliminado.",
+            'message' => "El programa \"{$nombre}\" ha sido eliminado correctamente.",
         ]);
 
         return back();

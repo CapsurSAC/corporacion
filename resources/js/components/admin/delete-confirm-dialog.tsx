@@ -42,7 +42,7 @@ export function DeleteConfirmDialog({
                         justifyContent: 'center',
                         width: 38,
                         height: 38,
-                        borderRadius: '50%',
+                        borderRadius: 1,
                         bgcolor: 'error.main',
                         color: 'white',
                     }}

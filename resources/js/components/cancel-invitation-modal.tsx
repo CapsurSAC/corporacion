@@ -44,16 +44,16 @@ export default function CancelInvitationModal({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Cancel invitation</DialogTitle>
+                    <DialogTitle>Cancelar invitación</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to cancel the invitation for{' '}
+                        ¿Estás seguro de que deseas anular la invitación enviada a{' '}
                         <strong>{invitation?.email}</strong>?
                     </DialogDescription>
                 </DialogHeader>
 
                 <DialogFooter className="gap-2">
                     <DialogClose asChild>
-                        <Button variant="secondary">Keep invitation</Button>
+                        <Button variant="secondary">Conservar invitación</Button>
                     </DialogClose>
 
                     <Button
@@ -62,7 +62,7 @@ export default function CancelInvitationModal({
                         disabled={processing}
                         onClick={cancelInvitation}
                     >
-                        Cancel invitation
+                        Anular invitación
                     </Button>
                 </DialogFooter>
             </DialogContent>

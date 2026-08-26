@@ -29,6 +29,8 @@ import {
     Chip,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useNotification } from '@/hooks/use-notification';
+import { isMinLength, isValidHexColor } from '@/lib/validation';
 import type { Comercio, Grupo } from '@/types';
 
 const COLOR_PRESETS = [
@@ -40,7 +42,7 @@ const COLOR_PRESETS = [
     { name: 'Dorado (CECAVA-MIN)', hex: '#ca8a04' },
     { name: 'Naranja (MATPEL)', hex: '#ea580c' },
     { name: 'Celeste (GLOBALEX)', hex: '#0284c7' },
-    { name: 'Ámbar (IGE)', hex: '#d97706' },
+    { name: 'Ámbar', hex: '#d97706' },
     { name: 'Púrpura', hex: '#7c3aed' },
 ];
 
@@ -62,7 +64,9 @@ export function ComercioDialog({
     currentTeamSlug,
 }: ComercioDialogProps) {
     const isEditing = !!comercio;
+    const { notify } = useNotification();
     const [currentTab, setCurrentTab] = useState(0);
+    const [clientErrors, setClientErrors] = useState<{ grupo_id?: string; nombre?: string; color_hex?: string }>({});
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm<{
@@ -152,6 +156,7 @@ export function ComercioDialog({
             }
         }
 
+        setClientErrors({});
         clearErrors();
     }, [comercio, open, defaultGrupoId, grupos]);
 
@@ -187,23 +192,62 @@ export function ComercioDialog({
         setData('fotos', list);
     };
 
+    const validate = (): boolean => {
+        const newErrors: { grupo_id?: string; nombre?: string; color_hex?: string } = {};
+
+        if (!data.grupo_id) {
+            newErrors.grupo_id = 'Debes seleccionar un grupo comercial.';
+        }
+        if (!isMinLength(data.nombre, 3)) {
+            newErrors.nombre = 'El nombre del comercio debe tener al menos 3 caracteres.';
+        } else if (data.nombre.trim().length > 255) {
+            newErrors.nombre = 'El nombre no puede superar los 255 caracteres.';
+        }
+        if (data.color_hex && !isValidHexColor(data.color_hex)) {
+            newErrors.color_hex = 'Formato de color hexadecimal inválido (ej. #1d4ed8).';
+        }
+
+        setClientErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            if (newErrors.grupo_id || newErrors.nombre || newErrors.color_hex) {
+                setCurrentTab(0);
+            }
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validate()) {
+            notify.warning('Corrige los campos requeridos antes de guardar.');
+            return;
+        }
 
         if (isEditing && comercio) {
             put(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Ficha de "${data.nombre}" actualizada con éxito.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al actualizar el comercio.');
                 },
             });
         } else {
             post(`/${currentTeamSlug}/admin/comercios`, {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notify.success(`Comercio "${data.nombre}" creado exitosamente.`);
                     onOpenChange(false);
                     reset();
+                },
+                onError: () => {
+                    notify.error('Ocurrió un error al registrar el comercio.');
                 },
             });
         }
@@ -216,7 +260,7 @@ export function ComercioDialog({
             maxWidth="md"
             fullWidth
         >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
                     <StorefrontIcon color="primary" />
                     <span>{isEditing ? 'Editar Ficha de Comercio' : 'Nuevo Comercio / Institución'}</span>
@@ -244,13 +288,18 @@ export function ComercioDialog({
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
-                                    <FormControl fullWidth size="small" error={!!errors.grupo_id}>
+                                    <FormControl fullWidth size="small" error={!!(clientErrors.grupo_id || errors.grupo_id)}>
                                         <InputLabel id="select-grupo-label">Grupo Perteneciente *</InputLabel>
                                         <Select
                                             labelId="select-grupo-label"
                                             value={data.grupo_id}
                                             label="Grupo Perteneciente *"
-                                            onChange={(e) => setData('grupo_id', e.target.value)}
+                                            onChange={(e) => {
+                                                setData('grupo_id', e.target.value);
+                                                if (clientErrors.grupo_id) {
+                                                    setClientErrors((prev) => ({ ...prev, grupo_id: undefined }));
+                                                }
+                                            }}
                                         >
                                             {grupos.map((g) => (
                                                 <MenuItem key={g.id} value={String(g.id)}>
@@ -258,6 +307,11 @@ export function ComercioDialog({
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        {(clientErrors.grupo_id || errors.grupo_id) && (
+                                            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                                                {clientErrors.grupo_id || errors.grupo_id}
+                                            </Typography>
+                                        )}
                                     </FormControl>
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 3 }}>
@@ -283,17 +337,22 @@ export function ComercioDialog({
                             <TextField
                                 label="Nombre Comercial / Instituto *"
                                 value={data.nombre}
-                                onChange={(e) => setData('nombre', e.target.value)}
+                                onChange={(e) => {
+                                    setData('nombre', e.target.value);
+                                    if (clientErrors.nombre) {
+                                        setClientErrors((prev) => ({ ...prev, nombre: undefined }));
+                                    }
+                                }}
                                 placeholder="Ej. ISTP AVANTI, ISTP SIS, NEXT-ONLINE..."
-                                error={!!errors.nombre}
-                                helperText={errors.nombre}
+                                error={!!(clientErrors.nombre || errors.nombre)}
+                                helperText={clientErrors.nombre || errors.nombre || 'Mínimo 3 caracteres requeridos'}
                                 fullWidth
                                 required
                                 size="small"
                             />
 
                             {/* Color Selector */}
-                            <Box sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: 'action.hover' }}>
+                            <Box sx={{ p: 2, borderRadius: 1, border: '1px solid', borderColor: 'divider', bgcolor: 'action.hover' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                                     <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
                                         Color de Identidad Visual Corporativa

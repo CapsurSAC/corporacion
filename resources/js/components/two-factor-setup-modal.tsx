@@ -103,8 +103,8 @@ function TwoFactorSetupStep({
 
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
-                        <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                        <span className="relative bg-card px-2 py-1 text-xs text-muted-foreground">
+                            o ingresa la clave manualmente
                         </span>
                     </div>
 
@@ -210,7 +210,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                Volver
                             </Button>
                             <Button
                                 type="submit"
@@ -219,7 +219,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                Confirmar
                             </Button>
                         </div>
                     </div>
@@ -262,27 +262,27 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-factor authentication enabled',
+                title: 'Autenticación de Dos Factores Activa',
                 description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                    'La autenticación en dos pasos ya está habilitada. Escanea el código QR o ingresa la clave de configuración en tu app autenticadora.',
+                buttonText: 'Cerrar',
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify authentication code',
+                title: 'Verificar código de autenticación',
                 description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                    'Ingresa el código de 6 dígitos que aparece en tu app autenticadora',
+                buttonText: 'Continuar',
             };
         }
 
         return {
-            title: 'Enable two-factor authentication',
+            title: 'Activar autenticación de dos factores',
             description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+                'Para completar la activación, escanea el código QR o ingresa la clave en tu app autenticadora (Google Authenticator, Authy, etc.)',
+            buttonText: 'Continuar',
         };
     }, [twoFactorEnabled, showVerificationStep]);
 
