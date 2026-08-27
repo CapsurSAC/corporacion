@@ -1,0 +1,3937 @@
+{
+  "capacitaciones_drive": {
+    "escifor": "https://drive.google.com/drive/folders/1D7cuxZoapXajlK069xZ5T4bRwdymMAqz?usp=sharing",
+    "multimarca": "https://drive.google.com/drive/folders/1Q8zsrELUCRWCXyatxW4tJcx5FDhTsXnV?usp=sharing"
+  },
+  "grupos": [
+    {
+      "nombre": "ESCIFOR",
+      "slug": "escifor",
+      "descripcion": "Corporación Educativa Escifor"
+    },
+    {
+      "nombre": "MULTIMARCA",
+      "slug": "multimarca",
+      "descripcion": "Consorcio Multimarca"
+    },
+    {
+      "nombre": "GLOBALEX / IGE",
+      "slug": "globalex-ige",
+      "descripcion": "Alianza Globalex e IGE"
+    }
+  ],
+  "rubros": [
+    {
+      "nombre": "Curso Tradicional",
+      "clave": "tradicional",
+      "color_hex": "#0284c7",
+      "categoria": "Modalidad de Formación",
+      "orden": 1
+    },
+    {
+      "nombre": "Curso Especializado",
+      "clave": "especializado",
+      "color_hex": "#7c3aed",
+      "categoria": "Modalidad de Formación",
+      "orden": 2
+    },
+    {
+      "nombre": "Ambientales",
+      "clave": "ambientales",
+      "color_hex": "#059669",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 3
+    },
+    {
+      "nombre": "Calidad e ISOs",
+      "clave": "calidad_isos",
+      "color_hex": "#0284c7",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 4
+    },
+    {
+      "nombre": "Mineros",
+      "clave": "mineros",
+      "color_hex": "#d97706",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 5
+    },
+    {
+      "nombre": "Administración",
+      "clave": "administracion",
+      "color_hex": "#0d9488",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 6
+    },
+    {
+      "nombre": "Arq. e Ingeniería",
+      "clave": "arquitectura_ingenieria",
+      "color_hex": "#4f46e5",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 7
+    },
+    {
+      "nombre": "OSHA",
+      "clave": "osha",
+      "color_hex": "#dc2626",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 8
+    },
+    {
+      "nombre": "Comercio Exterior",
+      "clave": "comercio_exterior",
+      "color_hex": "#0891b2",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 9
+    },
+    {
+      "nombre": "Rubro Legal",
+      "clave": "rubro_legal",
+      "color_hex": "#7c3aed",
+      "categoria": "CECAVA (Rubros Técnicos)",
+      "orden": 10
+    },
+    {
+      "nombre": "No Actualizados",
+      "clave": "no_actualizados",
+      "color_hex": "#64748b",
+      "categoria": "Otros / Archivo",
+      "orden": 11
+    },
+    {
+      "nombre": "Nombramiento",
+      "clave": "nombramiento",
+      "color_hex": "#7c3aed",
+      "categoria": "MAGISTER (Educación)",
+      "orden": 12
+    },
+    {
+      "nombre": "Secundaria",
+      "clave": "secundaria",
+      "color_hex": "#059669",
+      "categoria": "MAGISTER (Educación)",
+      "orden": 13
+    },
+    {
+      "nombre": "Genérico",
+      "clave": "generico",
+      "color_hex": "#0284c7",
+      "categoria": "MAGISTER (Educación)",
+      "orden": 14
+    },
+    {
+      "nombre": "Tecnologías de la Información",
+      "clave": "tic",
+      "color_hex": "#2563eb",
+      "categoria": "SISTEMAS DEL SUR (TIC)",
+      "orden": 15
+    },
+    {
+      "nombre": "Inteligencia Artificial",
+      "clave": "inteligencia_artificial",
+      "color_hex": "#8b5cf6",
+      "categoria": "SISTEMAS DEL SUR (TIC)",
+      "orden": 16
+    },
+    {
+      "nombre": "Transformación Digital",
+      "clave": "transformacion_digital",
+      "color_hex": "#06b6d4",
+      "categoria": "SISTEMAS DEL SUR (TIC)",
+      "orden": 17
+    },
+    {
+      "nombre": "Programación",
+      "clave": "programacion",
+      "color_hex": "#10b981",
+      "categoria": "SISTEMAS DEL SUR (TIC)",
+      "orden": 18
+    },
+    {
+      "nombre": "Turismo y Hotelería",
+      "clave": "turismo_hoteleria",
+      "color_hex": "#f59e0b",
+      "categoria": "AVANTI (Turismo & Servicios)",
+      "orden": 19
+    },
+    {
+      "nombre": "Cosmetología y Estética",
+      "clave": "cosmetologia",
+      "color_hex": "#ec4899",
+      "categoria": "AVANTI (Turismo & Servicios)",
+      "orden": 20
+    },
+    {
+      "nombre": "Idiomas",
+      "clave": "idiomas",
+      "color_hex": "#3b82f6",
+      "categoria": "NEXT ONLINE (Idiomas)",
+      "orden": 21
+    },
+    {
+      "nombre": "Materiales Peligrosos",
+      "clave": "matpel",
+      "color_hex": "#ea580c",
+      "categoria": "MATPEL (Seguridad Industrial)",
+      "orden": 22
+    }
+  ],
+  "comercios": [
+    {
+      "nombre": "ISTP SIS",
+      "slug": "istp-sis",
+      "grupo_slug": "escifor",
+      "codigo": "SIS",
+      "sigla": "CEI",
+      "color_hex": "#0c43a3",
+      "logo_modo_claro": "/logos-comercios/sis-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/sis-para-fondo-oscuro.png",
+      "pagina_web": "https://www.sistemasdelsur.edu.pe/",
+      "plataforma_carrera": "https://www.sistemasdelsur.edu.pe/campus/",
+      "certificado_url": "https://drive.google.com/file/d/1Eo2Z5abbvLZ80-jLizG-aHPCs5aLoH4k/view",
+      "resolucion_revalidacion": "https://drive.google.com/file/d/1pGXQ_SoHFLT1jWWX1h7NMJ1R7ufPHtEP/view?usp=sharing",
+      "resolucion_creacion": "https://drive.google.com/file/d/1K2lg-693jDr2AGzxYfVbu6q4sjMyOkJY/view?usp=sharing",
+      "escale_minedu": "http://escale.minedu.gob.pe/",
+      "link_directo_escale": "https://escale.minedu.gob.pe/PadronWeb/info/ce?cod_mod=3dec9270bc77f782b6965f59879370e3&anexo=e5b2cd081051c13812069b7b77f0b41c",
+      "malla_curricular_url": "https://drive.google.com/file/d/1cMs7GY-AFObnvMvIcWOEFY9xRb8lLqnc/view?usp=sharing",
+      "reconocimiento_director": "https://drive.google.com/file/d/1RX_dWmYxR16O6EwJEKeKHGo2Tvf1TQ4c/view?usp=sharing",
+      "seminario": "https://drive.google.com/file/d/14uAg03cAqgcZAKiV9BkbVJId66dVW8Kg/view?usp=sharing",
+      "convenio": "https://drive.google.com/file/d/104PG2X_prnA5cjRMvjTrWTrrJs8f-blK/view?usp=sharing",
+      "canales_youtube": [
+        "https://www.youtube.com/@institutosis6394/videos",
+        "https://www.youtube.com/watch?v=dE-Szzr5hX8",
+        "https://www.youtube.com/watch?v=Vn0qJlZXYb4"
+      ],
+      "fotos": [
+        "https://drive.google.com/file/d/14PCtbpO_PMqdqKWAaHborKQEtR0almdr/view?usp=sharing",
+        "https://drive.google.com/file/d/18OWYw6l60R3wGhVRGZm849t74tN96Fff/view?usp=sharing"
+      ],
+      "brochure_vacaciones_utiles": "https://drive.google.com/file/d/1zw9nj0r3n4q-ukue8cxHqg2s3_ROkv3Y/view?usp=sharing",
+      "carreras": [
+        {
+          "nombre": "Computación e Informática",
+          "slug": "computacion-e-informatica",
+          "codigo": "COMP",
+          "tipo": "Carrera Profesional Técnica",
+          "modalidad": "Virtual / Presencial",
+          "duracion": "3 años (6 Ciclos)",
+          "url_malla_curricular": "https://drive.google.com/file/d/1cMs7GY-AFObnvMvIcWOEFY9xRb8lLqnc/view?usp=sharing",
+          "modelo_certificado": "https://drive.google.com/file/d/1Eo2Z5abbvLZ80-jLizG-aHPCs5aLoH4k/view",
+          "resolucion": "R.M. 355-97-ED / R.D. 632-2006-ED",
+          "descripcion": "Formación técnica profesional en desarrollo de sistemas, soporte computacional y gestión de redes."
+        }
+      ],
+      "diplomados": [
+        {
+          "nombre": "ESPECIALIDAD INTELIGENCIA ARTIFICIAL (IA)",
+          "slug": "especialidad-inteligencia-artificial-ia",
+          "tipo": "inteligencia_artificial",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1O313ulC_A-x1uJXhdFukVem-eLdr8kRK/view?usp=sharing",
+          "youtube": "https://youtu.be/3HXvHY0TdVo?si=3QCI5LroQWI03A7R",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "ESPECIALIDAD-CERTIFICACIÓN EXPERTO EN N8N \nArquitectura y Automatización Total de Procesos",
+          "slug": "especialidad-certificaci-n-experto-en-n8n-arquitectura-y-automatizaci-n-total-de-procesos",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1pBlrCLXKG0-H9VIRwRk5Mnw1Lv_7EQ-s/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "ESPECIALIDAD EN CIBERSEGURIDAD AVANZADA (CIBRAVANZ)",
+          "slug": "especialidad-en-ciberseguridad-avanzada-cibravanz",
+          "tipo": "transformacion_digital",
+          "flyer": "https://drive.google.com/file/d/1-DK-j2TBkySKZKBgJkPHHXJbHXL_Y0oQ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1lmJdEIdNJd5CX9N8h4sxZgCf-G3IeQCx/view?usp=sharing",
+          "youtube": "https://youtu.be/ByeyCURcIvw?si=BaVGmKI9OPylcoJR",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ESPECIALIDAD INTELIGENCIA ARTIFICIAL (IA)",
+          "slug": "especialidad-inteligencia-artificial-ia",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/16mWUKT-ji6mh2frS3HhJCPN5viA8sG_h/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1aDMGOvcUMK49qzQqHlbBTw3uUuk2PEMG/view?usp=sharing",
+          "youtube": "https://youtu.be/3HXvHY0TdVo?si=3QCI5LroQWI03A7R",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        }
+      ],
+      "cursos": [
+        {
+          "nombre": "CURSO ESPECIALIZADO EN INTELIGENCIA ARTIFICIAL PARA MARKETING (IAMKT)",
+          "slug": "curso-especializado-en-inteligencia-artificial-para-marketing-iamkt",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/1hKuXxqlQLveEBkQyVpW6HUQf2L7Z9uAg/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/12gGXe9-T9WuvmWLTU3eXjiFVelGPTMah/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL BÁSICO (GPTBA)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-b-sico-gptba",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/11oHCDExvO1HlvgHH2QCLSNC3XWWqPiXA/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1veS2PAK_jwSsiZVl9AJcv1-aGsJ3uvhj/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL INTERMEDIO (GTPINT)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-intermedio-gtpint",
+          "tipo": "inteligencia_artificial",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1imysKpw2B-4NdhKglOL1ViGgzMV5DiPr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL AVANZADO (GTPAVAN)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-avanzado-gtpavan",
+          "tipo": "inteligencia_artificial",
+          "flyer": null,
+          "brochure": null,
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "Mini-Arquitectos de IA (Kids & Teens)",
+          "slug": "mini-arquitectos-de-ia-kids--teens",
+          "tipo": "inteligencia_artificial",
+          "flyer": null,
+          "brochure": null,
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "Diseño y Creación de contenidos con IA",
+          "slug": "dise-o-y-creaci-n-de-contenidos-con-ia",
+          "tipo": "inteligencia_artificial",
+          "flyer": null,
+          "brochure": null,
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "PROGRAMACIÓN BÁSICA CON PYTHON (PBPY)",
+          "slug": "programaci-n-b-sica-con-python-pbpy",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/1Wu8mhmF5dViwK1rgqriD-0bqVmlhr1rW/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1fGWg2S-hHye7wSqJqi3rs3X76RKm2LsL/view?usp=sharing",
+          "youtube": "https://youtu.be/BiSXl8SxTUI",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "DESARROLLO DE APLICACIONES MOVILES (APMOVILES)",
+          "slug": "desarrollo-de-aplicaciones-moviles-apmoviles",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/1Go5dQgt58AWHRArU17jB478532G6O7j2/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BcxiwkriFAV9ah1G4An1tdppFEHKNG1R/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "Introducción y exploración a Cisco Packet Tracer (PACTRACER)",
+          "slug": "introducci-n-y-exploraci-n-a-cisco-packet-tracer-pactracer",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1LnrFz_nAGPLOiI7EXCV0IWzHUcFWfHWl/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "ASISTENTE ADMINISTRATIVO COMPUTARIZADO(AA)",
+          "slug": "asistente-administrativo-computarizado-aa",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/18DRtrj76Oh3iCFni1Gf8_zOV2HIegbSr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "ENSAMBLAJE Y DIAGNÓSTICO DE ÉQUIPOS DE CÓMPUTO (ENDIAEQP)",
+          "slug": "ensamblaje-y-diagn-stico-de-quipos-de-c-mputo-endiaeqp",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BlE38tpMFKBRHG1T-uqXimFQlyryvipH/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=WoP20gKoK5E&t=15s",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "OFIMÁTICA EMPRESARIAL (OFEMPR)",
+          "slug": "ofim-tica-empresarial-ofempr",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1N3ApfTl7reCTtPi5o1lZMkdikarPlfxW/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=IIBdZq5Q5UI",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "MARKETING DIGITAL PARA NEGOCIOS (MKDNEG)",
+          "slug": "marketing-digital-para-negocios-mkdneg",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/1czuejjIy3cb93rG0_Nrb0wtgpsS3E9sO/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Q_yM55BkPBk4P-8jmsM4sCVAWUc91wYo/view?usp=sharing",
+          "youtube": "https://youtu.be/UChPcWPZ4R0",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "ITIL 4 FOUNDATION FOR IT GOVERNANCE & SERVICE MANAGEMENT (ITIL4)",
+          "slug": "itil-4-foundation-for-it-governance--service-management-itil4",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/1NI7qCVYxVpZBCdeI_m_45Fy1NYioT02J/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/15_ST8k8JEm0scDpJ13DgXs0raDFf6Nnp/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "Model-Driven Programmability (DRIVPROGRA)",
+          "slug": "model-driven-programmability-drivprogra",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/10wkRb0B52Xbtl7gOFXJcF0dTxEGV4QmZ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO SAP - ERP (SAPERP)",
+          "slug": "curso-especializado-sap-erp-saperp",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1UO_KXJqk0_ANS-1TCfnGyq7ajYjC-rb8/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "SEGURIDAD INFORMÁTICA Y TECNOLOGÍAS DE LA INFORMACIÓN (SI)",
+          "slug": "seguridad-inform-tica-y-tecnolog-as-de-la-informaci-n-si",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1gh6IG127kQjL-R5OOo8nRJZmL0TASXfG/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1j3cacpWLxVHiclc9AislxAOpn6JsCprP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN TIKTOKS ADS (TIKTOKADS)",
+          "slug": "curso-especializado-en-tiktoks-ads-tiktokads",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1t1bZ9aVriast6N5IVdKZ3biSeViNIvQ9/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1tr0OEKEMiEa5WAHT97a00vpNbHF4tf8R/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": "computacion-e-informatica"
+        },
+        {
+          "nombre": "COREL DRAW PARA PRINCIPIANTES (CDR)",
+          "slug": "corel-draw-para-principiantes-cdr",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1sKC8RhMAlwCHjsnA7i0-xyU9AEtMTzn-/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BiraWXqNNKJ-Vz6JaPCAf_vV0qjkcJQZ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "REDES SOCIALES PARA EMPRENDEDORES (REDS)",
+          "slug": "redes-sociales-para-emprendedores-reds",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/10ZdETx-C53CUVy8H2G0nltuFPmOhUKIU/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1tZOfINApmtzN7PLTufkzGxxLbnaQ9ROK/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "SEO Y SEM DESDE CERO: POSICIONA EN GOOGLE (SS)",
+          "slug": "seo-y-sem-desde-cero-posiciona-en-google-ss",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1ZWsTPqxTV0p7L6ctt3FIBMIlw6XXPJx9/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/16MjXOwMRvoEMuCiZHd2gWutm08TtEW-Q/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "IMPLEMENTACIÓN DE REDES (IR)",
+          "slug": "implementaci-n-de-redes-ir",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Trp1nsWAee21z5O3fV_1aUHQcLT8Zmp2/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1KW4A3iHewxWU8owApN5FBcH5iQqZTYxP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "AGILE SCRUM FUNDAMENTALS (ASF)",
+          "slug": "agile-scrum-fundamentals-asf",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1GwFnMDlDN82CKq6w02aD9W4LwV0bkv_U/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1RrG-Gwf2eAw8D71_9tXLHu0qOR9C85Aq/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "EXCEL BÁSICO (EXB)",
+          "slug": "excel-b-sico-exb",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1cnvK0_r0WO6jXD7-k6tKh90mUMhJfV-f/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YtGYYY8wK0SI7ca4Y_6xx7pkINrZZ4cl/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "EXCEL INTERMEDIO (EXI)",
+          "slug": "excel-intermedio-exi",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1GvH5vSsZ6akGsOVC5vkSh9uy1NTshyAt/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ystXRL-i066P5tTKflynB4UGW80YzN6A/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "FACEBOOK ADS (FBADS)",
+          "slug": "facebook-ads-fbads",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1C1ce2BnGS4G6dreuCUZkS5PMWqSQBvkP/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1H_DR3La9xOOIGVrLfwOOUb0l5gmOwkNa/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "INSTAGRAM ADS (IADS)",
+          "slug": "instagram-ads-iads",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/18rVg5ttCEv-Ts-eb9eK3pRYs3BFMWZej/view?usp=sharing",
+          "brochure": null,
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "IMPLEMENTACIÓN DE SERVICIOS IP (ISIP)",
+          "slug": "implementaci-n-de-servicios-ip-isip",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1X_zUEqZix4DIDVHeaYmhOYliUDyFac8x/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YHPeM5tPA_JfBwITS24id89B-APr7du-/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "SCRUM MÁSTER (SCRMAST)",
+          "slug": "scrum-m-ster-scrmast",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1k9hJI6Mo1ONhFDXrKPlsgegccsl_lXDq/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1B-bF7Z7EcxH3nKb1Cd5f2aEn5FSrqzNK/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ANALÍTICA WEB CON GOOGLE ANALYTICS (AWGA)",
+          "slug": "anal-tica-web-con-google-analytics-awga",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1PjIOUJboSriP5_k6aEDIt9Fhq-dDd4Fn/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1zCidpp0LMUEOtWmpiNKnwIT19EAPwZX9/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CONTABILIDAD FINANCIERA (CONTFINA)",
+          "slug": "contabilidad-financiera-contfina",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1pjBivICl_gnJ-pxRu7y5RYShv8aqmiLM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1fa4DTG-mTdre8Ot1mgmLpDEvSnTIPx3F/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ATENCIÓN AL CLIENTE Y TÉCNICAS DE VENTA (ATCTC)",
+          "slug": "atenci-n-al-cliente-y-t-cnicas-de-venta-atctc",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1hT2ak2Al1Klq1l2VwaV622FO_FIq70Cm/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1lsFT74FhJIQ9AE7JU1xfvjZJQ96CJCsZ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "COMMUNITY MANAGER (CM)",
+          "slug": "community-manager-cm",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1N4XFq183GAw1xKq1H6C5pFdvjGCm1WbL/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1bQvq_VUOH8MqzHDC_O9pEiJ9QVARZC9S/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DESARROLLO FRONT END (DFRONT)",
+          "slug": "desarrollo-front-end-dfront",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1cDaquy-JxKix7EyAGhainigm2871k8aS/view?usp=sharing",
+          "brochure": null,
+          "youtube": "https://youtu.be/uRbxm21yK8Y",
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DISEÑO GRÁFICO Y EDICIÓN DE VIDEOS (DGEV)",
+          "slug": "dise-o-gr-fico-y-edici-n-de-videos-dgev",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1xWHhD5SFyO2lAMqO-67sV_WPJrh-9mav/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1CcE7OW8zAazwSApTjfIAL_ThA5SNOrA1/view?usp=sharing",
+          "youtube": "https://youtu.be/yVJG-uYvlog",
+          "precio": "S/. 200.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "SEGURIDAD INFORMÁTICA Y TECNOLOGÍAS DE LA INFORMACIÓN (SI)",
+          "slug": "seguridad-inform-tica-y-tecnolog-as-de-la-informaci-n-si",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1gh6IG127kQjL-R5OOo8nRJZmL0TASXfG/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1j3cacpWLxVHiclc9AislxAOpn6JsCprP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Tecnologías en Ciberseguridad - basica (TCIBERBA)",
+          "slug": "tecnolog-as-en-ciberseguridad-basica-tciberba",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1lkFrMfTrazZClYPPAnGgoaCbW6MtLpEi/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1s062qOmgo-boLfXH4l7Oui7JXEoSNRpb/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Hacking Ético Profesional (HKEPRO)",
+          "slug": "hacking-tico-profesional-hkepro",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1BCZiz6hDD0lRdRvG2Qz_CBktKlw0kD46/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=926YRNKL9Ws",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Hacking a Redes Sociales (HKREDS)",
+          "slug": "hacking-a-redes-sociales-hkreds",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13Y9bbR_rSq8CBNGYegEJMP2KzmTMvAb1/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ADMINISTRACIÓN DE BASE DE DATOS (ABD)",
+          "slug": "administraci-n-de-base-de-datos-abd",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1DAENt6GiJTPNgvLxZuhzHk-nqr5cxpdj/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "BASE DE DATOS SQL DESDE CERO (SQL0)",
+          "slug": "base-de-datos-sql-desde-cero-sql0",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1qa5Se27mIJybx524Jcfrz9_qRnjZfJnF/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=MxsaXaVvCBQ",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "MICROSOFT SQL SERVER ADMINISTRADOR & BI (SQLBI)",
+          "slug": "microsoft-sql-server-administrador--bi-sqlbi",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17nTUguWd4kwPXdHzODqNrOogRIshE9_X/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1s_cL6F7-B21zb4sXQ-dau0Hln_KxdMrq/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=HfN6lMxmV0k",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ANÁLISIS DE DATOS CON POWER BI (ANAPBI)",
+          "slug": "an-lisis-de-datos-con-power-bi-anapbi",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1RdaqxTT1Nb-aUyw7UP8-RJdwnbcj2FQM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YWgxrc29TppJNOmjy4Om5BizMGXTC0NP/view?usp=sharing",
+          "youtube": "https://youtu.be/tc252cUKA1o?si=ZGiMdPIwJ8j4iWbH",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "PROGRAMACIÓN BÁSICA CON PYTHON (PBPY)",
+          "slug": "programaci-n-b-sica-con-python-pbpy",
+          "tipo": "programacion",
+          "flyer": "https://drive.google.com/file/d/1Wu8mhmF5dViwK1rgqriD-0bqVmlhr1rW/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1fGWg2S-hHye7wSqJqi3rs3X76RKm2LsL/view?usp=sharing",
+          "youtube": "https://youtu.be/BiSXl8SxTUI",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DESARROLLO WEB CON JAVASCRIPT (JAVSCRIPT)",
+          "slug": "desarrollo-web-con-javascript-javscript",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1V3fDj7ZhRG7WP510u3fx0Ib3rL5QYzgw/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=VlEI4sgqlkk",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DISEÑO Y DESARROLLO WEB FRONT END Y BACK END (DWEB)",
+          "slug": "dise-o-y-desarrollo-web-front-end-y-back-end-dweb",
+          "tipo": "programacion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1y7cMGCLTeL4GbTSNiiWb0_3hIvEo7Jju/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=05pna3vYcbE",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ASISTENTE ADMINISTRATIVO COMPUTARIZADO(AA)",
+          "slug": "asistente-administrativo-computarizado-aa",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/18DRtrj76Oh3iCFni1Gf8_zOV2HIegbSr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ENSAMBLAJE Y DIAGNÓSTICO DE ÉQUIPOS DE CÓMPUTO (ENDIAEQP)",
+          "slug": "ensamblaje-y-diagn-stico-de-quipos-de-c-mputo-endiaeqp",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BlE38tpMFKBRHG1T-uqXimFQlyryvipH/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=WoP20gKoK5E&t=15s",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "OFIMÁTICA EMPRESARIAL (OFEMPR)",
+          "slug": "ofim-tica-empresarial-ofempr",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1N3ApfTl7reCTtPi5o1lZMkdikarPlfxW/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=IIBdZq5Q5UI",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "MARKETING DIGITAL PARA NEGOCIOS (MKDNEG)",
+          "slug": "marketing-digital-para-negocios-mkdneg",
+          "tipo": "transformacion_digital",
+          "flyer": "https://drive.google.com/file/d/1czuejjIy3cb93rG0_Nrb0wtgpsS3E9sO/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Q_yM55BkPBk4P-8jmsM4sCVAWUc91wYo/view?usp=sharing",
+          "youtube": "https://youtu.be/UChPcWPZ4R0",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ITIL 4 FOUNDATION FOR IT GOVERNANCE & SERVICE MANAGEMENT (ITIL4)",
+          "slug": "itil-4-foundation-for-it-governance--service-management-itil4",
+          "tipo": "transformacion_digital",
+          "flyer": "https://drive.google.com/file/d/1NI7qCVYxVpZBCdeI_m_45Fy1NYioT02J/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/15_ST8k8JEm0scDpJ13DgXs0raDFf6Nnp/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Administración de Redes y Comunicación de Datos basico-interm (ARC)",
+          "slug": "administraci-n-de-redes-y-comunicaci-n-de-datos-basico-interm-arc",
+          "tipo": "transformacion_digital",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1MHbIcl1D1jGfP7XPvSYHdF2v69AjN6Wm/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ADMINISTRACIÓN DE REDES Y COMUNICACIONES NIVEL AVANZADO: INFRAESTRUCTURA DE TI (INFRATI)",
+          "slug": "administraci-n-de-redes-y-comunicaciones-nivel-avanzado-infraestructura-de-ti-infrati",
+          "tipo": "transformacion_digital",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1PIZidQWBMh0NZbwz8zwC4mR02zYEV8vd/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN INTELIGENCIA ARTIFICIAL PARA MARKETING (IAMKT)",
+          "slug": "curso-especializado-en-inteligencia-artificial-para-marketing-iamkt",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/1dNjocD6f8uRHiXzlV_mXjpuUn9b7oXKE/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1b8vTdEBIV7RwixrCJcaY4l3kgcz4IirK/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL BÁSICO (GPTBA)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-b-sico-gptba",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/1jgICgLGrmD4CmeKC8pZYIeTMlDq0UYG8/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1877kdnvrGGp6GmClEAldBg3i-I7ZLjOL/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL INTERMEDIO (GTPINT)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-intermedio-gtpint",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/1A836C-LlfYu3PDUwVdb5UYzlpRNky7GK/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1XGvW5ecLTBOsgtSzP8i1dUL-PeXExIGy/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CHAT GPT: NIVEL AVANZADO (GTPAVAN)",
+          "slug": "curso-especializado-en-chat-gpt-nivel-avanzado-gtpavan",
+          "tipo": "inteligencia_artificial",
+          "flyer": "https://drive.google.com/file/d/1sVh7Sqbya8NIxvjb-_RX49TZNUUUI2sc/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1T92wljjH-i97yTkLx-NquNWizYSwtPkU/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Diseño e implementación de páginas web con IA",
+          "slug": "dise-o-e-implementaci-n-de-p-ginas-web-con-ia",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1ys45Wi9UAvZ1BU7sQ8RD3Sx2XeIWQnrr/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/11zuX9ZsItI_HILzi52FvykV08hE5hSgi/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Analista Junior en Ciberseguridad",
+          "slug": "analista-junior-en-ciberseguridad",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1p5sXkuZvgCfwkcUdYI217WhErmqW44Q3/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BtZcPGJ6undHeeIhDuSf_0m5JCKhJmzu/view?usp=sharing",
+          "youtube": "https://youtu.be/O4XDeFMVdVI?si=rbkAPVbfcScq_Wuv",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Redes Cisco: CCNA en Switching, Routing y Wireless",
+          "slug": "redes-cisco-ccna-en-switching-routing-y-wireless",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Kf1JueykpeqIrCHUPCg8-jTq_gaecrZ_/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1KZxmGJR9d6ZEI07xLmzHFRK7pAh5tkmL/view?usp=sharing",
+          "youtube": "https://youtu.be/SrtzKLKr7ww?si=vqgifyUfqAeNcaRp",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Fundamentos de redes Cisco",
+          "slug": "fundamentos-de-redes-cisco",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Ls8geZaU9k37K02u8Lo69BuJdL3B7ChM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1LsnSswYpjKaflbB0tVYe6GBp4pMlkoGG/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Enrutamiento Avanzado en Redes",
+          "slug": "enrutamiento-avanzado-en-redes",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1yx7auiltWfw8ScwfunK-Y0cKuw0SFCAT/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ArF-8MFiEt0l_xBlQ6rlmcGbCDP3DPi_/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Inteligencia de Negocios: Power BI",
+          "slug": "inteligencia-de-negocios-power-bi",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1ACvwxLiN1buxV75oQ9jLGI5Awfu4gKMw/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1CG5gPCihFp6GvnpeixXwNuSwLdtXyTMG/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "REDES CCNA CON BRIDGING V7 (REDBRIGV7)",
+          "slug": "redes-ccna-con-bridging-v7-redbrigv7",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/12_Z5hUAJhcd98Md4PNb7OhdKLuf9lJ8h/view?usp=sharing",
+          "youtube": "https://youtu.be/0Ryk4vkk-T8?si=gGMgu5LUx7PurZjU",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Administración de Redes y Comunicación de Datos basico-interm (ARC)",
+          "slug": "administraci-n-de-redes-y-comunicaci-n-de-datos-basico-interm-arc",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1MHbIcl1D1jGfP7XPvSYHdF2v69AjN6Wm/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ASISTENTE ADMINISTRATIVO COMPUTARIZADO(AA)",
+          "slug": "asistente-administrativo-computarizado-aa",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/18DRtrj76Oh3iCFni1Gf8_zOV2HIegbSr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ENSAMBLAJE Y DIAGNÓSTICO DE ÉQUIPOS DE CÓMPUTO (ENDIAEQP)",
+          "slug": "ensamblaje-y-diagn-stico-de-quipos-de-c-mputo-endiaeqp",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BlE38tpMFKBRHG1T-uqXimFQlyryvipH/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=WoP20gKoK5E&t=15s",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "OFIMÁTICA EMPRESARIAL (OFEMPR)",
+          "slug": "ofim-tica-empresarial-ofempr",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1N3ApfTl7reCTtPi5o1lZMkdikarPlfxW/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=IIBdZq5Q5UI",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "MARKETING DIGITAL PARA NEGOCIOS (MKDNEG)",
+          "slug": "marketing-digital-para-negocios-mkdneg",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1czuejjIy3cb93rG0_Nrb0wtgpsS3E9sO/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Q_yM55BkPBk4P-8jmsM4sCVAWUc91wYo/view?usp=sharing",
+          "youtube": "https://youtu.be/UChPcWPZ4R0",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "APLICACIONES BIG DATA CON PYTHON FUNDAMENTALS (BIGPYTH)",
+          "slug": "aplicaciones-big-data-con-python-fundamentals-bigpyth",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1kdDXuLlfH-7nLHq2bxOipqU_E3_u0HdF/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1SvdNkk5ytb0myryUnrzrH_RGgazoOeuc/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "PROGRAMACIÓN BÁSICA CON PYTHON (PBPY)",
+          "slug": "programaci-n-b-sica-con-python-pbpy",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1Wu8mhmF5dViwK1rgqriD-0bqVmlhr1rW/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1fGWg2S-hHye7wSqJqi3rs3X76RKm2LsL/view?usp=sharing",
+          "youtube": "https://youtu.be/BiSXl8SxTUI",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "PROGRAMACIÓN BÁSICA CON JAVA NETBEANS (NETBEANS)",
+          "slug": "programaci-n-b-sica-con-java-netbeans-netbeans",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1pSRfutp3jOLAhMPuPgqylUjevr0l1Tmq/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=VlEI4sgqlkk",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DESARROLLO WEB CON JAVASCRIPT (JAVSCRIPT)",
+          "slug": "desarrollo-web-con-javascript-javscript",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1V3fDj7ZhRG7WP510u3fx0Ib3rL5QYzgw/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=VlEI4sgqlkk",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "DISEÑO Y DESARROLLO WEB FRONT END Y BACK END (DWEB)",
+          "slug": "dise-o-y-desarrollo-web-front-end-y-back-end-dweb",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1y7cMGCLTeL4GbTSNiiWb0_3hIvEo7Jju/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=05pna3vYcbE",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ANÁLISIS DE DATOS CON POWER BI (ANAPBI)",
+          "slug": "an-lisis-de-datos-con-power-bi-anapbi",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1RdaqxTT1Nb-aUyw7UP8-RJdwnbcj2FQM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YWgxrc29TppJNOmjy4Om5BizMGXTC0NP/view?usp=sharing",
+          "youtube": "https://youtu.be/tc252cUKA1o?si=ZGiMdPIwJ8j4iWbH",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "MICROSOFT SQL SERVER ADMINISTRADOR & BI (SQLBI)",
+          "slug": "microsoft-sql-server-administrador--bi-sqlbi",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/17nTUguWd4kwPXdHzODqNrOogRIshE9_X/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1s_cL6F7-B21zb4sXQ-dau0Hln_KxdMrq/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=HfN6lMxmV0k",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ADMINISTRACIÓN DE BASE DE DATOS (ABD)",
+          "slug": "administraci-n-de-base-de-datos-abd",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1DAENt6GiJTPNgvLxZuhzHk-nqr5cxpdj/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "BASE DE DATOS SQL DESDE CERO (SQL0)",
+          "slug": "base-de-datos-sql-desde-cero-sql0",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1qa5Se27mIJybx524Jcfrz9_qRnjZfJnF/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=MxsaXaVvCBQ",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO : CIBERSEGURIDAD EMPRESARIAL 360: CIBERPROTECCIÓN Y PRIVACIDAD EN ACCIÓN (CIB360)",
+          "slug": "curso--ciberseguridad-empresarial-360-ciberprotecci-n-y-privacidad-en-acci-n-cib360",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/17MDUxgImNukzQP7xKX05P_kpct4kFz2V/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/188yTLcDStZXMWZk6cquXNWvagMwPe8LB/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO: DEFENSA DIGITAL: CURSO INTEGRAL DE SEGURIDAD INFORMÁTICA (DEFDIGITAL)",
+          "slug": "curso-defensa-digital-curso-integral-de-seguridad-inform-tica-defdigital",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/10f6upGnwQkvEGrIG6TGE1iA1vSi3CHeq/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1VZ1-dFGfIuQmxqzqTGcBCg4zFIZ-jtFu/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO: ENGAÑO Y DEFENSA: INTRODUCCIÓN A LA INGENIERÍA SOCIAL EN SEGURIDAD INFORMÁTICA (ENGYDEFEN)",
+          "slug": "curso-enga-o-y-defensa-introducci-n-a-la-ingenier-a-social-en-seguridad-inform-tica-engydefen",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1-i7g9XzH1CKiDL6iSuDqhWxQN1D7Tv3O/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1oOSMnMi2nq_VLpKunvlBEG2kt_5Ens1b/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "AGILE SCRUM FUNDAMENTALS (ASF)",
+          "slug": "agile-scrum-fundamentals-asf",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1GwFnMDlDN82CKq6w02aD9W4LwV0bkv_U/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1RrG-Gwf2eAw8D71_9tXLHu0qOR9C85Aq/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "COMMUNITY MANAGER (CM)",
+          "slug": "community-manager-cm",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1N4XFq183GAw1xKq1H6C5pFdvjGCm1WbL/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1bQvq_VUOH8MqzHDC_O9pEiJ9QVARZC9S/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ATENCIÓN AL CLIENTE Y TÉCNICAS DE VENTA (ATCTC)",
+          "slug": "atenci-n-al-cliente-y-t-cnicas-de-venta-atctc",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1hT2ak2Al1Klq1l2VwaV622FO_FIq70Cm/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1lsFT74FhJIQ9AE7JU1xfvjZJQ96CJCsZ/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "SCRUM MÁSTER (SCRMAST)",
+          "slug": "scrum-m-ster-scrmast",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1k9hJI6Mo1ONhFDXrKPlsgegccsl_lXDq/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1B-bF7Z7EcxH3nKb1Cd5f2aEn5FSrqzNK/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "IMPLEMENTACIÓN DE SERVICIOS IP (ISIP)",
+          "slug": "implementaci-n-de-servicios-ip-isip",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1X_zUEqZix4DIDVHeaYmhOYliUDyFac8x/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YHPeM5tPA_JfBwITS24id89B-APr7du-/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "APLICACIONES BIG DATA CON PYTHON FUNDAMENTALS (BIGPYTH)",
+          "slug": "aplicaciones-big-data-con-python-fundamentals-bigpyth",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1kdDXuLlfH-7nLHq2bxOipqU_E3_u0HdF/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1SvdNkk5ytb0myryUnrzrH_RGgazoOeuc/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "IMPLEMENTACIÓN DE REDES (IR)",
+          "slug": "implementaci-n-de-redes-ir",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Trp1nsWAee21z5O3fV_1aUHQcLT8Zmp2/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1KW4A3iHewxWU8owApN5FBcH5iQqZTYxP/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Diseño e implementación de páginas web con IA",
+          "slug": "dise-o-e-implementaci-n-de-p-ginas-web-con-ia",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1ys45Wi9UAvZ1BU7sQ8RD3Sx2XeIWQnrr/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/11zuX9ZsItI_HILzi52FvykV08hE5hSgi/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Analista Junior en Ciberseguridad",
+          "slug": "analista-junior-en-ciberseguridad",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1p5sXkuZvgCfwkcUdYI217WhErmqW44Q3/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BtZcPGJ6undHeeIhDuSf_0m5JCKhJmzu/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Redes Cisco: CCNA en Switching, Routing y Wireless",
+          "slug": "redes-cisco-ccna-en-switching-routing-y-wireless",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Kf1JueykpeqIrCHUPCg8-jTq_gaecrZ_/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1KZxmGJR9d6ZEI07xLmzHFRK7pAh5tkmL/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Fundamentos de redes Cisco",
+          "slug": "fundamentos-de-redes-cisco",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1Ls8geZaU9k37K02u8Lo69BuJdL3B7ChM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1LsnSswYpjKaflbB0tVYe6GBp4pMlkoGG/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Enrutamiento Avanzado en Redes",
+          "slug": "enrutamiento-avanzado-en-redes",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1yx7auiltWfw8ScwfunK-Y0cKuw0SFCAT/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ArF-8MFiEt0l_xBlQ6rlmcGbCDP3DPi_/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Inteligencia de Negocios: Power BI",
+          "slug": "inteligencia-de-negocios-power-bi",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1ACvwxLiN1buxV75oQ9jLGI5Awfu4gKMw/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1CG5gPCihFp6GvnpeixXwNuSwLdtXyTMG/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO : CIBERSEGURIDAD EMPRESARIAL 360: CIBERPROTECCIÓN Y PRIVACIDAD EN ACCIÓN (CIB360)",
+          "slug": "curso--ciberseguridad-empresarial-360-ciberprotecci-n-y-privacidad-en-acci-n-cib360",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17MDUxgImNukzQP7xKX05P_kpct4kFz2V/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/188yTLcDStZXMWZk6cquXNWvagMwPe8LB/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO: DEFENSA DIGITAL: CURSO INTEGRAL DE SEGURIDAD INFORMÁTICA (DEFDIGITAL)",
+          "slug": "curso-defensa-digital-curso-integral-de-seguridad-inform-tica-defdigital",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/10f6upGnwQkvEGrIG6TGE1iA1vSi3CHeq/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1VZ1-dFGfIuQmxqzqTGcBCg4zFIZ-jtFu/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO: ENGAÑO Y DEFENSA: INTRODUCCIÓN A LA INGENIERÍA SOCIAL EN SEGURIDAD INFORMÁTICA (ENGYDEFEN)",
+          "slug": "curso-enga-o-y-defensa-introducci-n-a-la-ingenier-a-social-en-seguridad-inform-tica-engydefen",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1-i7g9XzH1CKiDL6iSuDqhWxQN1D7Tv3O/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1oOSMnMi2nq_VLpKunvlBEG2kt_5Ens1b/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ITIL 4 FOUNDATION FOR IT GOVERNANCE & SERVICE MANAGEMENT (ITIL4)",
+          "slug": "itil-4-foundation-for-it-governance--service-management-itil4",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1NI7qCVYxVpZBCdeI_m_45Fy1NYioT02J/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/15_ST8k8JEm0scDpJ13DgXs0raDFf6Nnp/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ENSAMBLAJE Y DIAGNÓSTICO DE ÉQUIPOS DE CÓMPUTO (ENDIAEQP)",
+          "slug": "ensamblaje-y-diagn-stico-de-quipos-de-c-mputo-endiaeqp",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1BlE38tpMFKBRHG1T-uqXimFQlyryvipH/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "OFIMÁTICA EMPRESARIAL (OFEMPR)",
+          "slug": "ofim-tica-empresarial-ofempr",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/17qO8SRTl5eQEQAuzn0nJDNPwMKjft_ei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1N3ApfTl7reCTtPi5o1lZMkdikarPlfxW/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "MARKETING DIGITAL PARA NEGOCIOS (MKDNEG)",
+          "slug": "marketing-digital-para-negocios-mkdneg",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1czuejjIy3cb93rG0_Nrb0wtgpsS3E9sO/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Q_yM55BkPBk4P-8jmsM4sCVAWUc91wYo/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "Hacking a Redes Sociales (HKREDS)",
+          "slug": "hacking-a-redes-sociales-hkreds",
+          "tipo": "tic",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13Y9bbR_rSq8CBNGYegEJMP2KzmTMvAb1/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "ESPECIALIDAD EN CIBERSEGURIDAD AVANZADA EN TECNOLOGÍAS DE INFORMACIÓN (CIBRAVANZ)",
+          "slug": "especialidad-en-ciberseguridad-avanzada-en-tecnolog-as-de-informaci-n-cibravanz",
+          "tipo": "tic",
+          "flyer": "https://drive.google.com/file/d/1-DK-j2TBkySKZKBgJkPHHXJbHXL_Y0oQ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1lmJdEIdNJd5CX9N8h4sxZgCf-G3IeQCx/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        }
+      ]
+    },
+    {
+      "nombre": "ISTP AVANTI",
+      "slug": "istp-avanti",
+      "grupo_slug": "escifor",
+      "codigo": "AVANTI",
+      "sigla": "AVANTI",
+      "color_hex": "#d97706",
+      "logo_modo_claro": "/logos-comercios/avanti-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/avanti-para-fondo-oscuro.png",
+      "catalogo_url": "https://drive.google.com/file/d/1qx_3CAGwHJbUwGvxmu-AFDVB_miekO4x/view?usp=sharing",
+      "reconocimiento_director": "https://drive.google.com/file/d/1ciClWEzQSGi4SW_NRpxROnKdm2jcMGQl/view?usp=sharing",
+      "escale_minedu": "https://escale.minedu.gob.pe/PadronWeb/info/ce?cod_mod=307c278290bf7d64516def7626b16a34&anexo=e5b2cd081051c13812069b7b77f0b41c",
+      "plataforma_carrera": "https://avantisac.edu.pe/aulavirtual/",
+      "pagina_web": "https://avantisac.edu.pe/",
+      "como_ingresar_plataforma": "https://youtu.be/dnHgMp8LOSM",
+      "promocion_vigente": null,
+      "carreras": [
+        {
+          "nombre": "Guía Oficial de Turismo",
+          "slug": "guia-oficial-de-turismo",
+          "codigo": "GOT",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/1kjmeE-c7DV9ul9nuCYan6X2FbM9XHGgs/view?usp=sharing",
+          "modelo_certificado": "https://drive.google.com/file/d/1EVOpHHosfJNQkILZxMi6K2Mub1L_o6do/view?usp=sharing",
+          "modelo_titulo": null,
+          "descripcion": "Formación integral en guiado, conducción de grupos, gestión de servicios turísticos e interpretación del patrimonio."
+        },
+        {
+          "nombre": "Administración de Servicios de Hostelería",
+          "slug": "administracion-de-servicios-de-hosteleria",
+          "codigo": "ASH",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/1kPldSrUXtoRbPhv6GQUCEQv_SETHY6aH/view?usp=sharing",
+          "modelo_titulo": "https://drive.google.com/file/d/11RMNLQFV0hyq4_CL5dfDeChb4RAhVDWq/view?usp=sharing",
+          "resolucion": null,
+          "descripcion": "Gestión estratégica de alojamiento, alimentos y bebidas, dirección de eventos y administración hotelera."
+        },
+        {
+          "nombre": "Cosmetología",
+          "slug": "cosmetologia",
+          "codigo": "COSM",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/1n3wk09DBQuRsAUnyNgGU3ewwhupD3Tr4/view?usp=sharing",
+          "flyer": "https://drive.google.com/file/d/1m7jw8afmse3fYwiTRaXSJJYf0l4awRm2/view?usp=sharing",
+          "modelo_titulo": null,
+          "descripcion": "Especialización en tratamientos capilares, cuidado estético facial, corporal y tendencias profesionales de belleza."
+        }
+      ],
+      "diplomados": [
+        {
+          "nombre": "DIPLOMADO EN DIRECCIÓN EN MARKETING Y VENTAS PARA EL SECTOR TURISMO-HOTELERO (DMVST) #ACTUALIZADO",
+          "slug": "diplomado-en-direcci-n-en-marketing-y-ventas-para-el-sector-turismo-hotelero-dmvst-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1QoapXQFKCWAwn4QSvK75rsb_0tXr9MF7/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1rbXxnwjFxFYobJoFfVRxYevbOmnqR-5M/view?usp=sharing",
+          "youtube": "https://www.youtube.com/watch?v=qpHvWhTjGM8",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN DISEÑO Y DESARROLLO DE PAQUETES TURÍSTICOS (DDPT) #ACTUALIZADO",
+          "slug": "diplomado-en-dise-o-y-desarrollo-de-paquetes-tur-sticos-ddpt-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1i3c9TMklk5P7GrEFMb10uCQ_RnuRKqme/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1q29MmSymiLSNNjpgMcwc3FImVdVVrU0h/view?usp=sharing",
+          "youtube": "https://youtu.be/JsfyugindPM",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN TÉCNICAS DE GUIADO TURÍSTICO (TGT) #ACTUALIZADO",
+          "slug": "diplomado-en-t-cnicas-de-guiado-tur-stico-tgt-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1geJUpBpcaANAYO8BdsTcn3UxdH3luMqu/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/19ji-8BSVDTRu9pF5JKo5z4PVnFDLVz12/view?usp=sharing",
+          "youtube": "https://youtu.be/B9tqsUFVMqk",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN DIRECCIÓN Y GESTION DE AGENCIAS DE VIAJE (DGAV)",
+          "slug": "diplomado-en-direcci-n-y-gestion-de-agencias-de-viaje-dgav",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1zRONKr0B_aLjdCWYlYExRQ2Dsry22zkl/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1zOE7btOAWQWC23vrIBqEwjsQD8ufeX3t/view?usp=sharing",
+          "youtube": "https://youtu.be/0RmPM88Ky58?si=ywzpZ_qARTxdNW61",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO AGENTE DE VIAJE (AGV) #ACTUALIZADO",
+          "slug": "diplomado-agente-de-viaje-agv-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1JmlKdBKhHmNqV4joggw5Y2Ei2r016Cqt/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1sSbYzdcMqrMsZInm9aap1cYtJzraXXTV/view?usp=sharing",
+          "youtube": "https://youtu.be/ssqu1zm1d9g?si=60KNdySlH47fD9j4",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ALTA DIRECCIÓN EN EL SECTOR TURÍSTICO (ADST)",
+          "slug": "diplomado-alta-direcci-n-en-el-sector-tur-stico-adst",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1mfCgkR24-RtZEZP4kdO-g3sBnUSfkUo5/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1wXMcfQL598_SYOGPXkVJ0s2-R6QitnSo/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN ADMINISTRACIÓN Y DIRECCIÓN DE HOTELES Y ALOJAMIENTO (ADHA) #ACTUALIZADO",
+          "slug": "diplomado-en-administraci-n-y-direcci-n-de-hoteles-y-alojamiento-adha-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1ZA3ag3AC5yUJe3-a3jg1A0jCkhXiow4l/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1xuuxqVAmb93MYrHU2lG3Eraa1PcNd5j_/view?usp=sharing",
+          "youtube": "https://youtu.be/o1f33e1PWm0",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GESTIÓN INTEGRAL DE AGENCIAS DE VIAJE: DE AGENTE A DIRECTOR #NUEVO",
+          "slug": "diplomado-en-gesti-n-integral-de-agencias-de-viaje-de-agente-a-director-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/18AgeXyeFUmI9wLOQDzEoptX4ukmnZh8n/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ax0kdwsjyztIgxczrqEKdtRZhf5T2d85/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GUIADO TURÍSTICO 4.0: INTERPRETACIÓN, SEGURIDAD Y EXPERIENCIAS #NUEVO",
+          "slug": "diplomado-en-guiado-tur-stico-4-0-interpretaci-n-seguridad-y-experiencias-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1xyCf8LIGUIlDCCuBW0PTtmIh9iiCA3Wh/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/15Ont4X6jF1NTJehxI_5-fpKkrQNMdSRq/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN DIRECCIÓN COMERCIAL 4.0: MARKETING, VENTAS Y IA PARA TURISMO #NUEVO",
+          "slug": "diplomado-en-direcci-n-comercial-4-0-marketing-ventas-y-ia-para-turismo-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1CCf__gB1rucoTNC2JyAbTftAuDHQEC21/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1nidLlnD6979DYsk1MI1M9z3RrUnj7CiV/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO INTEGRAL EN GESTIÓN Y SEGURIDAD DE REST, BARES Y SERV. GASTRONÓMICOS #NUEVO",
+          "slug": "diplomado-integral-en-gesti-n-y-seguridad-de-rest-bares-y-serv-gastron-micos-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1hlq_bhLoOIU0GjaGJb2DTdlYZlNn74-A/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1VhGavPtzeniS8oqVAfTwXTSD4j18TI49/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADOS REPOTENCIANDO MI SITIO WEB HOTELES & HOSTALES (RSWH)",
+          "slug": "curso-especializados-repotenciando-mi-sitio-web-hoteles--hostales-rswh",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/16E9bujI9BknD7IaQZgFXAJzeon1hH2cE/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/11zedXnc1qB7HeTOgVJgnjXGSWMTRQjYY/view?usp=sharing",
+          "youtube": "https://youtu.be/4CJGAHfmsDM",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO ESPECIALIZADO EN CREACIÓN Y DIRECCIÓN DE RUTAS TURÍSTICAS (CDRTU) #ACTUALIZADO",
+          "slug": "curso-especializado-en-creaci-n-y-direcci-n-de-rutas-tur-sticas-cdrtu-actualizado",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1jvVHgiB0fnGQFWuIN5IW5V6ijIliXZKh/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1M3BE8ZyZ-e4wtd2I7ZmS9oEYz8YXrhy_/view?usp=sharing",
+          "youtube": "https://youtu.be/oFX9zx6CURc",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO Gestión Profesional en housekeeping #NUEVO",
+          "slug": "curso-gesti-n-profesional-en-housekeeping-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1ITYN98_K72bfbr0y0TdQjDM4ruCB4--Q/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YgjqfO9z8JOmdFPXB1IuCTtScGPJJ24_/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO Organización Profesional en Eventos y Congresos #NUEVO",
+          "slug": "curso-organizaci-n-profesional-en-eventos-y-congresos-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1i2iS4O63ArqiqK0ZOpOyXNf1Jy4TS1X3/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1_JzXbewjdUrkRl-PLtB4zpZQ4c5pfMsn/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO Estrategias de Marketing para Negocios Gastronómicos #NUEVO",
+          "slug": "curso-estrategias-de-marketing-para-negocios-gastron-micos-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1mPr2rEpxJdNUSL-AOrdY86GJI5mYUdv-/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1tt5nQFfiGY3aNbJw3_S8ruV9h4ELH9WC/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO Turismo Vivencial y Desarrollo de Comunidades #NUEVO",
+          "slug": "curso-turismo-vivencial-y-desarrollo-de-comunidades-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1a7jzt9LoYAJQs82rBDlyGu1xoVe_sKU5/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/182L6LCOrwhYcwle-zprDFNXnr81ExOzz/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO Recepción y Atención al Cliente en Hoteles de Alto Nivel #NUEVO",
+          "slug": "curso-recepci-n-y-atenci-n-al-cliente-en-hoteles-de-alto-nivel-nuevo",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1Qrz0nJkD3QMZTyxQ8aZWwlrtPRFXiO1y/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1XopbF4hq6caQYh_eG87QdeSvZ9lIE6h1/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE CAUTERIZACION CAPILAR (CAUCAP)",
+          "slug": "curso-de-cauterizacion-capilar-caucap",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1kXPPO0D-poYVwk9tuuiHU6x1fpW4e8av/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/169MlJY7BVvStoA0x2_I_LLZshlvq-N2c/view?usp=sharing",
+          "youtube": "https://youtu.be/ktZASVg5Y6o?si=hS3hALX-pXj9JiJI",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN UÑAS ACRILICAS Y GEL (UÑACG)",
+          "slug": "diplomado-en-u-as-acrilicas-y-gel-u-acg",
+          "tipo": "turismo_hoteleria",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1JHCzZICpe9hXDCb3mFiHP2N3y0EaZVKS/view?usp=sharing",
+          "youtube": "https://youtu.be/2wXE-vj8TrE?si=XtOORK698uQO0J9F",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO PELUQUERIA Y BARBERIA (PELBARB)",
+          "slug": "diplomado-peluqueria-y-barberia-pelbarb",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/19-ewmKUDXxD_HmnuvXUo8AGxzaLqYwGG/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1gC3ORtHgWongLbuoukdUW5ColoWWkMVo/view?usp=sharing",
+          "youtube": "https://youtu.be/N_jc2mSBHYY",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO PREVENC. DE RIESGOS LABORALES EN BARES Y  RESTAURATES (PRLBR)",
+          "slug": "diplomado-prevenc-de-riesgos-laborales-en-bares-y-restaurates-prlbr",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1qkM-yESGkDB9Uezyv4NJ1BFp0JOjyYz2/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1aJ4nXlhQ5ImWkk_RW8nfP-uxliB36xhL/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO DIRECCION DE RESTAURANTES (DREST)",
+          "slug": "diplomado-direccion-de-restaurantes-drest",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1WUKQ6zU6J5ZAOypo0b8eYeJR2h7uUIei/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ddgGlwWIjyipbVTdi_1IdZiXXDxh_Jtw/view?usp=sharing",
+          "youtube": "https://youtu.be/kc9OBQGivfI?si=Yp-fItpK68-drh_K",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN EMPODERAMIENTO FEMENINO EN LA ALTA DIRECCIÓN DE TURISMO (EFADT)",
+          "slug": "diplomado-en-empoderamiento-femenino-en-la-alta-direcci-n-de-turismo-efadt",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1dZ1HqhRcWAhtkJ7r1jX20in09393SVw_/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1hJXrB4yhmY-VcrQPZRXK6SUNl2Esp65H/view?usp=sharing",
+          "youtube": "https://youtu.be/ViB0pv4HOdo?si=rN-0brFJSfcB2z3R",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TURISMO POTENCIADO POR LA IA (TUPOIA)",
+          "slug": "diplomado-turismo-potenciado-por-la-ia-tupoia",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1XFrjH6D7oABNzX2ayVPEb12iuJ39ol-_/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1JIWD0hpy_P3n_sNdGx6zuu1iYthjbIB7/view?usp=sharing",
+          "youtube": "https://youtu.be/f9mdWW5pd0o?si=eF6Cy9phTCKoWo8h",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TURISMO MISTICO (TUMI)",
+          "slug": "diplomado-turismo-mistico-tumi",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1I_VFhF_BNzrY-OGDq5nuY7Jnk7doIq0d/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1vDpeFZ5_slpp8Ef4EoSYQeDUPeN952Xy/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TURISMO ESPIRITUAL (TUESPI)",
+          "slug": "diplomado-turismo-espiritual-tuespi",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1m6lTzr4jYtoK_NUCaMYSj4iTN9L5iPQL/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1JxsMmG7v6yyXxOLkJR1klDolt01Dgw-l/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN PROYECTO TURÍSTICO SOSTENIBLE(TUSOS)",
+          "slug": "diplomado-en-proyecto-tur-stico-sostenible-tusos",
+          "tipo": "turismo_hoteleria",
+          "flyer": "https://drive.google.com/file/d/1fIj7bVbxMMSoqbAroD28jCEx94uDo-BM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Cicqw4zUN2GG0xofmq3pG4hxaRqXOz2U/view?usp=sharing",
+          "youtube": "https://youtu.be/IrLC3UyXY7Q?si=RgD3YKzpXQ9rqvrc",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN CONTAMINACIÓN CRUZADA (CC)",
+          "slug": "diplomado-en-contaminaci-n-cruzada-cc",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1_MAUfZTWIWmj10lDa1qT3I7mfZj1AHnZ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1OYPmB8PWjkexl6S5wGZOpNMcXQ6_XD0Z/view",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN BUENAS PRÁCTICAS DE MANIPULACIÓN, HIEGIENE Y CONSERVACIÓN DE ALIMENTOS (BPMHCA)",
+          "slug": "diplomado-en-buenas-pr-cticas-de-manipulaci-n-hiegiene-y-conservaci-n-de-alimentos-bpmhca",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1vhwzkXpnKoUAMej9O8N8AiiK_DrwkX9x/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1r7VqSTdJ7HXdmR6sqYt-LXDlQSdSz3HF/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        }
+      ],
+      "cursos": []
+    },
+    {
+      "nombre": "NEXT-ONLINE",
+      "slug": "next-online",
+      "grupo_slug": "escifor",
+      "codigo": "NEXT",
+      "sigla": "NEXT",
+      "color_hex": "#0284c7",
+      "logo_modo_claro": "/logos-comercios/next-online-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/next-online-para-fondo-oscuro.png",
+      "carreras": [],
+      "diplomados": [],
+      "cursos": [
+        {
+          "nombre": "INGLÉS BÁSICO (IB) (ACTUALIZADO)",
+          "slug": "ingl-s-b-sico-ib-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Vh4OKRd7t1SiqXtHhkU47VZ-oyuWTvEa/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS INTERMEDIO (IINT) (ACTUALIZADO)",
+          "slug": "ingl-s-intermedio-iint-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Q6la7AWdaoJvWcvH0NQKLhUID-dSnHsB/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS AVANZADO (IAVAN) (ACTUALIZADO)",
+          "slug": "ingl-s-avanzado-iavan-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Vot_WyZsqEwVkCXlYaquL0r4CJCRzQkd/view?usp=sharing",
+          "youtube": "https://youtu.be/uzOfM9qDut0",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS TEENS (ACTUALIZADO)",
+          "slug": "ingl-s-teens-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Fwfc_8g97qyYXlg6c2wAB8wDtaiBskMw/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 500.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS KIDS (ACTUALIZADO)",
+          "slug": "ingl-s-kids-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/17NoTMPZ-k-Sdu8s2DHuCrFOMVqKNWlTr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "QUECHUA BÁSICO (QBAS)  (ACTUALIZADO)",
+          "slug": "quechua-b-sico-qbas-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/15ycXuubkSz7xl0vXA4PPRJ0fbPzfQoyv/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "QUECHUA INTERMEDIO (QINT)  (ACTUALIZADO)",
+          "slug": "quechua-intermedio-qint-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1me-VpctolX7JKuyE-c75ODIzp19nPakO/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "QUECHUA AVANZADO (QAVAN)  (ACTUALIZADO)",
+          "slug": "quechua-avanzado-qavan-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1k-R3yGnRvU7g5BZwHkC0LUvuz4tBTk5j/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "AIMARA BÁSICO   (ACTUALIZADO)",
+          "slug": "aimara-b-sico-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1iyGAt_SasRNLwregs8RcinLpFepcQaZZ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 0.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "AIMARA INTERMEDIO  (ACTUALIZADO)",
+          "slug": "aimara-intermedio-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1z6EbbGFCdWkEsCnrHt7PmKWf3-e88MH_/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 0.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "AIMARA AVANZADO  (ACTUALIZADO)",
+          "slug": "aimara-avanzado-actualizado",
+          "tipo": "tradicional",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1LhZUU6EsmoVdcZSnKTHo9mySUbxhYLCU/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 0.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS TÉCNICO PARA DISEÑADORES WEB (ITDW)",
+          "slug": "ingl-s-t-cnico-para-dise-adores-web-itdw",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1kApFxEkC1s9znRPRLyVLN2mlF_Jzg-8-/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Os3YJVGZLML4dmcKu9r9wL795dJofrCF/view?usp=sharing",
+          "youtube": "https://youtu.be/uzOfM9qDut0",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS TÉCNICO PARA MARKETING DIGITAL Y PUBLICIDAD (ITMKTD)",
+          "slug": "ingl-s-t-cnico-para-marketing-digital-y-publicidad-itmktd",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1650yHIa0uWj4uv0ncb3u6hgJKhxgWEFn/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1P3YLeCTT_eLF7kXnW48sE4Ydjxj67PfF/view?usp=sharing",
+          "youtube": "https://youtu.be/uzOfM9qDut0",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS TÉCNICO PARA PROGRAMADORES (ITPROG)",
+          "slug": "ingl-s-t-cnico-para-programadores-itprog",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1nnMe_esZDX2qrSR0EDuCSB6PxkTNSX2v/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1O0I6_uln1EMHdNDyHSxcUgWjpTCJwe4Q/view?usp=sharing",
+          "youtube": "https://youtu.be/uzOfM9qDut0",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INGLÉS TÉCNICO PARA SISTEMAS Y REDES (ITSISRED)",
+          "slug": "ingl-s-t-cnico-para-sistemas-y-redes-itsisred",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1gJJAwW3q8DDEx4T-MWrcNYERUKEMHHmr/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Sco-is7Vvr4A8qhF0q96ck8MW-vytVIz/view?usp=sharing",
+          "youtube": "https://youtu.be/uzOfM9qDut0",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        }
+      ]
+    },
+    {
+      "nombre": "MAGISTER",
+      "slug": "magister",
+      "grupo_slug": "escifor",
+      "codigo": "MAG",
+      "sigla": "MAG",
+      "color_hex": "#7c3aed",
+      "logo_modo_claro": "/logos-comercios/magister-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/magister-para-fondo-oscuro.png",
+      "carreras": [],
+      "diplomados": [
+        {
+          "nombre": "EDUCACIÓN FINANCIERA Y TRIBUTARIA (EFT)",
+          "slug": "educaci-n-financiera-y-tributaria-eft",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/1eYswISr8W5XZxapz1gpKHgBZ4pHBFagM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1XRwUYffMsvgUP2sCnt8NivqNxX-YaV45/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CONTABILIDAD NIVEL I: NORMATIVA (CNI)",
+          "slug": "contabilidad-nivel-i-normativa-cni",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/1lGOxQOJN5VmkvulzIjTwru196JHCQ4ho/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/18ooWt06Z7J4tHElT3rw_9kyr4xZ9tfSJ/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CONTABILIDAD NIVEL II: ANÁLISIS FINANCIERO (CNII)",
+          "slug": "contabilidad-nivel-ii-an-lisis-financiero-cnii",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/15Iq3S8xMR0jIqL5NfbOFjcUEYZB4Yii4/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/17-77ISdtWdzk4DztAS0NYrUda9TWdxbc/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DERECHOS DEL CONSUMIDOR NIVEL I (DCI)",
+          "slug": "derechos-del-consumidor-nivel-i-dci",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/1M23mzBHJmHRBQdoYAhIh-uuNfV6dG4_8/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1wa1UTuNDyLRki1m2kvPAaTBzdRgMW3V4/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DERECHOS DEL CONSUMIDOR NIVEL II (DCII)",
+          "slug": "derechos-del-consumidor-nivel-ii-dcii",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/16KXSWOt3WMz9XzaJsNIyDs-Qoihxe6IH/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1YXHFHM6IbKOlbVXC4JwIB2vPQeZrsUGx/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "ECONOMÍA NIVEL I: PRINCIPIOS DE LA ECONOMÍA (ENI)",
+          "slug": "econom-a-nivel-i-principios-de-la-econom-a-eni",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/12KjvwGBrEmFcDamSq4RYQfrNoeBBB7hP/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1lpkf5GdST3kupyyv58M0zFVvi9k8qQcQ/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "ECONOMÍA NIVEL II: ANÁLISIS ECONÓMICO (ENII)",
+          "slug": "econom-a-nivel-ii-an-lisis-econ-mico-enii",
+          "tipo": "secundaria",
+          "flyer": "https://drive.google.com/file/d/1r4UCkiIhwOrMWOK03r21uxsTd91s_2yA/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1DOOy4zL19dJVFqyjU9KcXv6S-iCYeV95/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INNOVACIÓN TECNOLÓGICA USANDO TIC (ITUT)",
+          "slug": "innovaci-n-tecnol-gica-usando-tic-itut",
+          "tipo": "generico",
+          "flyer": "https://drive.google.com/file/d/108x6VAHv_OkbwCsfpzbWoW70x067s84_/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1D37aWm6DlpuNBOzdVGeEvSn5OR8djNLx/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Gestión y Administración de entornos virtuales de aprendizaje con Moodle",
+          "slug": "gesti-n-y-administraci-n-de-entornos-virtuales-de-aprendizaje-con-moodle",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1ItaPzDq7GoVz4ALnrqLk3b8470e5QTmy/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Diseño Curricular",
+          "slug": "dise-o-curricular",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1H9gW4tsAbHJWbnqjet-GNL1G3dVNE1Xw/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Procesos de gestión educativa",
+          "slug": "procesos-de-gesti-n-educativa",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1H8Q670KVU56M_wEk4hMAgWFWG8dYXaCx/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Método de evaluación en Aula",
+          "slug": "m-todo-de-evaluaci-n-en-aula",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/14rVJ2oPgmr678CgHZOBzsxEyHofCI667/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO DISEÑO Y DESARROLLO DE MATERIALES EDUCATIVOS DIGITALES (DDME)",
+          "slug": "diplomado-diseno-y-desarrollo-de-materiales-educativos-digitales-ddme",
+          "tipo": "generico",
+          "flyer": "https://drive.google.com/file/d/1sELpR31iLQ277lgdg-2wk8WydUvrMXA6/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1FupjIeznHVMd_ZlNldCoE_gP8BDPaGHS/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ENSEÑANZA Y GAMIFICACIÓ CON PIZARRA INTELIGENTE (EGPI)",
+          "slug": "diplomado-ense-anza-y-gamificaci-con-pizarra-inteligente-egpi",
+          "tipo": "generico",
+          "flyer": "https://drive.google.com/file/d/1Gkbqwa-6X-oDQPd4gpj7Vi6q8H7Kc8p0/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Y3zlVpaQAyyWvZ3ZukWTn4KuvVdHjIO8/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Instrumentos de gestión educativa",
+          "slug": "instrumentos-de-gesti-n-educativa",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1CWc5U_tvMGaZ90zlmEWWfTEshs6fzrtd/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INTELIGENCIA ARTIFICIAL APLICADA EN AULA (IAAA)",
+          "slug": "inteligencia-artificial-aplicada-en-aula-iaaa",
+          "tipo": "generico",
+          "flyer": "https://drive.google.com/file/d/1lVFJk-7mznWgTbTSxUWH2D2n2IkBZb_D/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Msu0mWc-epvSXamAlA4_Q6jzhuXbRUii/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Gestión para directores, subdirectores en educación básica regular",
+          "slug": "gesti-n-para-directores-subdirectores-en-educaci-n-b-sica-regular",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1a08HfGT4B3qtYYQoqhJggfvEiQTj_GpP/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Modelo curricular para capacidades y destrezas",
+          "slug": "modelo-curricular-para-capacidades-y-destrezas",
+          "tipo": "generico",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1kPn2MibxSH156DarZ_GrYQumET7mGIp-/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        }
+      ],
+      "cursos": []
+    },
+    {
+      "nombre": "CECAVA",
+      "slug": "cecava",
+      "grupo_slug": "multimarca",
+      "codigo": "CECAVA",
+      "sigla": "CECAVA",
+      "color_hex": "#059669",
+      "logo_modo_claro": "/logos-comercios/cecava-unico.png",
+      "logo_modo_oscuro": "/logos-comercios/cecava-unico.png",
+      "carreras": [],
+      "diplomados": [
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN SUPERVISOR SSOMA (SUSOMA) ACTUALIZADO",
+          "slug": "diplomado-especializado-en-supervisor-ssoma-susoma-actualizado",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1DC82DJQmhDD4X7_GjbfV3VxGeJQgAtHT/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1oCZkBiXqF46oA90g-PjEwrCz0cfguFDt/view?usp=sharing",
+          "youtube": "https://youtu.be/wlEkb3y1CZ0?si=0oViLnlpYBUAn2iB",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN SEGURIDAD, SALUD OCUPACIONAL Y MEDIO AMBIENTE -SSOMA (SSOMA)",
+          "slug": "diplomado-especializado-en-seguridad-salud-ocupacional-y-medio-ambiente-ssoma-ssoma",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1Pw-1RCrVPzDBbnCSslL_--Y9Pq5FqZex/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1b4C6tW6cpk9ZZnEPPsw4mGNjiB21g3x3/view?usp=sharing",
+          "youtube": "https://youtu.be/WyY3BIhnkTM?si=GBk-oCWqdhmcASiF",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SUPERVISOR AUDITOR SSOMA (SASS)",
+          "slug": "supervisor-auditor-ssoma-sass",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1TFUHNfigd-5ei1zVJ9whoD_fY6tT9uE9/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Svi7UD7ckfTAxiFuzKXvFEYBlBVeGLyg/view?usp=sharing",
+          "youtube": "https://bit.ly/3uMhipF",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SEGURIDAD, SALUD OCUPACIONAL, MEDIO AMBIENTE Y CALIDAD SSOMAC (SOMAC)",
+          "slug": "seguridad-salud-ocupacional-medio-ambiente-y-calidad-ssomac-somac",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1TDcKjBwDewor-KlHRQcE3NQQC_yPjlQ1/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1wlCGpiby4xTSmaNuTMECez639QeqgzoO/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Diplomado En Gestion Ambiental Y Evaluacion De Impacto Ambiental (GAEIA)",
+          "slug": "diplomado-en-gestion-ambiental-y-evaluacion-de-impacto-ambiental-gaeia",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/17cY2lRH3SzSpKmePbXRELlNzPkcKJ1zz/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1AccXiRw5nucS-XYEK8ePp3ZCChmSNVDe/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Gestión SSOMA Digital y Analítica de Datos NUEVO!!!",
+          "slug": "gesti-n-ssoma-digital-y-anal-tica-de-datos-nuevo",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1k0C9iUrKEnv3bMLooaLGMZVI7bNUra5O/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1rEGKaKkehi5n9xM-ThZ_7OAR5iMfF_NU/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Inteligencia Artificial Aplicada a SSOMA NUEVO!!!",
+          "slug": "inteligencia-artificial-aplicada-a-ssoma-nuevo",
+          "tipo": "ambientales",
+          "flyer": "https://drive.google.com/file/d/1rS7qxGZB3aePCnL1RWPd-SX7X-B1pgSN/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1_gLZTdqxzx2aRkRlS3DHOteITGTK7Klf/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "OSHA :Seguridad Básica para Trabajadores #NUEVO",
+          "slug": "osha-seguridad-b-sica-para-trabajadores-nuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1nZltdf1ahnyKq8-VDA11ocUM282X75AN/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "OSHA : Seguridad Avanzada para Supervisores y Administradores #NUEVO",
+          "slug": "osha--seguridad-avanzada-para-supervisores-y-administradores-nuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1C-g8ooX7CgyaILW9OHxhh22I3drST02o/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "OPERACIÓN\nSEGURA:MANEJO\nINTELIGENTE DE\nEQUIPOS Y\nHERRAMIENTAS#NUEVO",
+          "slug": "operaci-n-seguramanejo-inteligente-de-equipos-y-herramientasnuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1frUHG4TVBBm8k1reHlzjrjbbh1bB6iuN/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "OSHA: Seguridad en la Construcción #NUEVO",
+          "slug": "osha-seguridad-en-la-construcci-n-nuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1GLFnXOblVH_CIAK1GxLD4Gtqg3VbfOXY/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "OSHA General Industry Safety – Seguridad en la Industria en General #NUEVO",
+          "slug": "osha-general-industry-safety--seguridad-en-la-industria-en-general-nuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/12tiWY8-q4okD_ubrF7I0jJpzD8jvz3e1/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN ALTA GERENCIA DE SISTEMAS INTEGRADOS DE GESTIÓN Y AUDITOR INTERNO EN HSEQ (HSEQ)",
+          "slug": "diplomado-especializado-en-alta-gerencia-de-sistemas-integrados-de-gesti-n-y-auditor-interno-en-hseq-hseq",
+          "tipo": "calidad_isos",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Zl4gfEuhOWS0n0WFCIZfybUIt_4QlEY8/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ISO 35001 (I35001)",
+          "slug": "diplomado-iso-35001-i35001",
+          "tipo": "calidad_isos",
+          "flyer": "https://drive.google.com/file/d/1yskx0qJ6gv3Y4wsth3h-SnlkLU12Ny0y/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1q95wRWCx7MuBla6Jx_GK7QVmvj13-qAW/view?usp=sharing",
+          "youtube": "https://bit.ly/3cbzzpP",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "ISO 9001 SISTEMA DE GESTIÓN DE CALIDAD (I9001)",
+          "slug": "iso-9001-sistema-de-gesti-n-de-calidad-i9001",
+          "tipo": "calidad_isos",
+          "flyer": "https://drive.google.com/file/d/1Tbrr-bu3MQ8nQy8cAMpd_p7mJlJHt9Uq/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1xm8i0KPP76aVjxh2xJ2oS2aPXGWsx2_L/view?usp=sharing",
+          "youtube": "https://bit.ly/3uRT25l",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GERENCIA Y GESTIÓN DE PROYECTOS MINEROS (GPM)",
+          "slug": "gerencia-y-gesti-n-de-proyectos-mineros-gpm",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1I7hzg9oQ8sGkCddUEWfgoydugmCFpQsD/view?usp=share_link",
+          "youtube": "https://bit.ly/3uQATFh",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GERENCIA DE OPERACIONES MINERAS (GOM)",
+          "slug": "gerencia-de-operaciones-mineras-gom",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1MMY2a8ZrVI22PuH-wcVgKA2kpPfWv32V/view?usp=sharing",
+          "youtube": "https://bit.ly/3ATEiXq",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GESTION EFECTIVA EN COMERCIO EXTERIOR (GECEX)",
+          "slug": "diplomado-en-gestion-efectiva-en-comercio-exterior-gecex",
+          "tipo": "comercio_exterior",
+          "flyer": "https://drive.google.com/file/d/1iTsNWfqRi2aB1Jwtn9U-I_4k501WdV1j/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1_FtGhwccFpAqKFXxjEH8HmBGAZoBNx-u/view?usp=sharing",
+          "youtube": "https://youtu.be/ShtwVBCtero",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GESTIÓN PORTUARIA Y TRASNPORTE INTERMODAL (BÁSICO) (GPTIBAS)",
+          "slug": "diplomado-en-gesti-n-portuaria-y-trasnporte-intermodal-b-sico-gptibas",
+          "tipo": "comercio_exterior",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1cMjqNh4mmJXq8uVbCPjiU7du_a-CVEOD/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GESTIÓN PORTUARIA Y TRASNPORTE INTERMODAL (NIVEL INTERMEDIO) (GPTINT)",
+          "slug": "diplomado-en-gesti-n-portuaria-y-trasnporte-intermodal-nivel-intermedio-gptint",
+          "tipo": "comercio_exterior",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1ipdfQPLp1N7hkEA0VzC2yIIHFlJFPIhF/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN GESTIÓN PORTUARIA Y TRASNPORTE INTERMODAL (NIVEL AVANZADO) (GPTIAVA)",
+          "slug": "diplomado-en-gesti-n-portuaria-y-trasnporte-intermodal-nivel-avanzado-gptiava",
+          "tipo": "comercio_exterior",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1bBLB0ty4Ne9_XiTCPiF2Rdp_qj9y3Yvr/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN MANEJO Y NAVEGACION GPS (MNGP)",
+          "slug": "diplomado-en-manejo-y-navegacion-gps-mngp",
+          "tipo": "comercio_exterior",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1ASf0ZRGu2_EA1a7X213jVtyzdg7Fxisf/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO Administración y gestión pública por resultados (AGPR)",
+          "slug": "diplomado-administraci-n-y-gesti-n-p-blica-por-resultados-agpr",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1vmWYcwY20ZV3iKEOv_vR10x9AWve95Hh/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO  gestión pública  (GP)",
+          "slug": "diplomado-gesti-n-p-blica-gp",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1C0obH3zc4uMJaP_IKWReYD1ydK1lmnLF/view",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SEGURIDAD y SALUD EN EL TRABAJO(DLABSST)",
+          "slug": "diplomado-seguridad-y-salud-en-el-trabajo-dlabsst",
+          "tipo": "rubro_legal",
+          "flyer": "https://drive.google.com/file/d/1X_HlSc_P2h-aCPGPNEZbsyGNafpDeJOm/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Fk5ix_JKK0w7K3ec0YqTJ-H7qyrx_oBU/view?usp=sharing",
+          "youtube": "https://youtu.be/KByTnXxCscY?si=ZYHyp2aKBXI1oEO6",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN DELITOS DE CORRUPCION DE FUNCIONARIOS (DCFUNC)",
+          "slug": "diplomado-especializado-en-delitos-de-corrupcion-de-funcionarios-dcfunc",
+          "tipo": "rubro_legal",
+          "flyer": "https://drive.google.com/file/d/14tcfOVn9dQU4NrgSICVY3OwwaQJ-NK_W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/14MHKM9su0mpOr8qJ43r0gIchk_eJr1fy/view?usp=sharing",
+          "youtube": "https://youtu.be/BzjKgtc19tA?si=9S_159IAzi8tVoWV",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "PERFORACIÓN Y VOLADURA DE ROCAS (PVR)",
+          "slug": "perforaci-n-y-voladura-de-rocas-pvr",
+          "tipo": "arquitectura_ingenieria",
+          "flyer": null,
+          "brochure": "https://bit.ly/3z899yg",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "EQUIPOS DE PERFORACIÓN EN MINERIA SUBTERRANEA (PMSUB)",
+          "slug": "equipos-de-perforaci-n-en-mineria-subterranea-pmsub",
+          "tipo": "arquitectura_ingenieria",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/18gtLkVSBPeHgSgE5y-bHp0ohiJBSRDDS/view?usp=sharing",
+          "youtube": "https://bit.ly/3RET0rc",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "ELABORACIÓN DE INSTRUMENTOS DE GESTIÓN DE ESTUDIO DE IMPACTO AMBIENTAL (EIA)",
+          "slug": "elaboraci-n-de-instrumentos-de-gesti-n-de-estudio-de-impacto-ambiental-eia",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/19K3auZFs6ND5VM7OOBCKpp4YKClaEZ-8/view?usp=sharing",
+          "youtube": "https://bit.ly/3yFyFJX",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "PROGRAMACIÓN PYTHON EN ARCGIS (GIS)",
+          "slug": "programaci-n-python-en-arcgis-gis",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1TDcKjBwDewor-KlHRQcE3NQQC_yPjlQ1/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1E8V087MWy_nwYZ5-0AOorhAkR8I9ZaCe/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "POWER BI (BÁSICO-INTERMEDIO) ORIENTADO A LA MINERIA ((PWBI)",
+          "slug": "power-bi-b-sico-intermedio-orientado-a-la-mineria-pwbi",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1F4hVZfSZwIwybxotYWjidwEuz0g4J0mI/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1tFLS6w3Rx5THpXT9Uzz-MrD7eIK8K-Ea/view?usp=share_link",
+          "youtube": "https://bit.ly/3aFiC6K",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "POWER BI (AVANZADO) ORIENTADO A LA MINERIA (PWA)",
+          "slug": "power-bi-avanzado-orientado-a-la-mineria-pwa",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1aeMePkYE0dlFLxEvyJ7cp7zMbFmL76B0/view?usp=share_link",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DESARROLLO EN LA GESTIÓN LOGÍSTICA (DGL)",
+          "slug": "desarrollo-en-la-gesti-n-log-stica-dgl",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1U9o3RpwsrdAhhna2YheUSf0owCKYlGii/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GESTIÓN DE LA CALIDAD Y MEJORA CONTINUA EN LA INDUSTRIA (GCMCI)",
+          "slug": "gesti-n-de-la-calidad-y-mejora-continua-en-la-industria-gcmci",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1n_1A7oxkx406cYRC_zYW3KwuP40A8ovk/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO LOGISTICA EMPRESARIAL (DLE)",
+          "slug": "diplomado-logistica-empresarial-dle",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1xoWgHYbhbjM0uLsKV-ImuUfrijw455OD/view?usp=sharing",
+          "youtube": "https://youtu.be/NuOGaPyS0AQ",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO Gestión de recursos humanos  (GRH)",
+          "slug": "diplomado-gesti-n-de-recursos-humanos-grh",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1qq1WW5v8OYBxhdN4-Csi1gGKyVNA-M2H/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO Liderazgo Empresarial (LE)",
+          "slug": "diplomado-liderazgo-empresarial-le",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1y-Z0K4F-2uVCleuNerl3oiDz65RFnqxZ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1VpALeKMm8bHD-mzIgUJop2GyXDwll7x7/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "INTERPRETACIÓN DE PLANOS (IP)",
+          "slug": "interpretaci-n-de-planos-ip",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://bit.ly/3RESFoq",
+          "youtube": "https://bit.ly/3IEHo3E",
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DISPATCH NIVEL INTRODUCTORIO, INTERMEDIO, AVANZANDO (DNIIA)",
+          "slug": "dispatch-nivel-introductorio-intermedio-avanzando-dniia",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/15j8N8yZ4uhFm2NlqwF_6n5YJeR_7IoLS/view?usp=share_link",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GERENCIA DE OPERACIONES MINERAS (GOM)",
+          "slug": "gerencia-de-operaciones-mineras-gom",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://bit.ly/3ciNDxZ",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN SUPERVISOR SSOMA (SUSOMA) ACTUALIZADO",
+          "slug": "diplomado-especializado-en-supervisor-ssoma-susoma-actualizado",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1oCZkBiXqF46oA90g-PjEwrCz0cfguFDt/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN SEGURIDAD, SALUD OCUPACIONAL Y MEDIO AMBIENTE -SSOMA (SSOMA)",
+          "slug": "diplomado-especializado-en-seguridad-salud-ocupacional-y-medio-ambiente-ssoma-ssoma",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1b4C6tW6cpk9ZZnEPPsw4mGNjiB21g3x3/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SUPERVISOR AUDITOR SSOMA (SASS)",
+          "slug": "supervisor-auditor-ssoma-sass",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Svi7UD7ckfTAxiFuzKXvFEYBlBVeGLyg/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SEGURIDAD, SALUD OCUPACIONAL, MEDIO AMBIENTE Y CALIDAD SSOMAC (SOMAC)",
+          "slug": "seguridad-salud-ocupacional-medio-ambiente-y-calidad-ssomac-somac",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1wlCGpiby4xTSmaNuTMECez639QeqgzoO/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN ALTA GERENCIA DE SISTEMAS INTEGRADOS DE GESTIÓN Y AUDITOR INTERNO EN HSEQ (HSEQ)",
+          "slug": "diplomado-especializado-en-alta-gerencia-de-sistemas-integrados-de-gesti-n-y-auditor-interno-en-hseq-hseq",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1PJ4X1lFuePApjgIHkHIcnx0EHKa-iKT4/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GERENCIA DE OPERACIONES MINERAS (GOM)",
+          "slug": "gerencia-de-operaciones-mineras-gom",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1MMY2a8ZrVI22PuH-wcVgKA2kpPfWv32V/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SEGURIDAD MINERA, HIGIENE INDUSTRIAL Y SALUD OCUPACIONAL (SMHISO)",
+          "slug": "seguridad-minera-higiene-industrial-y-salud-ocupacional-smhiso",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1srzDbOOP0Og2LzUXBiIKuNaNiHy0OmlQ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GERENCIA Y GESTIÓN DE PROYECTOS MINEROS (GPM)",
+          "slug": "gerencia-y-gesti-n-de-proyectos-mineros-gpm",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1QinN761N1xgsBpc0LhUxc40o1mUcFONO/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO Administración y gestión pública por resultados (AGPR)",
+          "slug": "diplomado-administraci-n-y-gesti-n-p-blica-por-resultados-agpr",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1vmWYcwY20ZV3iKEOv_vR10x9AWve95Hh/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "EQUIPOS DE PERFORACIÓN EN MINERIA SUBTERRANEA (PMSUB)",
+          "slug": "equipos-de-perforaci-n-en-mineria-subterranea-pmsub",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1rGEAs3SAzdvydmuzyCRJFOH_8X0m27-Y/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        }
+      ],
+      "cursos": [
+        {
+          "nombre": "CURSO DE HAZWOPER – Manejo de Residuos Peligrosos y Respuesta a Emergencias #NUEVO",
+          "slug": "curso-de-hazwoper--manejo-de-residuos-peligrosos-y-respuesta-a-emergencias-nuevo",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1LBIwnibk8qeZBXfyZh_bjEoWw9NwlkOW/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DERECHO LABORAL SECTOR PUBLICO(DLSPUB)",
+          "slug": "curso-derecho-laboral-sector-publico-dlspub",
+          "tipo": "rubro_legal",
+          "flyer": "https://drive.google.com/file/d/1Vd2Hegvfpt0DetOzBYbVl-vj5h63f07I/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1oyDyBQNbblRUDo0Yx7BN9XVq5u61tEui/view?usp=sharing",
+          "youtube": "https://youtu.be/AsXmCINWKBU?si=4sxDCAmLAnQsD_cN",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DERECHO LABORAL SECTOR PRIVADO(DLABSP)",
+          "slug": "curso-derecho-laboral-sector-privado-dlabsp",
+          "tipo": "rubro_legal",
+          "flyer": "https://drive.google.com/file/d/1rere4l1-AecJOOAOygxotMk5hVTyjfWl/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Ihsqyg_Q-xozWYY6B0tlU5FKTkNPsFTo/view?usp=sharing",
+          "youtube": "https://youtu.be/YbdHLzwLiUg?si=BYm4Okksfl9f2K1r",
+          "precio": "S/. 550.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ESPECIALIZADO EN SEGURIDAD Y SALUD OCUPACIONAL (visión integrada de la seguridad en el trabajo)(SESAOCVISION)",
+          "slug": "diplomado-especializado-en-seguridad-y-salud-ocupacional-visi-n-integrada-de-la-seguridad-en-el-trabajo-sesaocvision",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1shuZnSlJ_9Td1E0Ttrx1I4hd34bxD98Z/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1zcZdDemfhcSXP-dyyyVzVr8CQ7ibB4_J/view?usp=sharing",
+          "youtube": "https://youtu.be/8XEYo_eqihs?si=2vb6aJT2V8f0-W_D",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO  EN CONTABILIDAD DIGITAL(CONTADIG)",
+          "slug": "curso-en-contabilidad-digital-contadig",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1vFEMPNxMg8P_zFM2SaaWrw3CYXgljtNb/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1W3EeN7ZHZD0-xs0pgIRt6mSxdmBP-stH/view?usp=sharing",
+          "youtube": "https://youtu.be/EHtdomFkkFQ?si=IQSDxOLTJ5Z8LlVa",
+          "precio": "S/. 250.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO ORGANOS DE REPRESENTACION Y NEGOCIACION COLECTIVA DE LA ADMINISTRACION  LOCAL(NEGCOLECTADM)",
+          "slug": "curso-organos-de-representacion-y-negociacion-colectiva-de-la-administracion-local-negcolectadm",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1q1sw22oksm5ZSaDOt49n07goo6Rmd_tK/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1E11z0IbLceymK9lbgJ1vrwVkaPMmasi-/view?usp=sharing",
+          "youtube": "https://youtu.be/KP_XtUwStcc?si=jVLHCa3EzraQUOYs",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO CONTRATACIONES CON EL ESTADO NIVEL BASICO (CONTESTBA)",
+          "slug": "diplomado-contrataciones-con-el-estado-nivel-basico-contestba",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1q1sw22oksm5ZSaDOt49n07goo6Rmd_tK/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1HPcoMatYeFCAx_GLeRPwfZVUYeVd4rg4/view?usp=sharing",
+          "youtube": "https://youtu.be/Qmijt-jZADc?si=AjzBH3ovpaYeFToh",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO CONTRATACIONES CON EL ESTADO NIVEL INTERMEDIO (CONTESTINT)",
+          "slug": "diplomado-contrataciones-con-el-estado-nivel-intermedio-contestint",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1NCBYCGGekYRR1gKvXQ4ggvt8xmJboOuc/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1qGeT8_M6ICSDDwDXSotHnKi8SmD6LK5w/view?usp=sharing",
+          "youtube": "https://youtu.be/5p1rAsp-QtU?si=sJhskYS7HpVM-aSo",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO CONTRATACIONES CON EL ESTADO NIVEL AVANZADO (CONTESTAVAN)",
+          "slug": "diplomado-contrataciones-con-el-estado-nivel-avanzado-contestavan",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/15xUYIEvOdpnNPs84JDnsxFjwmEAZ2lsm/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1OsqhazQ0EpWxjq1L0fIaa1z9Op7z65yh/view?usp=sharing",
+          "youtube": "https://youtu.be/PQTRn9BQlF0",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO RESPONSABILIDIAD SOCIAL EMPRESARIAL (RESOCEMP)",
+          "slug": "diplomado-responsabilidiad-social-empresarial-resocemp",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1wO8rcwzhAyMD0VgVhBfyKXhOdWX6yh1y/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1yYX_92FkSUDoApsT6qVQxAeRpiK_ApV8/view?usp=sharing",
+          "youtube": "https://youtu.be/eDh6c9v2aPM",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO LOGISTICA EMPRESARIAL (LOGEMPRESA)",
+          "slug": "diplomado-logistica-empresarial-logempresa",
+          "tipo": "especializado",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1JtcgYb-VMMef2_QGxtsAYeDVHv9zsadk/view?usp=sharing",
+          "youtube": "https://youtu.be/NuOGaPyS0AQ",
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Gestión de Recursos Humanos - Organización y Gestión del Talento",
+          "slug": "gesti-n-de-recursos-humanos-organizaci-n-y-gesti-n-del-talento",
+          "tipo": "especializado",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1XgWLZslLVEWNelSXw3-OFzmvWrKCrLno/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO Gestión en la Salud Pública (GSP)",
+          "slug": "diplomado-gesti-n-en-la-salud-p-blica-gsp",
+          "tipo": "especializado",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1FZlcilYtQFA0C60OsiS70_TmiswdcqUo/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Diplomado: Certificación en comunicación interna y administración de personal (CCIAP)",
+          "slug": "diplomado-certificaci-n-en-comunicaci-n-interna-y-administraci-n-de-personal-cciap",
+          "tipo": "especializado",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1FcfHhAjKkF-v1DVozSUlmOJltC1HhO0b/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 350.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "ESPECIALISTA EN SG-SST: SISTEMA DE GESTIÓN DE SEGURIDAD Y SALUD EN EL TRABAJO (SGSST)",
+          "slug": "especialista-en-sg-sst-sistema-de-gesti-n-de-seguridad-y-salud-en-el-trabajo-sgsst",
+          "tipo": "especializado",
+          "flyer": "https://drive.google.com/file/d/1ZTkq4Ngwda0g1p-XfcEmiRF5QtlC02_w/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1F5-y9lfk4rUhY8xEfBD5z8qirqHO-0BT/view?usp=sharing",
+          "youtube": "https://bit.ly/3z6YmnY",
+          "precio": "S/. 250.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIRECCIÓN ESTRATEGICA DE RECURSOS HUMANOS (DERH)",
+          "slug": "direcci-n-estrategica-de-recursos-humanos-derh",
+          "tipo": "no_actualizados",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1FnTFFtRiVTxIOkXW84JB-UO7jWF-EJsM/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 300.00",
+          "actualizado_drive": null
+        }
+      ]
+    },
+    {
+      "nombre": "CECAVA-MIN",
+      "slug": "cecava-min",
+      "grupo_slug": "multimarca",
+      "codigo": "CECAVA-MIN",
+      "sigla": "CECAVA-MIN",
+      "color_hex": "#d97706",
+      "logo_modo_claro": "/logos-comercios/cecava-min-unico.png",
+      "logo_modo_oscuro": "/logos-comercios/cecava-min-unico.png",
+      "carreras": [],
+      "diplomados": [
+        {
+          "nombre": "DIPLOMADO MANEJO DE TRANSPORTE DE LADO IZQUIERDO PARA MINERIA (TLIZQMIN)",
+          "slug": "diplomado-manejo-de-transporte-de-lado-izquierdo-para-mineria-tlizqmin",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1KTkhU-ricul_ZUFs7RDjSrJuBmurtqA4/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Ig3nYu9jGVTb5YJwras2a29F1IX2pBnv/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SEGURIDAD MINERA, HIGIENE INDUSTRIAL Y SALUD OCUPACIONAL (MHISOMIN)",
+          "slug": "diplomado-seguridad-minera-higiene-industrial-y-salud-ocupacional-mhisomin",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1LeKU7LzPnQ2iwR-qHOfG9M0F2isPlbwJ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1u8VM7Vd5tpfww3xqQrjUmcpEtMRZU9bS/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SUPERVISIÓN DE OPERACIONES MINERAS A TAJO ABIERTO (SOMINTAJA)",
+          "slug": "diplomado-supervisi-n-de-operaciones-mineras-a-tajo-abierto-somintaja",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1WNukHuHfp8pMyPrhH4jcEYpRg0CBAdJI/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1MvQW7uPZIo_Di5a7N5R23bdeqb2UY_WF/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO FORMACIÓN DE SUPERVISORES MINEROS (FSUPMIN)",
+          "slug": "diplomado-formaci-n-de-supervisores-mineros-fsupmin",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1R-SnAgqrq-0LkdYAHgfrsdP6bKwCZk87/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO PLANIFICACIÓN Y DISEÑO DE MINAS A TAJO ABIERTO (BÁSICO) (PLAMINTAJABA)",
+          "slug": "diplomado-planificaci-n-y-dise-o-de-minas-a-tajo-abierto-b-sico-plamintajaba",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1FxfSHxKqFMv7ag0lS2k-Y98FuBpgyHBN/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/14pXLwMpNukH_NWt3oTn-v_ARMhyyOalP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO PLANIFICACIÓN Y DISEÑO DE MINAS A TAJO ABIERTO (INTERMEDIO) (PLAMINTAJAINTER)",
+          "slug": "diplomado-planificaci-n-y-dise-o-de-minas-a-tajo-abierto-intermedio-plamintajainter",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1FxfSHxKqFMv7ag0lS2k-Y98FuBpgyHBN/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ARa6mja1u8J7stqvNmdD2-ojcnEX9Vf8/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO PLANIFICACIÓN Y DISEÑO DE MINAS A TAJO ABIERTO (AVANZADO) (PLAMINTAJAVANZ)",
+          "slug": "diplomado-planificaci-n-y-dise-o-de-minas-a-tajo-abierto-avanzado-plamintajavanz",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1FxfSHxKqFMv7ag0lS2k-Y98FuBpgyHBN/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/13u6oip6RG_K1G7ORgsstZPHQciMEQ7dh/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO DISEÑO Y EXPLOTACIÓN DE MINAS SUBTERRANEAS (DISYEXPLMINSUBT)",
+          "slug": "diplomado-dise-o-y-explotaci-n-de-minas-subterraneas-disyexplminsubt",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1nKPlUP_rQNatAWWh3pjRx-h67rsQ3Eqe/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1klL0n2ExszP1isvoB3evpSOgf-uUw9vI/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO ECONOMÍA CIRCULAR EN LA MINERIA (ECIRCMIN",
+          "slug": "diplomado-econom-a-circular-en-la-mineria-ecircmin",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1tQChS7-IirPAXhBWcirmwi-hXzGwC1Li/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/10-SzQHG8ViKY8yyBB5MCPscyh8A03PdI/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO GESTIÓN DE OPERACIONES MINERAS SUBTERRÁNEAS(GOMINSUB)",
+          "slug": "diplomado-gesti-n-de-operaciones-mineras-subterr-neas-gominsub",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1soXXAD9QNRPYgac7l4V0H1cSSw9aEqHn/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1WdlVlQ1pJC9Xc3vZi8x-ow-GFWjdRLAq/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO RELACIONES COMUNITARIAS Y RESOLUCIÓN DE CONFLICTOS SOCIALES EN MINERÍA",
+          "slug": "diplomado-relaciones-comunitarias-y-resoluci-n-de-conflictos-sociales-en-miner-a",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1zU9SMh-OpOb1jeZJBm13De3v5tZ113HL/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1UP0N65M22WsaNStGhiG_ZS1LxtealfAa/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO GESTIÓN DE FLOTA MINERA Y MANEJO DISPATCH (GESFLOMIN)",
+          "slug": "diplomado-gesti-n-de-flota-minera-y-manejo-dispatch-gesflomin",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1VK-Lx8PmMcd5rFoDrTOb_PrnD0xWCwLj/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SEGURIDAD MINERA SUBTERRANEA (SMSUB)",
+          "slug": "diplomado-seguridad-minera-subterranea-smsub",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1m8ClHwvs1SjmBmHqLma4kQY0z-xwnAjK/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Fotogrametría y Topografía Aplicadas con Drones",
+          "slug": "fotogrametr-a-y-topograf-a-aplicadas-con-drones",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1G2PYy5cBay442RmwLox_oJUR9sZXCIp0/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1wHwMvP0GeoxONaKMftvstG_3PVQuBBOB/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "FORMACIÓN DE SUPERVISORES MINEROS",
+          "slug": "formaci-n-de-supervisores-mineros",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1G2PYy5cBay442RmwLox_oJUR9sZXCIp0/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/128IApK_rYeRBj4vDSyssP1DWC5TH39cP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "Gestión de flotas minera con manejo dispatch",
+          "slug": "gesti-n-de-flotas-minera-con-manejo-dispatch",
+          "tipo": "mineros",
+          "flyer": "https://drive.google.com/file/d/1WQaxA-fjMY-84rQwYbsnfdKHhx8adP9v/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1nFNeWo2SIOjsTjGWfI-4W2yaivp2IR8Z/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 400.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "PERFORACIÓN Y VOLADURA DE ROCAS (PVR)",
+          "slug": "perforaci-n-y-voladura-de-rocas-pvr",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1RV08oFpoTr1timCvHCecZJuYJq9C0HnD/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "EQUIPOS DE PERFORACIÓN EN MINERIA SUBTERRANEA (PMSUB)",
+          "slug": "equipos-de-perforaci-n-en-mineria-subterranea-pmsub",
+          "tipo": "mineros",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/19ROVrEANXfOpGT58vt-o9z_tQeKFWBbf/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        }
+      ],
+      "cursos": []
+    },
+    {
+      "nombre": "MATPEL",
+      "slug": "matpel",
+      "grupo_slug": "multimarca",
+      "codigo": "MATPEL",
+      "sigla": "MATPEL",
+      "color_hex": "#ea580c",
+      "logo_modo_claro": "/logos-comercios/matpel-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/matpel-para-fondo-oscuro.png",
+      "carreras": [],
+      "diplomados": [
+        {
+          "nombre": "DIPLOMADO DE GESTIÓN Y MANEJO DE RESIDUOS SÓLIDOS (GMRS)",
+          "slug": "diplomado-de-gesti-n-y-manejo-de-residuos-s-lidos-gmrs",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/12KWIESvopuAZvQRfSs_tAoaK-9QTn1KF/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GIRS: GESTIÓN INTEGRAL DE RESIDUOS SÓLIDOS (GIRS)",
+          "slug": "girs-gesti-n-integral-de-residuos-s-lidos-girs",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1oF3zd5PMQNztjvl4G2wOkaeKKeJvlAcg/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1egjrf9ISnMD71REK-a-Jd4_npsexZwG6/view?usp=sharing",
+          "youtube": "https://youtu.be/9OoPE517Z6o",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "PREVENCIONISTA\nDE RIESGOS (PRL)",
+          "slug": "prevencionista-de-riesgos-prl",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1aBuoPnvXWmz705kaKvnBtKBozmVc5L8c/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1Uvm1otXJlwazqLpMeTLY4KQn70faI65f/view?usp=sharing",
+          "youtube": "https://youtu.be/Nu0gGp9FrVA",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SUPERVISIÓN DE TRABAJOS DE ALTO RIESGO (STAR)",
+          "slug": "supervisi-n-de-trabajos-de-alto-riesgo-star",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1m22-OkNEgJnJ5k3m-rnZ9CDldYBhZ_bc/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1i890R0l52HK4nL2A6EMpydCysEqGQjdZ/view?usp=sharing",
+          "youtube": "https://youtu.be/k7VRWTDxgYc",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "MATERIALES PELIGROSOS NIVEL I, II, III (123)",
+          "slug": "materiales-peligrosos-nivel-i-ii-iii-123",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1tWhujMbUoPzt28Kzd5m_2NVpHr4JOuCu/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1meDkk8kMbv6I-HEV0nYrByWPrh0KUHFW/view?usp=sharing",
+          "youtube": "https://youtu.be/txAvZgmZLT8",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO DE GESTIÓN Y MANEJO DE RESIDUOS SÓLIDOS (GMRS)",
+          "slug": "diplomado-de-gesti-n-y-manejo-de-residuos-s-lidos-gmrs",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1XzDaL8dWkdAcQWd_-CVVOaFE0d8vuFxr/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1dNJJEKUAF5qqS0fFUMeg87UDIUeFy1xQ/view?usp=sharing",
+          "youtube": "https://youtu.be/KQ63KbpdA4U?si=KiP9Z_wAyjAKZbAy",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE CPR/First Aid Certification – Certificación en RCP y Primeros Auxilios #NUEVO",
+          "slug": "curso-de-cpr-first-aid-certification--certificaci-n-en-rcp-y-primeros-auxilios-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1V5rEygutcl5tDvlIoyDcrc68XTnmJETP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO de Capacitación en RCP y Primeros Auxilios #NUEVO",
+          "slug": "curso-de-capacitaci-n-en-rcp-y-primeros-auxilios-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1S_OGJbgWGl_TflzYCnCdLy45z2oepxRx/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE Capacitación en Manejo de Materiales Peligrosos y Riesgos Químicos #NUEVO",
+          "slug": "curso-de-capacitaci-n-en-manejo-de-materiales-peligrosos-y-riesgos-qu-micos-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1xHRifOPPFgTMxbkw7YWsMAkJj7IFRnA5/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO  - MANEJO Y TRANSPORTE SEGURO DE HIDROCARBUROS #NUEVO",
+          "slug": "diplomado-manejo-y-transporte-seguro-de-hidrocarburos-nuevo",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1VxmGok9ltcho0bt3f6BEg5REjmMyDdET/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1gYeN6Ag9hT4rrPcAV1L5y-TeilnL80hq/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRANSPORTE SEGURO DE COMBUSTIBLES Y GLP #NUEVO",
+          "slug": "diplomado-transporte-seguro-de-combustibles-y-glp-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1A3Z0jc3QWMlcmYbreusKYu0K1I5_YcSu/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO  - MANEJO Y TRANSPORTE SEGURO DE HIDROCARBUROS #NUEVO",
+          "slug": "diplomado-manejo-y-transporte-seguro-de-hidrocarburos-nuevo",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1VxmGok9ltcho0bt3f6BEg5REjmMyDdET/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1gYeN6Ag9hT4rrPcAV1L5y-TeilnL80hq/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRANSPORTE SEGURO DE COMBUSTIBLES Y GLP #NUEVO",
+          "slug": "diplomado-transporte-seguro-de-combustibles-y-glp-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1A3Z0jc3QWMlcmYbreusKYu0K1I5_YcSu/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRABAJOS EN\nEXCAVACIÓN #NUEVO",
+          "slug": "diplomado-trabajos-en-excavaci-n-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1PRWRa8NU31XpX8OG5YqHuJv7hMVu1xZf/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRABAJOS EN\nESPACIOS CONFINADOS #NUEVO",
+          "slug": "diplomado-trabajos-en-espacios-confinados-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1NWb_oNBFcyJU4wMCcaAOsfQW5OlUd9AS/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SEGURIDAD CON HERRAMIENTAS\nMANUALES/ ELÉCTRICAS #NUEVO",
+          "slug": "diplomado-seguridad-con-herramientas-manuales-el-ctricas-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1DzzDLHdLQ-c_9ETvZot4_2Apifa2kv3H/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SEGURIDAD CON ESCALERA Y ANDAMIOS #NUEVO",
+          "slug": "diplomado-seguridad-con-escalera-y-andamios-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1tCAcJfyx9VZXHVxmm5QlYGo-18VWv73B/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRABAJOS EN CALIENTE #NUEVO",
+          "slug": "diplomado-trabajos-en-caliente-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13dg8CWjbm93t5K4BDcX80i0Skk4o-wqa/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO CONTROL DE SUSTANCIAS PELIGROSAS MATPEL #NUEVO",
+          "slug": "diplomado-control-de-sustancias-peligrosas-matpel-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1TyxbAQVXuKiPMNbqvLCaYZjsNZkDdSnj/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO RIESGOS ELÉCTRICOS #NUEVO",
+          "slug": "diplomado-riesgos-el-ctricos-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Xkumbz5DrMmPw1sS4HKCL3xnT9D86dWa/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SISTEMA DE IZAJE #NUEVO",
+          "slug": "diplomado-sistema-de-izaje-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1A_qXpvbiLv1W8WuUwgvMAOE9d-zDOYv8/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO TRABAJOS EN ALTURAS #NUEVO",
+          "slug": "diplomado-trabajos-en-alturas-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1ZbIr4GlWjN1Hj_07TS3OJwWGpKQPY1zq/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO SUPERVISOR ESCOLTA DE CARGA Y MATERIALES PELIGROSOS  (SECMP)",
+          "slug": "diplomado-supervisor-escolta-de-carga-y-materiales-peligrosos-secmp",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1Uk6LVapoH3QCbOrqTMqqUSKqi2TRb9Dx/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1-hM9iQclFMI-IkSOu9tzXkHmjIIKPLYQ/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "DIPLOMADO EN MANEJO Y NAVEGACIÓN GPS (MNGPS)",
+          "slug": "diplomado-en-manejo-y-navegaci-n-gps-mngps",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/1BDbwp02YdQIC5v_sBwDIkZt62V4ojQAJ/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1tUgA4cJLUiL1_-qLUuUF3u4fm086cz-w/view?usp=sharing",
+          "youtube": "https://youtu.be/FIPOKaGbQsk",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        }
+      ],
+      "cursos": [
+        {
+          "nombre": "CURSO MATPEL NIVEL 1",
+          "slug": "curso-matpel-nivel-1",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1-xF1L6vHCFbMDJrFOfls7l9G0FstIK1t/view?usp=sharing",
+          "youtube": "https://youtu.be/676XGy8RjZ0",
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 2",
+          "slug": "curso-matpel-nivel-2",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1SZWRyzVEe2bXk7n4xoh0PoSkzAhzKwE5/view?usp=sharing",
+          "youtube": "https://youtu.be/3ARLq8Q-jQE",
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 3",
+          "slug": "curso-matpel-nivel-3",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/17rrL3K9UYk3ZJwffBLYr_G_uqyCJdBO6/view?usp=sharing",
+          "youtube": "https://youtu.be/E21XPKrUrqM",
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 4",
+          "slug": "curso-matpel-nivel-4",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1ZIHEIeXhMJdEgELxqMPJlWUIHa1592qd/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 5",
+          "slug": "curso-matpel-nivel-5",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1SDsnZFq95RInm-_SfNFg6RMNsoB0Rm9F/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "GIRS: GESTIÓN INTEGRAL DE RESIDUOS SÓLIDOS (GIRS)",
+          "slug": "girs-gesti-n-integral-de-residuos-s-lidos-girs",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/16KQm-RgxFrP0udAQKLsX-_WLFpclk8Uw/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "PREVENCIÓN DE RIESGOS LABORALES(PRL)",
+          "slug": "prevenci-n-de-riesgos-laborales-prl",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1HxzRaJoMiXeDKfb391E30g4xlWqiAUE_/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "SUPERVISIÓN DE TRABAJOS DE ALTO RIESGO (STAR)",
+          "slug": "supervisi-n-de-trabajos-de-alto-riesgo-star",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/16dUOh3PL7-53DBjySr5fkhRA1N5qYmrw/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS EN CALIENTE (TC)",
+          "slug": "trabajos-en-caliente-tc",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Og_q4kAs1fWvj7ElIrnsLJFRwVkUljx7/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS EN ALTURAS (TA)",
+          "slug": "trabajos-en-alturas-ta",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1dJoqp_7ShXgYPe8VnuU3Rgatyw91sPmT/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS CON FUENTE DE ENERGÍA ELÉCTRICA (TFEE)",
+          "slug": "trabajos-con-fuente-de-energ-a-el-ctrica-tfee",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/10lvodXuFRJTikgWjrJVnDmRRYn2xJGYT/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO EN PRIMEROS AUXILIOS, EVALUACIÓN PRIMARIA Y RCP (PAEP)",
+          "slug": "curso-en-primeros-auxilios-evaluaci-n-primaria-y-rcp-paep",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1_SvTFBTZR_bYqYAAIK44e7TmDNihgDEq/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE USO Y MANEJO DE EXTINTORES (UMEX)",
+          "slug": "curso-de-uso-y-manejo-de-extintores-umex",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1o65kVDl9TV9xejYqHLBOWEzf1Vz4zFMB/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 1",
+          "slug": "curso-matpel-nivel-1",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1bBuqtQD5iIKtO6fKBrBbcw9nyXswJn0W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/15Sv_2ThKsaET9MYgzdVu_a67uTejETKf/view?usp=sharing",
+          "youtube": "https://youtu.be/676XGy8RjZ0",
+          "precio": "S/. 200.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 2",
+          "slug": "curso-matpel-nivel-2",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1bBuqtQD5iIKtO6fKBrBbcw9nyXswJn0W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1oYDiSVkxb5prpCYI1lzJ-pHLajLlLdJO/view?usp=sharing",
+          "youtube": "https://youtu.be/3ARLq8Q-jQE",
+          "precio": "S/. 200.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 3",
+          "slug": "curso-matpel-nivel-3",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1bBuqtQD5iIKtO6fKBrBbcw9nyXswJn0W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1ki3d02XTpSdbmTHxCYsPgYsnIaR-aMrp/view?usp=sharing",
+          "youtube": "https://youtu.be/E21XPKrUrqM",
+          "precio": "S/. 200.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 4",
+          "slug": "curso-matpel-nivel-4",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1bBuqtQD5iIKtO6fKBrBbcw9nyXswJn0W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1--yir_UcDgUe4noVy76lmUycy7GzqQMl/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MATPEL NIVEL 5",
+          "slug": "curso-matpel-nivel-5",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1bBuqtQD5iIKtO6fKBrBbcw9nyXswJn0W/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1A3uaE9nM7kHCjF8YuEYD6G8O4_OTKO8H/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 200.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS EN CALIENTE (TC)",
+          "slug": "trabajos-en-caliente-tc",
+          "tipo": "matpel",
+          "flyer": "https://bit.ly/3OcAeVs",
+          "brochure": "https://drive.google.com/file/d/1H8_co4l9FRqDM6RkhK7Ir8STf-GVLPAb/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 150.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS EN ALTURAS (TA)",
+          "slug": "trabajos-en-alturas-ta",
+          "tipo": "matpel",
+          "flyer": "https://bit.ly/3cii1IN",
+          "brochure": "https://drive.google.com/file/d/1odmf3V1vVv7ycT5sHXqBubhbLVrGQBZk/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 150.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "TRABAJOS CON FUENTE DE ENERGÍA ELÉCTRICA (TFEE)",
+          "slug": "trabajos-con-fuente-de-energ-a-el-ctrica-tfee",
+          "tipo": "matpel",
+          "flyer": "https://bit.ly/3OfV3zc",
+          "brochure": "https://drive.google.com/file/d/1sBv-quVhQ7Q0_4Iy-fF550kETULzlpAe/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 150.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO EN PRIMEROS AUXILIOS, EVALUACIÓN PRIMARIA Y RCP (PAEP)",
+          "slug": "curso-en-primeros-auxilios-evaluaci-n-primaria-y-rcp-paep",
+          "tipo": "matpel",
+          "flyer": "https://bit.ly/3z6f5rF",
+          "brochure": "https://drive.google.com/file/d/1dex3DDGtO3Usv2GGFqwL5A-jT_DsTXNM/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 150.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE USO Y MANEJO DE EXTINTORES (UMEX)",
+          "slug": "curso-de-uso-y-manejo-de-extintores-umex",
+          "tipo": "matpel",
+          "flyer": "https://drive.google.com/file/d/1Z787HPCr4k7HZbwUtakYlPXXWWCLtraM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1zPLnXIfnlYvKHTaXK67dfeOTw2gcY7me/view?usp=sharing",
+          "youtube": "https://bit.ly/3clnJcZ",
+          "precio": "S/. 150.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE CPR/First Aid Certification – Certificación en RCP y Primeros Auxilios #NUEVO",
+          "slug": "curso-de-cpr-first-aid-certification--certificaci-n-en-rcp-y-primeros-auxilios-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1V5rEygutcl5tDvlIoyDcrc68XTnmJETP/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO de Capacitación en RCP y Primeros Auxilios #NUEVO",
+          "slug": "curso-de-capacitaci-n-en-rcp-y-primeros-auxilios-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1S_OGJbgWGl_TflzYCnCdLy45z2oepxRx/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO DE Capacitación en Manejo de Materiales Peligrosos y Riesgos Químicos #NUEVO",
+          "slug": "curso-de-capacitaci-n-en-manejo-de-materiales-peligrosos-y-riesgos-qu-micos-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1xHRifOPPFgTMxbkw7YWsMAkJj7IFRnA5/view?usp=sharing",
+          "youtube": null,
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CERTIFICACIÓN PROFESIONAL DE RIGGER – APAREJAMIENTO Y\nSEÑALIZACIÓN DE IZAJES #NUEVO",
+          "slug": "certificaci-n-profesional-de-rigger--aparejamiento-y-se-alizaci-n-de-izajes-nuevo",
+          "tipo": "matpel",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/14fq8lo0SL0iSJHS3Dkt5HOIxDj-u1_Ly/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null
+        },
+        {
+          "nombre": "CURSO MANEJO DEFENSIVO Y MATERIALES PELIGROSOS (NO INCLUYE MATPEL) (MDMP)",
+          "slug": "curso-manejo-defensivo-y-materiales-peligrosos-no-incluye-matpel-mdmp",
+          "tipo": "no_actualizados",
+          "flyer": "https://drive.google.com/file/d/16ykOxlEQEQDWIgxT4kIZSN4_0rEg1InS/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1HNtuUllZqSMp28zLdbk7dYcE9VL0LpWI/view?usp=sharing",
+          "youtube": "https://youtu.be/vCW3dfUJLnw?si=8xTg3jMVT9rQZW6m",
+          "precio": "S/. 450.00",
+          "actualizado_drive": null
+        }
+      ]
+    },
+    {
+      "nombre": "ISTP GLOBALEX",
+      "slug": "istp-globalex",
+      "grupo_slug": "globalex-ige",
+      "codigo": "GLOB",
+      "sigla": "GLOBALEX",
+      "color_hex": "#1d4ed8",
+      "logo_modo_claro": "/logos-comercios/globalex-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/globalex-para-fondo-oscuro.png",
+      "catalogo_url": "https://drive.google.com/file/d/1VS1lA9whOQH5s_t3QgbPgHHyn5A-_ugZ/view?usp=sharing",
+      "certificado_url": "https://drive.google.com/file/d/1LI4kZIWTrOdZFh_qoxrgNgtJYbPjiDwU/view?usp=sharing",
+      "carreras": [
+        {
+          "nombre": "Administración de Negocios Internacionales",
+          "slug": "administracion-de-negocios-internacionales",
+          "codigo": "ADMNI",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/1zEYWtd1hRQSViAfW8dcgaBdbN-NDyzQp/view?usp=sharing",
+          "descripcion": "Gestión aduanera, logística de comercio internacional, operaciones financieras y negociación global."
+        },
+        {
+          "nombre": "Marketing Digital",
+          "slug": "marketing-digital",
+          "codigo": "MKD",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/16f4bna9H1KUhNXs6QpO7KUyBJGBOpPin/view?usp=sharing",
+          "descripcion": "Estrategias de posicionamiento en medios digitales, performance, branding, analítica web y comercio electrónico."
+        },
+        {
+          "nombre": "Desarrollo de Sistemas de Información",
+          "slug": "desarrollo-de-sistemas-de-informacion",
+          "codigo": "DSI",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "brochure": "https://drive.google.com/file/d/1J8RXOoToQfwy-w1AJ4QK-tWjsEhHpeGq/view?usp=sharing",
+          "descripcion": "Ingeniería de software, desarrollo Full Stack, base de datos, ciberseguridad y arquitectura en la nube."
+        }
+      ],
+      "diplomados": [
+        {
+          "nombre": "Diplomado Especializado en Marketing internacional",
+          "slug": "diplomado-especializado-en-marketing-internacional",
+          "tipo": "comercio_exterior",
+          "flyer": "https://drive.google.com/file/d/1-AM3xdZEYBADoxq6IEfpr2sOTXMwyIK1/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1H4e6URnf86bxgc3dEw-p1lhvYeJoXZQz/view?usp=sharing",
+          "youtube": "https://youtu.be/6wngR2r4Gq4?si=A7gVD1bVOR1powC_",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-internacionales"
+        },
+        {
+          "nombre": "Diplomado Especializado en Logística",
+          "slug": "diplomado-especializado-en-log-stica",
+          "tipo": "comercio_exterior",
+          "flyer": "https://drive.google.com/file/d/1kkd-94Iha4D4sfv1HcGuqOwijpQcwE3y/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/13zojl8qGn-XZGSor71i49BBlUSwk8fRf/view?usp=sharing",
+          "youtube": "https://youtu.be/aSDvtIMnixs?si=LqVf-UnMcjZsX0-o",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-internacionales"
+        },
+        {
+          "nombre": "Diplomado Especializado en Costos y Presupuestos",
+          "slug": "diplomado-especializado-en-costos-y-presupuestos",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1zNLI-S6XDbIh0TqAzvrcJaSZGwMm9cwo/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1bjUz6HhfobFmgKsx76OJ2-yllHdgsFJG/view?usp=sharing",
+          "youtube": "https://youtu.be/ZiJmLFMrcaA?si=w7vuvRGieiFuAuIy",
+          "precio": "S/. 400.00",
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-internacionales"
+        },
+        {
+          "nombre": "BROCHURE CARRERA MARKETING DIGITAL",
+          "slug": "brochure-carrera-marketing-digital",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/16f4bna9H1KUhNXs6QpO7KUyBJGBOpPin/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "marketing-digital"
+        },
+        {
+          "nombre": "Diplomado Especializado en Estrategias de marketing digital",
+          "slug": "diplomado-especializado-en-estrategias-de-marketing-digital",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1_m5O5e4Sxk8dc9ZCMeuS4Pg7V41o6pXD/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1CyyOB-Zw2WMfWhMJYiq0QH3rTooCvWn0/view?usp=sharing",
+          "youtube": "https://youtu.be/oJhGjClwsqU?si=ir_8RITUIFEkTPty",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "marketing-digital"
+        },
+        {
+          "nombre": "Diplomado Especializado en Branding",
+          "slug": "diplomado-especializado-en-branding",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1eDN-BonZiA5ChpGDZYYsECl_JWY6_h8H/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/12--qJTdsl_6j6MQ5Tm3u2OCBaRiXXlpD/view?usp=sharing",
+          "youtube": "https://youtu.be/hXBI6sTSrgw?si=IqU9ZgI2ZXygCvyH",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "marketing-digital"
+        },
+        {
+          "nombre": "BROCHURE CARRERA DE DESARROLLO DE SISTEMAS DE INFORMACIÓN",
+          "slug": "brochure-carrera-de-desarrollo-de-sistemas-de-informaci-n",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1J8RXOoToQfwy-w1AJ4QK-tWjsEhHpeGq/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "desarrollo-de-sistemas-de-informacion"
+        },
+        {
+          "nombre": "Diplomado Especializado en Desarrollo Fullstack",
+          "slug": "diplomado-especializado-en-desarrollo-fullstack",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1pZiHXT1k5loCoPlSPTmHU5tw5JcLIWeM/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/154ihvX2Ms-M6wbECCgAMz0vLnEtKCrVx/view?usp=sharing",
+          "youtube": "https://youtu.be/i7jMUsHi6zQ?si=Pl_V_bjY1T01u89i",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "desarrollo-de-sistemas-de-informacion"
+        },
+        {
+          "nombre": "Diplomado Especializado en Realidad Virtual (VR) y Realidad Aumentada (AR)",
+          "slug": "diplomado-especializado-en-realidad-virtual-vr-y-realidad-aumentada-ar",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1k4fpux6gs7gBUd_lIU8OTliyHIu4Cv2D/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1gveeYY6M5A3GRofEl-aIdiUbjtKhsGls/view?usp=sharing",
+          "youtube": "https://youtu.be/ivA_7GhUD0g?si=rnT5GhniQbZXS2iv",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "desarrollo-de-sistemas-de-informacion"
+        },
+        {
+          "nombre": "Diplomado Especializado en Criptografía y Ciberdefensa",
+          "slug": "diplomado-especializado-en-criptograf-a-y-ciberdefensa",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1hfr4YsGFaQailConXzqj64t1-eVPYc7C/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1l0X5ey7PqUtNL28aY8dPydW6-bmBvFsO/view?usp=sharing",
+          "youtube": "https://youtu.be/TF8wtgwSUbM?si=KuDhCf5KkUiAOhvx",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "desarrollo-de-sistemas-de-informacion"
+        }
+      ],
+      "cursos": [
+        {
+          "nombre": "Curso Especializado en Experto en gestión comercial y marketing",
+          "slug": "curso-especializado-en-experto-en-gesti-n-comercial-y-marketing",
+          "tipo": "administracion",
+          "flyer": "https://drive.google.com/file/d/1teV1KxxR41tFxDb0BqLzlk362UV-UFM3/view?usp=sharing",
+          "brochure": "https://drive.google.com/file/d/1zv_cy2PiDn2R3XiKAcfVqITg21M7oO26/view?usp=sharing",
+          "youtube": "https://youtu.be/EPWKdkNYxg8?si=40ffvzYbPtEp4a9E",
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "marketing-digital"
+        }
+      ]
+    },
+    {
+      "nombre": "ISTP IGE",
+      "slug": "istp-ige",
+      "grupo_slug": "globalex-ige",
+      "codigo": "IGE",
+      "sigla": "IGE",
+      "color_hex": "#059669",
+      "logo_modo_claro": "/logos-comercios/globalex-para-fondo-blanco.png",
+      "logo_modo_oscuro": "/logos-comercios/globalex-para-fondo-oscuro.png",
+      "carreras": [
+        {
+          "nombre": "Administración de Negocios Bancarios y Financieros",
+          "slug": "administracion-de-negocios-bancarios-y-financieros",
+          "codigo": "ANBF",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "descripcion": "Gestión financiera, microfinanzas, mercados de capitales, análisis de riesgos crediticios y banca digital."
+        },
+        {
+          "nombre": "Gestión Administrativa",
+          "slug": "gestion-administrativa",
+          "codigo": "GA",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "descripcion": "Optimización de procesos empresariales, control de gestión, talento humano y administración de recursos."
+        },
+        {
+          "nombre": "Diseño Gráfico",
+          "slug": "diseno-grafico",
+          "codigo": "DG",
+          "tipo": "Carrera Profesional Técnica",
+          "duracion": "3 años (6 Ciclos)",
+          "modalidad": "Virtual / Presencial",
+          "descripcion": "Comunicación visual, branding corporativo, diseño UX/UI, animación digital y producción publicitaria."
+        }
+      ],
+      "diplomados": [
+        {
+          "nombre": "Transformación Digital en Banca y Finanzas",
+          "slug": "transformaci-n-digital-en-banca-y-finanzas",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1HcpVuihkFSEA-XUeik9y_63VaElqRu83/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-bancarios-y-financieros"
+        },
+        {
+          "nombre": "Gestión de Tesorería y Mercados Financieros",
+          "slug": "gesti-n-de-tesorer-a-y-mercados-financieros",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1Sj5CTTO2bUZeSt0QE7srvTgVFVAqapHv/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-bancarios-y-financieros"
+        },
+        {
+          "nombre": "Finanzas estratégicas y gestión de riesgos",
+          "slug": "finanzas-estrat-gicas-y-gesti-n-de-riesgos",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/14tmJyjcUihu9st0d81TVuIjyXarKovhS/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "administracion-de-negocios-bancarios-y-financieros"
+        },
+        {
+          "nombre": "Gestión  de procesos y Productividad Empresarial",
+          "slug": "gesti-n-de-procesos-y-productividad-empresarial",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/16rbri_1r9fBZLh2M-FsnnJS9QZithg2l/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "gestion-administrativa"
+        },
+        {
+          "nombre": "Dirección y Gestión Empresarial",
+          "slug": "direcci-n-y-gesti-n-empresarial",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1DtAm8eZoE3OckH0EJRbaYcpGX6BNFNzT/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "gestion-administrativa"
+        },
+        {
+          "nombre": "Innovación y Transformación Organizacional",
+          "slug": "innovaci-n-y-transformaci-n-organizacional",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13-7DnL8UO2GmuqByq-9NU4sQnxFz3jpi/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "gestion-administrativa"
+        },
+        {
+          "nombre": "Branding y Estrategia Digital",
+          "slug": "branding-y-estrategia-digital",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1EOIphvK7i84iTJio6bDmfS-JegJZurQm/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "diseno-grafico"
+        },
+        {
+          "nombre": "Diseño UX/UI y Experiencia de Usuario",
+          "slug": "dise-o-ux-ui-y-experiencia-de-usuario",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1zPzVXRB5d8PL2z_J9y4aX4QRXGgYoiav/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "diseno-grafico"
+        },
+        {
+          "nombre": "Motion Graphics y Producción Audiovisual",
+          "slug": "motion-graphics-y-producci-n-audiovisual",
+          "tipo": "administracion",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/17HjpkdoPjIw3zih_nwgZXfQk4XleSkCO/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": "diseno-grafico"
+        }
+      ],
+      "cursos": [
+        {
+          "nombre": "CURSO CORTO - Seguridad Esencial para Trabajadores OSHA10",
+          "slug": "curso-corto-seguridad-esencial-para-trabajadores-osha10",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1O_0rIO76ceF60a5zwx-Wqi_bhYoFJXCO/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - Gestión avanzada de Seguridad Laboral OSHA 30",
+          "slug": "curso-corto-gesti-n-avanzada-de-seguridad-laboral-osha-30",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/12X7GKkq4jmfLGgRzPusTesqIwPYmOSBy/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - Gestión de Seguridad en Obras Civiles OSHA",
+          "slug": "curso-corto-gesti-n-de-seguridad-en-obras-civiles-osha",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1SuPfq0vRPl_Hi17-sBOtTMvhu4Hdh9FO/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - RCP y Auxilios de Emergencia",
+          "slug": "curso-corto-rcp-y-auxilios-de-emergencia",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/15rHLeOj_wLpkrx5Ac1kyv6k4Os0kttf4/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - Vida Seguridad de RCP y Primeros Auxilios",
+          "slug": "curso-corto-vida-seguridad-de-rcp-y-primeros-auxilios",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/1debzsA5pyAInYOBrDFMD8-cpnPYy7njH/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - GESTIÓN DE SEGURIDAD CON OSHA",
+          "slug": "curso-corto-gesti-n-de-seguridad-con-osha",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13QyGJLDQTmi7LInMnMWvV0NWOD6xBAuT/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - Seguridad Total en Entornos Industriales OSHA",
+          "slug": "curso-corto-seguridad-total-en-entornos-industriales-osha",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13FTWYKNnVsce808dB06THEVCI6eNX0_W/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - Seguridad Química Industrial y Manejo de materiales peligrosos",
+          "slug": "curso-corto-seguridad-qu-mica-industrial-y-manejo-de-materiales-peligrosos",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/12ax47C_YjwrifmLD7Ej347XehaTB0y4i/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        },
+        {
+          "nombre": "CURSO CORTO - HAZWOPER INDUSTRIAL: SEGURIDAD Y CONTROL DE RESIDUOS",
+          "slug": "curso-corto-hazwoper-industrial-seguridad-y-control-de-residuos",
+          "tipo": "osha",
+          "flyer": null,
+          "brochure": "https://drive.google.com/file/d/13W-oGGVHcOysH6deNfvjV_wMktnwzWaF/view?usp=sharing",
+          "youtube": null,
+          "precio": null,
+          "actualizado_drive": null,
+          "carrera_slug": null
+        }
+      ]
+    }
+  ]
+}

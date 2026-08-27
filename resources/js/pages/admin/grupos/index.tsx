@@ -55,8 +55,8 @@ const getGrupoColor = (slug: string): string => {
 
 export default function GruposIndex({ grupos = [] }: Props) {
     const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+    
+    
     const { notify } = useNotification();
 
     const [search, setSearch] = useState('');
@@ -103,7 +103,7 @@ export default function GruposIndex({ grupos = [] }: Props) {
         });
 
         if (confirmed) {
-            router.delete(`/${currentTeamSlug}/admin/grupos/${grupo.id}`, {
+            router.delete(`/admin/grupos/${grupo.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`El grupo comercial "${grupo.nombre}" ha sido eliminado exitosamente.`);
@@ -459,7 +459,7 @@ export default function GruposIndex({ grupos = [] }: Props) {
                                                             return (
                                                                 <Link
                                                                     key={com.id}
-                                                                    href={`/${currentTeamSlug}/admin/comercios/${com.id}/edit`}
+                                                                    href={`/admin/comercios/${com.id}/edit`}
                                                                     style={{ textDecoration: 'none' }}
                                                                 >
                                                                     <Chip
@@ -527,7 +527,7 @@ export default function GruposIndex({ grupos = [] }: Props) {
                                             <TableCell sx={{ textAlign: 'right' }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
                                                     <Link
-                                                        href={`/${currentTeamSlug}/admin/comercios?grupo_id=${grupo.id}`}
+                                                        href={`/admin/comercios?grupo_id=${grupo.id}`}
                                                         style={{ textDecoration: 'none' }}
                                                     >
                                                         <Tooltip title="Ver comercios del grupo" arrow>
@@ -613,21 +613,21 @@ export default function GruposIndex({ grupos = [] }: Props) {
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 grupo={selectedGrupo}
-                currentTeamSlug={currentTeamSlug}
+                
             />
         </>
     );
 }
 
-GruposIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+GruposIndex.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
         {
             title: 'Grupos Comerciales',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/grupos` : '#',
+            href: '/admin/grupos',
         },
     ],
 });

@@ -7,6 +7,7 @@ use App\Models\Carrera;
 use App\Models\Comercio;
 use App\Models\Curso;
 use App\Models\Grupo;
+use App\Models\Rubro;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -22,7 +23,7 @@ class CursoController extends Controller
     {
         $comercioId = $request->query('comercio_id');
         $carreraId = $request->query('carrera_id');
-        $tipo = $request->query('tipo');
+        $tipo = $request->query('tipo') ?? $request->query('rubros') ?? $request->query('rubro');
         $search = $request->query('search');
 
         $cursosQuery = Curso::query()
@@ -59,6 +60,7 @@ class CursoController extends Controller
             'comercios' => $comercios,
             'carreras' => $carreras,
             'grupos' => $grupos,
+            'rubros' => Rubro::where('activo', true)->orderBy('orden')->orderBy('nombre')->get(),
             'filters' => [
                 'comercio_id' => $comercioId,
                 'carrera_id' => $carreraId,
@@ -73,6 +75,10 @@ class CursoController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->filled('rubros') && ! $request->filled('tipo')) {
+            $request->merge(['tipo' => $request->input('rubros')]);
+        }
+
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
@@ -124,9 +130,13 @@ class CursoController extends Controller
     /**
      * Update the specified curso in storage.
      */
-    public function update(Request $request, string $current_team, $curso): RedirectResponse
+    public function update(Request $request, $curso): RedirectResponse
     {
         $cursoModel = $curso instanceof Curso ? $curso : Curso::findOrFail($curso);
+
+        if ($request->filled('rubros') && ! $request->filled('tipo')) {
+            $request->merge(['tipo' => $request->input('rubros')]);
+        }
 
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
@@ -182,7 +192,7 @@ class CursoController extends Controller
     /**
      * Remove the specified curso from storage.
      */
-    public function destroy(Request $request, string $current_team, $curso): RedirectResponse
+    public function destroy(Request $request, $curso): RedirectResponse
     {
         $cursoModel = $curso instanceof Curso ? $curso : Curso::findOrFail($curso);
         $nombre = $cursoModel->nombre;

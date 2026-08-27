@@ -27,7 +27,6 @@ interface CarreraDialogProps {
     carrera?: Carrera | null;
     comercios: Comercio[];
     defaultComercioId?: number | null;
-    currentTeamSlug: string;
 }
 
 export function CarreraDialog({
@@ -36,7 +35,7 @@ export function CarreraDialog({
     carrera,
     comercios,
     defaultComercioId,
-    currentTeamSlug,
+    
 }: CarreraDialogProps) {
     const isEditing = !!carrera;
     const { notify } = useNotification();
@@ -105,7 +104,7 @@ export function CarreraDialog({
         }
 
         if (isEditing && carrera) {
-            put(`/${currentTeamSlug}/admin/carreras/${carrera.id}`, {
+            put(`/admin/carreras/${carrera.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Carrera "${data.nombre}" actualizada con éxito.`);
@@ -117,7 +116,7 @@ export function CarreraDialog({
                 },
             });
         } else {
-            post(`/${currentTeamSlug}/admin/carreras`, {
+            post(`/admin/carreras`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Carrera "${data.nombre}" registrada exitosamente.`);

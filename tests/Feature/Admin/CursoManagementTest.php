@@ -15,14 +15,13 @@ class CursoManagementTest extends TestCase
 
     public function test_guests_cannot_access_cursos_index(): void
     {
-        $response = $this->get('/default/admin/cursos');
+        $response = $this->get('/admin/cursos');
         $response->assertRedirect(route('login'));
     }
 
     public function test_authenticated_user_can_view_cursos_index_and_filter(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercio = Comercio::factory()->create();
 
@@ -39,7 +38,7 @@ class CursoManagementTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.cursos.index', ['current_team' => $team->slug]));
+            ->get(route('admin.cursos.index', ));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -49,9 +48,7 @@ class CursoManagementTest extends TestCase
 
         $filteredResponse = $this
             ->actingAs($user)
-            ->get(route('admin.cursos.index', [
-                'current_team' => $team->slug,
-                'tipo' => 'especializado',
+            ->get(route('admin.cursos.index', ['tipo' => 'especializado',
             ]));
 
         $filteredResponse->assertOk();
@@ -65,12 +62,11 @@ class CursoManagementTest extends TestCase
     public function test_user_can_create_a_curso(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
         $comercio = Comercio::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.cursos.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.cursos.store', ), [
                 'comercio_id' => $comercio->id,
                 'nombre' => 'Curso Especializado en Respuesta a Emergencias Químicas',
                 'tipo' => 'especializado',
@@ -91,7 +87,6 @@ class CursoManagementTest extends TestCase
     public function test_user_can_update_a_curso(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $curso = Curso::factory()->create([
             'nombre' => 'Curso Básico de Seguridad',
@@ -100,9 +95,7 @@ class CursoManagementTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->put(route('admin.cursos.update', [
-                'current_team' => $team->slug,
-                'curso' => $curso->id,
+            ->put(route('admin.cursos.update', ['curso' => $curso->id,
             ]), [
                 'comercio_id' => $curso->comercio_id,
                 'nombre' => 'Curso Intensivo de Seguridad Minera e Industrial',
@@ -121,15 +114,12 @@ class CursoManagementTest extends TestCase
     public function test_user_can_delete_a_curso(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $curso = Curso::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->delete(route('admin.cursos.destroy', [
-                'current_team' => $team->slug,
-                'curso' => $curso->id,
+            ->delete(route('admin.cursos.destroy', ['curso' => $curso->id,
             ]));
 
         $response->assertRedirect();

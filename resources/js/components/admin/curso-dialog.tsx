@@ -8,6 +8,7 @@ import {
     TextField,
     Select,
     MenuItem,
+    ListSubheader,
     FormControl,
     InputLabel,
     Button,
@@ -17,10 +18,10 @@ import {
     FormHelperText,
     Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength } from '@/lib/validation';
-import type { Curso, Comercio } from '@/types';
+import type { Curso, Comercio, Rubro } from '@/types';
 
 interface CursoDialogProps {
     open: boolean;
@@ -28,9 +29,9 @@ interface CursoDialogProps {
     curso?: Curso | null;
     comercios: Comercio[];
     carreras?: { id: number; comercio_id: number; nombre: string; codigo?: string | null }[];
+    rubros?: Rubro[];
     defaultComercioId?: number | null;
     defaultCarreraId?: number | null;
-    currentTeamSlug: string;
 }
 
 export function CursoDialog({
@@ -39,9 +40,10 @@ export function CursoDialog({
     curso,
     comercios,
     carreras = [],
+    rubros = [],
     defaultComercioId,
     defaultCarreraId,
-    currentTeamSlug,
+    
 }: CursoDialogProps) {
     const isEditing = !!curso;
     const { notify } = useNotification();
@@ -136,7 +138,7 @@ export function CursoDialog({
         }
 
         if (isEditing && curso) {
-            put(`/${currentTeamSlug}/admin/cursos/${curso.id}`, {
+            put(`/admin/cursos/${curso.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Curso "${data.nombre}" actualizado con éxito.`);
@@ -148,7 +150,7 @@ export function CursoDialog({
                 },
             });
         } else {
-            post(`/${currentTeamSlug}/admin/cursos`, {
+            post(`/admin/cursos`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Curso "${data.nombre}" registrado exitosamente.`);
@@ -161,6 +163,17 @@ export function CursoDialog({
             });
         }
     };
+
+    const groupedRubros = useMemo(() => {
+        if (!rubros || rubros.length === 0) return null;
+        const groups: Record<string, Rubro[]> = {};
+        for (const r of rubros) {
+            const cat = r.categoria || 'Otros Rubros';
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(r);
+        }
+        return Object.entries(groups);
+    }, [rubros]);
 
     return (
         <Dialog
@@ -226,20 +239,62 @@ export function CursoDialog({
 
                             <Grid size={{ xs: 12, sm: 5 }}>
                                 <FormControl fullWidth size="small">
-                                    <InputLabel id="select-tipo-label">Tipo de Curso</InputLabel>
+                                    <InputLabel id="select-tipo-label">Rubro / Categoría</InputLabel>
                                     <Select
                                         labelId="select-tipo-label"
                                         value={data.tipo}
-                                        label="Tipo de Curso"
+                                        label="Rubro / Categoría"
                                         onChange={(e) => setData('tipo', e.target.value)}
                                     >
-                                        <MenuItem value="">Sin Tipo / Curso Libre</MenuItem>
-                                        <MenuItem value="tradicional">Tradicional</MenuItem>
-                                        <MenuItem value="especializado">Especializado</MenuItem>
+                                        <MenuItem value="">🎓 Sin Categoría / Curso Libre</MenuItem>
+
+                                        {groupedRubros ? (
+                                            groupedRubros.map(([catName, items]) => [
+                                                <ListSubheader key={catName} sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    {catName}
+                                                </ListSubheader>,
+                                                ...items.map((r) => (
+                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#0284c7', flexShrink: 0 }} />
+                                                            {r.nombre}
+                                                        </Box>
+                                                    </MenuItem>
+                                                )),
+                                            ])
+                                        ) : (
+                                            <>
+                                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    Modalidad de Formación
+                                                </ListSubheader>
+                                                <MenuItem value="tradicional">📘 Curso Tradicional</MenuItem>
+                                                <MenuItem value="especializado">⭐ Curso Especializado</MenuItem>
+
+                                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    CECAVA (Rubros Técnicos)
+                                                </ListSubheader>
+                                                <MenuItem value="ambientales">🌿 Rubro Ambiental</MenuItem>
+                                                <MenuItem value="calidad_isos">🏆 Rubro Calidad e ISOs</MenuItem>
+                                                <MenuItem value="mineros">⛏️ Rubro Minero</MenuItem>
+                                                <MenuItem value="administracion">💼 Rubro Administración</MenuItem>
+                                                <MenuItem value="arquitectura_ingenieria">📐 Rubro Arquitectura e Ingeniería</MenuItem>
+                                                <MenuItem value="osha">🦺 Rubro OSHA</MenuItem>
+                                                <MenuItem value="comercio_exterior">🚢 Rubro Comercio Exterior</MenuItem>
+                                                <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
+                                                <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
+
+                                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    MAGISTER (Educación)
+                                                </ListSubheader>
+                                                <MenuItem value="nombramiento">📝 Nombramiento Docente</MenuItem>
+                                                <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
+                                                <MenuItem value="generico">🎓 Genérico / Otros</MenuItem>
+                                            </>
+                                        )}
                                     </Select>
                                     {isMatpel && (
                                         <FormHelperText sx={{ color: 'text.secondary' }}>
-                                            En Matpel los cursos son libres (sin tipo específico).
+                                            En Matpel los cursos son libres (sin rubro/categoría específica).
                                         </FormHelperText>
                                     )}
                                 </FormControl>

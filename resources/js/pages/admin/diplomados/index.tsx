@@ -41,13 +41,14 @@ import { DiplomadoDialog } from '@/components/admin/diplomado-dialog';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
-import type { Diplomado, Comercio, Grupo, Carrera } from '@/types';
+import type { Carrera, Comercio, Diplomado, Grupo, Rubro } from '@/types';
 
 interface Props {
     diplomados: Diplomado[];
     comercios: Comercio[];
     carreras?: Carrera[];
     grupos?: Grupo[];
+    rubros?: Rubro[];
     filters: {
         comercio_id?: string;
         tipo?: string;
@@ -59,11 +60,12 @@ export default function DiplomadosIndex({
     diplomados = [],
     comercios = [],
     carreras = [],
+    rubros = [],
     filters,
 }: Props) {
     const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+    
+    
     const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
@@ -80,7 +82,7 @@ export default function DiplomadosIndex({
         search?: string;
     }) => {
         router.get(
-            `/${currentTeamSlug}/admin/diplomados`,
+            `/admin/diplomados`,
             {
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
                 tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
@@ -128,7 +130,7 @@ export default function DiplomadosIndex({
         });
 
         if (confirmed) {
-            router.delete(`/${currentTeamSlug}/admin/diplomados/${diplomado.id}`, {
+            router.delete(`/admin/diplomados/${diplomado.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Diplomado "${diplomado.nombre}" eliminado exitosamente.`);
@@ -146,6 +148,26 @@ export default function DiplomadosIndex({
                 <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
                     General / Libre
                 </Typography>
+            );
+        }
+
+        const rubroMatch = rubros.find((r) => r.clave === tipo);
+        if (rubroMatch) {
+            const color = rubroMatch.color_hex || '#7c3aed';
+            return (
+                <Chip
+                    label={rubroMatch.nombre}
+                    size="small"
+                    sx={{
+                        bgcolor: `${color}15`,
+                        color: color,
+                        border: `1px solid ${color}35`,
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        height: 22,
+                        borderRadius: 0.8,
+                    }}
+                />
             );
         }
 
@@ -373,22 +395,34 @@ export default function DiplomadosIndex({
                             >
                                 <MenuItem value="all">🎓 Todos los rubros</MenuItem>
                                 <MenuItem value="sin_categoria">Libre / Sin Categoría</MenuItem>
+                                {rubros && rubros.length > 0 ? (
+                                    rubros.map((r) => (
+                                        <MenuItem key={r.clave} value={r.clave}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#7c3aed', flexShrink: 0 }} />
+                                                {r.nombre}
+                                            </Box>
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <>
+                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>CECAVA</ListSubheader>
+                                        <MenuItem value="ambientales">🌿 Ambientales</MenuItem>
+                                        <MenuItem value="calidad_isos">🏆 Calidad e ISOs</MenuItem>
+                                        <MenuItem value="mineros">⛏️ Mineros</MenuItem>
+                                        <MenuItem value="administracion">💼 Administración</MenuItem>
+                                        <MenuItem value="arquitectura_ingenieria">📐 Arq. e Ingeniería</MenuItem>
+                                        <MenuItem value="osha">🦺 OSHA</MenuItem>
+                                        <MenuItem value="comercio_exterior">🚢 Comercio Exterior</MenuItem>
+                                        <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
+                                        <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
 
-                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>CECAVA</ListSubheader>
-                                <MenuItem value="ambientales">🌿 Ambientales</MenuItem>
-                                <MenuItem value="calidad_isos">🏆 Calidad e ISOs</MenuItem>
-                                <MenuItem value="mineros">⛏️ Mineros</MenuItem>
-                                <MenuItem value="administracion">💼 Administración</MenuItem>
-                                <MenuItem value="arquitectura_ingenieria">📐 Arq. e Ingeniería</MenuItem>
-                                <MenuItem value="osha">🦺 OSHA</MenuItem>
-                                <MenuItem value="comercio_exterior">🚢 Comercio Exterior</MenuItem>
-                                <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
-                                <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
-
-                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>MAGISTER</ListSubheader>
-                                <MenuItem value="nombramiento">📝 Nombramiento</MenuItem>
-                                <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
-                                <MenuItem value="generico">🎓 Genérico</MenuItem>
+                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>MAGISTER</ListSubheader>
+                                        <MenuItem value="nombramiento">📝 Nombramiento</MenuItem>
+                                        <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
+                                        <MenuItem value="generico">🎓 Genérico</MenuItem>
+                                    </>
+                                )}
                             </Select>
                         </FormControl>
                     </Box>
@@ -706,21 +740,22 @@ export default function DiplomadosIndex({
                 diplomado={selectedDiplomado}
                 comercios={comercios}
                 carreras={carreras}
-                currentTeamSlug={currentTeamSlug}
+                rubros={rubros}
+                
             />
         </>
     );
 }
 
-DiplomadosIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+DiplomadosIndex.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
         {
-            title: 'Diplomados y Especializaciones',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/diplomados` : '#',
+            title: 'Diplomados',
+            href: '/admin/diplomados',
         },
     ],
 });

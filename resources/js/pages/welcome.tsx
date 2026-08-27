@@ -3,9 +3,13 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import BusinessIcon from '@mui/icons-material/Business';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ClearIcon from '@mui/icons-material/Clear';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DomainIcon from '@mui/icons-material/Domain';
+import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import LoginIcon from '@mui/icons-material/Login';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
@@ -32,11 +36,13 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { useState, useMemo } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { useState, useMemo, useEffect } from 'react';
 import AppLogo from '@/components/app-logo';
 import AcademicOfferExplorer from '@/components/catalog/academic-offer-explorer';
 import ComercioDetailModal from '@/components/catalog/comercio-detail-modal';
 import LoginPopover from '@/components/login-popover';
+import { useNotification } from '@/hooks/use-notification';
 import { dashboard } from '@/routes';
 import type { Comercio, Grupo } from '@/types';
 
@@ -50,6 +56,10 @@ interface WelcomeProps {
         totalCursos: number;
     };
     initialComercio?: Comercio | null;
+    driveLinks?: {
+        escifor?: string;
+        multimarca?: string;
+    };
 }
 
 export default function Welcome({
@@ -62,14 +72,37 @@ export default function Welcome({
         totalCursos: 34,
     },
     initialComercio = null,
+    driveLinks = {
+        escifor: '',
+        multimarca: '',
+    },
 }: WelcomeProps) {
     const page = usePage();
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
+    const { notify } = useNotification();
     const auth = (page.props.auth || {}) as { user?: any };
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
+    const dashboardUrl = auth.user ? '/dashboard' : '/';
 
     // Estado del Popover de inicio de sesión para el administrador
     const [loginAnchorEl, setLoginAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+    // Detección automática: si se accede con ?login=1 o desde un intento de acceso protegido,
+    // se abre inmediatamente el minicuadro de inicio de sesión anclado al botón.
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('login') === '1' || params.get('login') === 'true') {
+                const timer = setTimeout(() => {
+                    const btn = document.getElementById('btn-iniciar-sesion') as HTMLButtonElement | null;
+                    if (btn) {
+                        setLoginAnchorEl(btn);
+                    }
+                }, 100);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, []);
 
     // Estado de la Ficha Modal de Comercio seleccionada para consulta
     const [selectedComercio, setSelectedComercio] = useState<Comercio | null>(initialComercio);
@@ -101,6 +134,17 @@ export default function Welcome({
 
     const handleCloseComercioDetail = () => {
         setDetailModalOpen(false);
+    };
+
+    const handleRedirect = (url?: string, label?: string) => {
+        if (!url || !url.trim()) {
+            notify.info(
+                `El enlace de Drive Capacitación ${label} aún no ha sido configurado en el panel administrativo.`
+            );
+            return;
+        }
+        const fullUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+        window.open(fullUrl, '_blank', 'noopener,noreferrer');
     };
 
     // Extraer todos los comercios planos
@@ -206,25 +250,69 @@ export default function Welcome({
                             />
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             {auth.user ? (
-                                <Link href={dashboardUrl} style={{ textDecoration: 'none' }}>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        endIcon={<ArrowForwardIcon />}
-                                        sx={{ px: 2.5, fontWeight: 700 }}
-                                    >
-                                        Ir al Panel de Control
-                                    </Button>
-                                </Link>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Chip
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: 'primary.main', color: '#fff', width: 28, height: 28, fontSize: '0.8rem', fontWeight: 800 }}>
+                                                {(auth.user.name || 'A').substring(0, 1).toUpperCase()}
+                                            </Avatar>
+                                        }
+                                        label={auth.user.name || 'Administrador'}
+                                        size="medium"
+                                        variant="outlined"
+                                        sx={{ fontWeight: 700, display: { xs: 'none', sm: 'inline-flex' } }}
+                                    />
+                                    <Link href={dashboardUrl} style={{ textDecoration: 'none' }}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            endIcon={<ArrowForwardIcon />}
+                                            sx={{
+                                                px: 2.5,
+                                                py: 0.9,
+                                                fontWeight: 800,
+                                                borderRadius: 2,
+                                                textTransform: 'none',
+                                                boxShadow: '0 4px 14px rgba(12, 67, 163, 0.25)',
+                                            }}
+                                        >
+                                            Ir al Panel de Control
+                                        </Button>
+                                    </Link>
+                                </Box>
                             ) : (
                                 <Tooltip title="Acceso exclusivo para el administrador del sistema" arrow>
                                     <Button
+                                        id="btn-iniciar-sesion"
                                         variant="outlined"
                                         color="primary"
                                         onClick={handleOpenLogin}
-                                        sx={{ px: 2.5, fontWeight: 700 }}
+                                        startIcon={<LoginIcon />}
+                                        sx={{
+                                            px: { xs: 2, sm: 2.8 },
+                                            py: 0.9,
+                                            fontWeight: 800,
+                                            borderRadius: 2,
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2,
+                                            textTransform: 'none',
+                                            fontSize: '0.92rem',
+                                            bgcolor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(96, 165, 250, 0.08)'
+                                                    : 'rgba(12, 67, 163, 0.04)',
+                                            boxShadow: '0 2px 8px rgba(12, 67, 163, 0.08)',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                borderWidth: 2,
+                                                bgcolor: 'primary.main',
+                                                color: '#ffffff',
+                                                boxShadow: '0 4px 16px rgba(12, 67, 163, 0.3)',
+                                                transform: 'translateY(-1px)',
+                                            },
+                                        }}
                                     >
                                         Iniciar Sesión
                                     </Button>
@@ -247,18 +335,6 @@ export default function Welcome({
                     }}
                 >
                     <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                        <Chip
-                            icon={<VerifiedUserIcon sx={{ color: '#54d8ee !important' }} />}
-                            label="Consorcio Educativo & Catálogo de Marcas Acreditadas MINEDU"
-                            sx={{
-                                bgcolor: 'rgba(255, 255, 255, 0.12)',
-                                color: '#ffffff',
-                                fontWeight: 'bold',
-                                mb: 2.5,
-                                backdropFilter: 'blur(6px)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                            }}
-                        />
 
                         <Typography
                             variant="h2"
@@ -321,6 +397,92 @@ export default function Welcome({
                                     },
                                 }}
                             />
+                        </Box>
+
+                        {/* Botones de Capacitaciones Drive con Tooltips (Debajo del buscador en el Header) */}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                                mb: 3,
+                            }}
+                        >
+                            <Tooltip
+                                title="Abrir carpeta en Google Drive con grabaciones y capacitaciones de ESCIFOR"
+                                arrow
+                                placement="bottom"
+                            >
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    startIcon={<FolderSharedIcon sx={{ fontSize: 19 }} />}
+                                    endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
+                                    onClick={() => handleRedirect(driveLinks?.escifor, 'ESCIFOR')}
+                                    sx={{
+                                        bgcolor: 'rgba(255, 255, 255, 0.16)',
+                                        backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                                        color: '#ffffff',
+                                        fontWeight: 800,
+                                        fontSize: '0.86rem',
+                                        letterSpacing: '0.02em',
+                                        px: 2.8,
+                                        py: 1,
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': {
+                                            bgcolor: 'rgba(255, 255, 255, 0.28)',
+                                            borderColor: '#ffffff',
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+                                        },
+                                    }}
+                                >
+                                    Capacitación ESCIFOR
+                                </Button>
+                            </Tooltip>
+
+                            <Tooltip
+                                title="Abrir carpeta en Google Drive con grabaciones y capacitaciones de MULTIMARCA"
+                                arrow
+                                placement="bottom"
+                            >
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    startIcon={<FolderSharedIcon sx={{ fontSize: 19 }} />}
+                                    endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
+                                    onClick={() => handleRedirect(driveLinks?.multimarca, 'MULTIMARCA')}
+                                    sx={{
+                                        bgcolor: 'rgba(34, 197, 94, 0.22)',
+                                        backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(74, 222, 128, 0.45)',
+                                        color: '#ffffff',
+                                        fontWeight: 800,
+                                        fontSize: '0.86rem',
+                                        letterSpacing: '0.02em',
+                                        px: 2.8,
+                                        py: 1,
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': {
+                                            bgcolor: 'rgba(34, 197, 94, 0.35)',
+                                            borderColor: '#4ade80',
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.35)',
+                                        },
+                                    }}
+                                >
+                                    Capacitación MULTIMARCA
+                                </Button>
+                            </Tooltip>
                         </Box>
 
                         {/* Indicadores en vivo */}
@@ -437,21 +599,27 @@ export default function Welcome({
                                 <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 3, my: 4 }}>
                                     <StorefrontIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 1.5 }} />
                                     <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                                        No se encontraron comercios ni marcas
+                                        {allComercios.length === 0
+                                            ? 'Catálogo en preparación'
+                                            : 'No se encontraron comercios ni marcas'}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
-                                        Intenta borrar el término de búsqueda o selecciona otro grupo corporativo.
+                                        {allComercios.length === 0
+                                            ? 'Aún no se han registrado marcas en el sistema. El administrador puede agregarlas desde el panel administrativo.'
+                                            : 'Intenta borrar el término de búsqueda o selecciona otro grupo corporativo.'}
                                     </Typography>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => {
-                                            setSearchQuery('');
-                                            setSelectedGrupoId('all');
-                                        }}
-                                        sx={{ borderRadius: 2, textTransform: 'none' }}
-                                    >
-                                        Restablecer Filtros
-                                    </Button>
+                                    {allComercios.length > 0 && (
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => {
+                                                setSearchQuery('');
+                                                setSelectedGrupoId('all');
+                                            }}
+                                            sx={{ borderRadius: 2, textTransform: 'none' }}
+                                        >
+                                            Restablecer Filtros
+                                        </Button>
+                                    )}
                                 </Paper>
                             ) : (
                                 <Grid container spacing={3}>
@@ -497,19 +665,59 @@ export default function Welcome({
                                                         {/* Cabecera de Marca */}
                                                         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 2 }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
-                                                                <Avatar
-                                                                    sx={{
-                                                                        width: 48,
-                                                                        height: 48,
-                                                                        bgcolor: brandColor,
-                                                                        color: '#ffffff',
-                                                                        fontWeight: 900,
-                                                                        fontSize: '1.1rem',
-                                                                        boxShadow: `0 4px 12px ${brandColor}40`,
-                                                                    }}
-                                                                >
-                                                                    {(comercio.sigla || comercio.nombre).substring(0, 3).toUpperCase()}
-                                                                </Avatar>
+                                                                {(() => {
+                                                                    const logoSrc = isDark
+                                                                        ? (comercio.logo_modo_oscuro || comercio.logo_modo_claro)
+                                                                        : (comercio.logo_modo_claro || comercio.logo_modo_oscuro);
+
+                                                                    if (logoSrc) {
+                                                                        return (
+                                                                            <Box
+                                                                                sx={{
+                                                                                    height: 48,
+                                                                                    width: 82,
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    justifyContent: 'center',
+                                                                                    p: 0.5,
+                                                                                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
+                                                                                    borderRadius: 2,
+                                                                                    border: '1px solid',
+                                                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                                                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                                                                                    flexShrink: 0,
+                                                                                }}
+                                                                            >
+                                                                                <Box
+                                                                                    component="img"
+                                                                                    src={logoSrc}
+                                                                                    alt={`Logo ${comercio.nombre}`}
+                                                                                    sx={{
+                                                                                        maxHeight: 40,
+                                                                                        maxWidth: '100%',
+                                                                                        objectFit: 'contain',
+                                                                                    }}
+                                                                                />
+                                                                            </Box>
+                                                                        );
+                                                                    }
+
+                                                                    return (
+                                                                        <Avatar
+                                                                            sx={{
+                                                                                width: 48,
+                                                                                height: 48,
+                                                                                bgcolor: brandColor,
+                                                                                color: '#ffffff',
+                                                                                fontWeight: 900,
+                                                                                fontSize: '1.1rem',
+                                                                                boxShadow: `0 4px 12px ${brandColor}40`,
+                                                                            }}
+                                                                        >
+                                                                            {(comercio.sigla || comercio.nombre).substring(0, 3).toUpperCase()}
+                                                                        </Avatar>
+                                                                    );
+                                                                })()}
                                                                 <Box>
                                                                     <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
                                                                         {comercio.nombre}
@@ -566,14 +774,115 @@ export default function Welcome({
                                                             )}
 
                                                             {comercio.resolucion_creacion && (
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                    <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
-                                                                    <Typography variant="caption" noWrap sx={{ fontWeight: 700 }}>
-                                                                        R. Creación:{' '}
-                                                                        <Box component="span" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main', flexShrink: 0 }} />
+                                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                                                            R. Creación:
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    {comercio.resolucion_creacion.startsWith('http') || comercio.resolucion_creacion.includes('drive.google.com') ? (
+                                                                        <Button
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            color="primary"
+                                                                            component="a"
+                                                                            href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            endIcon={<LaunchIcon sx={{ fontSize: '13px !important' }} />}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            sx={{
+                                                                                py: 0.1,
+                                                                                px: 1,
+                                                                                borderRadius: 1.5,
+                                                                                textTransform: 'none',
+                                                                                fontSize: '0.72rem',
+                                                                                fontWeight: 700,
+                                                                                lineHeight: 1.4,
+                                                                            }}
+                                                                        >
+                                                                            Ver documento
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', fontWeight: 600 }}>
                                                                             {comercio.resolucion_creacion}
-                                                                        </Box>
-                                                                    </Typography>
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+                                                            )}
+
+                                                            {comercio.resolucion_revalidacion && (
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: 'info.main', flexShrink: 0 }} />
+                                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                                                            R. Revalidación:
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    {comercio.resolucion_revalidacion.startsWith('http') || comercio.resolucion_revalidacion.includes('drive.google.com') ? (
+                                                                        <Button
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            color="info"
+                                                                            component="a"
+                                                                            href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            endIcon={<LaunchIcon sx={{ fontSize: '13px !important' }} />}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            sx={{
+                                                                                py: 0.1,
+                                                                                px: 1,
+                                                                                borderRadius: 1.5,
+                                                                                textTransform: 'none',
+                                                                                fontSize: '0.72rem',
+                                                                                fontWeight: 700,
+                                                                                lineHeight: 1.4,
+                                                                            }}
+                                                                        >
+                                                                            Ver documento
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                                                            {comercio.resolucion_revalidacion}
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+                                                            )}
+
+                                                            {comercio.promocion_vigente && (
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
+                                                                        <LocalOfferIcon sx={{ fontSize: 15, color: '#ea580c', flexShrink: 0 }} />
+                                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#ea580c' }}>
+                                                                            Promoción:
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    <Button
+                                                                        size="small"
+                                                                        variant="outlined"
+                                                                        component="a"
+                                                                        href={comercio.promocion_vigente.startsWith('http') ? comercio.promocion_vigente : `https://${comercio.promocion_vigente}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        endIcon={<LaunchIcon sx={{ fontSize: '13px !important' }} />}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        sx={{
+                                                                            py: 0.1,
+                                                                            px: 1,
+                                                                            borderRadius: 1.5,
+                                                                            textTransform: 'none',
+                                                                            fontSize: '0.72rem',
+                                                                            fontWeight: 700,
+                                                                            lineHeight: 1.4,
+                                                                            color: '#ea580c',
+                                                                            borderColor: '#ea580c',
+                                                                            '&:hover': { borderColor: '#c2410c', bgcolor: 'rgba(234, 88, 12, 0.05)' },
+                                                                        }}
+                                                                    >
+                                                                        Ver promoción
+                                                                    </Button>
                                                                 </Box>
                                                             )}
                                                         </Box>

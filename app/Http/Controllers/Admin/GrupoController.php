@@ -75,7 +75,7 @@ class GrupoController extends Controller
     /**
      * Update the specified grupo.
      */
-    public function update(Request $request, string $current_team, $grupo): RedirectResponse
+    public function update(Request $request, $grupo): RedirectResponse
     {
         $grupoModel = $grupo instanceof Grupo ? $grupo : Grupo::findOrFail($grupo);
 
@@ -120,7 +120,7 @@ class GrupoController extends Controller
     /**
      * Remove the specified grupo.
      */
-    public function destroy(Request $request, string $current_team, $grupo): RedirectResponse
+    public function destroy(Request $request, $grupo): RedirectResponse
     {
         $grupoModel = $grupo instanceof Grupo ? $grupo : Grupo::findOrFail($grupo);
         $nombre = $grupoModel->nombre;

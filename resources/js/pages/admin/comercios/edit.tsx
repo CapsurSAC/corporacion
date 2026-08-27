@@ -30,6 +30,8 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import GoogleDriveIcon from '@/components/google-drive-icon';
+import { getDriveDirectImageUrl, isGoogleDriveUrl } from '@/lib/utils';
 import {
     Accordion,
     AccordionDetails,
@@ -70,11 +72,12 @@ import {
     Typography,
 } from '@mui/material';
 import { useState, useMemo } from 'react';
-import type { Comercio, Grupo, Carrera, Curso, Diplomado } from '@/types';
+import type { Carrera, Comercio, Curso, Diplomado, Grupo, Rubro } from '@/types';
 
 interface EditComercioPageProps {
     comercio: Comercio & { carreras?: Carrera[]; cursos?: Curso[]; diplomados?: Diplomado[] };
     grupos: Grupo[];
+    rubros?: Rubro[];
 }
 
 const COLOR_PRESETS = [
@@ -90,9 +93,9 @@ const COLOR_PRESETS = [
     { name: 'Gris Grafito', hex: '#4b5563' },
 ];
 
-export default function EditComercioPage({ comercio, grupos }: EditComercioPageProps) {
-    const { currentTeam } = usePage<{ currentTeam?: { slug: string; name: string } }>().props;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+export default function EditComercioPage({ comercio, grupos, rubros = [] }: EditComercioPageProps) {
+    
+    
     const { notify } = useNotification();
 
     // Tabs state
@@ -126,6 +129,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
         link_directo_escale: comercio.link_directo_escale || '',
         malla_curricular_url: comercio.malla_curricular_url || '',
         catalogo_url: comercio.catalogo_url || '',
+        brochure_vacaciones_utiles: comercio.brochure_vacaciones_utiles || '',
         como_ingresar_plataforma: comercio.como_ingresar_plataforma || '',
         reconocimiento_director: comercio.reconocimiento_director || '',
         seminario: comercio.seminario || '',
@@ -225,8 +229,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                 c.nombre.toLowerCase().includes(searchCurso.toLowerCase());
             const matchesTipo =
                 filterCursoTipo === 'all' ||
-                (filterCursoTipo === 'especializado' && c.tipo === 'especializado') ||
-                (filterCursoTipo === 'tradicional' && c.tipo !== 'especializado');
+                c.tipo === filterCursoTipo;
             return matchesSearch && matchesTipo;
         });
     }, [standaloneCursos, searchCurso, filterCursoTipo]);
@@ -242,7 +245,28 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
             );
         }
 
+        const rubroMatch = rubros.find((r) => r.clave === tipo);
+        if (rubroMatch) {
+            const color = rubroMatch.color_hex || '#7c3aed';
+            return (
+                <Chip
+                    label={rubroMatch.nombre}
+                    size="small"
+                    sx={{
+                        bgcolor: `${color}18`,
+                        color: color,
+                        border: `1px solid ${color}40`,
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        height: 22,
+                    }}
+                />
+            );
+        }
+
         const map: Record<string, { label: string; bg: string; color: string; border: string }> = {
+            tradicional: { label: 'Tradicional', bg: '#e0f2fe', color: '#0369a1', border: '#bae6fd' },
+            especializado: { label: 'Especializado', bg: '#f3e8ff', color: '#6b21a8', border: '#e9d5ff' },
             ambientales: { label: 'Ambientales', bg: '#ecfdf5', color: '#065f46', border: '#a7f3d0' },
             calidad_isos: { label: 'Calidad ISOs', bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe' },
             mineros: { label: 'Mineros', bg: '#fff7ed', color: '#9a3412', border: '#fed7aa' },
@@ -297,7 +321,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
             return;
         }
 
-        put(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
+        put(`/admin/comercios/${comercio.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 notify.success('Información institucional actualizada exitosamente.');
@@ -415,7 +439,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                     >
                         {/* Identidad izquierda */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flex: 1, minWidth: 0 }}>
-                            <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
+                            <Link href={`/admin/comercios`} style={{ textDecoration: 'none' }}>
                                 <Tooltip title="Volver al listado de comercios" arrow>
                                     <IconButton
                                         sx={{
@@ -995,14 +1019,51 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                             />
 
                                             <TextField
-                                                label="Promoción Vigente (Texto Informativo / Oferta)"
-                                                value={data.promocion_vigente}
-                                                onChange={(e) => setData('promocion_vigente', e.target.value)}
-                                                placeholder="Ej. Matrícula con 50% de descuento y certificación gratuita"
-                                                error={!!errors.promocion_vigente}
-                                                helperText={errors.promocion_vigente || 'Texto promocional destacado en el catálogo'}
+                                                label="Brochure Vacaciones Útiles (Link / URL)"
+                                                value={data.brochure_vacaciones_utiles}
+                                                onChange={(e) => setData('brochure_vacaciones_utiles', e.target.value)}
+                                                placeholder="https://.../vacaciones-utiles.pdf"
+                                                error={!!errors.brochure_vacaciones_utiles}
+                                                helperText={errors.brochure_vacaciones_utiles || 'Folleto o documento de temporada de vacaciones útiles'}
                                                 fullWidth
                                                 size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.brochure_vacaciones_utiles ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Ver brochure vacaciones útiles" arrow>
+                                                                    <IconButton href={data.brochure_vacaciones_utiles} target="_blank" size="small">
+                                                                        <PictureAsPdfIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
+                                            />
+
+                                            <TextField
+                                                label="Link de Promoción Vigente (URL / Enlace)"
+                                                value={data.promocion_vigente}
+                                                onChange={(e) => setData('promocion_vigente', e.target.value)}
+                                                placeholder="https://.../promocion-vigente"
+                                                error={!!errors.promocion_vigente}
+                                                helperText={errors.promocion_vigente || 'Enlace directo a la promoción, afiche, flyer o documento de descuentos'}
+                                                fullWidth
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        endAdornment: data.promocion_vigente ? (
+                                                            <InputAdornment position="end">
+                                                                <Tooltip title="Abrir enlace de promoción" arrow>
+                                                                    <IconButton href={data.promocion_vigente} target="_blank" size="small">
+                                                                        <LaunchIcon fontSize="small" color="primary" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </InputAdornment>
+                                                        ) : null,
+                                                    },
+                                                }}
                                             />
 
                                             <TextField
@@ -1125,23 +1186,32 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                             <CardHeader
                                                 avatar={<PhotoLibraryIcon color="primary" />}
                                                 title={`Galería Fotográfica y Sedes (${data.fotos.length})`}
-                                                subheader="Imágenes de infraestructura, eventos y sedes institucionales"
+                                                subheader="Fotos de infraestructura, eventos y sedes (enlaces de Google Drive o imágenes directas)"
                                                 titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             />
                                             <Divider />
                                             <CardContent sx={{ p: 2.5 }}>
-                                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                                <Box sx={{ display: 'flex', gap: 1, mb: 2.5 }}>
                                                     <TextField
                                                         size="small"
-                                                        placeholder="Pegar URL de Imagen / Foto..."
+                                                        placeholder="Pegar enlace de Google Drive de la foto o URL de imagen..."
                                                         value={nuevaFoto}
                                                         onChange={(e) => setNuevaFoto(e.target.value)}
                                                         fullWidth
+                                                        slotProps={{
+                                                            input: {
+                                                                startAdornment: (
+                                                                    <InputAdornment position="start">
+                                                                        <PhotoLibraryIcon color="action" fontSize="small" />
+                                                                    </InputAdornment>
+                                                                ),
+                                                            },
+                                                        }}
                                                         onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                e.preventDefault();
-                                                                handleAddFoto();
-                                                            }
+                                                             if (e.key === 'Enter') {
+                                                                 e.preventDefault();
+                                                                 handleAddFoto();
+                                                             }
                                                         }}
                                                     />
                                                     <Button
@@ -1154,73 +1224,133 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                     </Button>
                                                 </Box>
 
-                                                {/* Cuadrícula de fotos con thumbnails */}
-                                                <Grid container spacing={1.5}>
+                                                {/* Cuadrícula de fotos con renderizado de imagen real y preview */}
+                                                <Grid container spacing={2}>
                                                     {data.fotos.map((url, index) => (
-                                                        <Grid size={{ xs: 6, sm: 4 }} key={index}>
-                                                            <Box
+                                                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+                                                            <Paper
+                                                                variant="outlined"
                                                                 sx={{
-                                                                    position: 'relative',
                                                                     borderRadius: 2,
                                                                     overflow: 'hidden',
                                                                     border: '1px solid',
                                                                     borderColor: 'divider',
-                                                                    height: 90,
-                                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f1f5f9',
-                                                                    '&:hover .photo-actions': { opacity: 1 },
+                                                                    transition: 'all 0.2s',
+                                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#ffffff',
+                                                                    '&:hover': {
+                                                                        borderColor: '#2684fc',
+                                                                        boxShadow: '0 4px 14px rgba(38, 132, 252, 0.18)',
+                                                                    },
                                                                 }}
                                                             >
+                                                                {/* Contenedor de la foto real */}
                                                                 <Box
-                                                                    component="img"
-                                                                    src={url}
-                                                                    alt={`Foto ${index + 1}`}
-                                                                    onError={(e: any) => {
-                                                                        e.target.style.display = 'none';
-                                                                    }}
                                                                     sx={{
+                                                                        position: 'relative',
+                                                                        height: 140,
                                                                         width: '100%',
-                                                                        height: '100%',
-                                                                        objectFit: 'cover',
-                                                                    }}
-                                                                />
-                                                                {/* Acciones flotantes en hover */}
-                                                                <Box
-                                                                    className="photo-actions"
-                                                                    sx={{
-                                                                        position: 'absolute',
-                                                                        inset: 0,
-                                                                        bgcolor: 'rgba(0,0,0,0.5)',
+                                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#f1f5f9',
                                                                         display: 'flex',
                                                                         alignItems: 'center',
                                                                         justifyContent: 'center',
-                                                                        gap: 1,
-                                                                        opacity: { xs: 1, sm: 0 },
-                                                                        transition: 'opacity 0.2s',
+                                                                        overflow: 'hidden',
+                                                                        cursor: 'pointer',
                                                                     }}
+                                                                    onClick={() => setPreviewImageUrl(getDriveDirectImageUrl(url))}
                                                                 >
-                                                                    <IconButton
-                                                                        size="small"
-                                                                        onClick={() => setPreviewImageUrl(url)}
-                                                                        sx={{ color: '#ffffff', bgcolor: 'rgba(255,255,255,0.2)' }}
-                                                                    >
-                                                                        <VisibilityIcon fontSize="small" />
-                                                                    </IconButton>
-                                                                    <IconButton
-                                                                        size="small"
-                                                                        onClick={() => handleRemoveFoto(index)}
-                                                                        sx={{ color: '#ff6b6b', bgcolor: 'rgba(255,255,255,0.2)' }}
-                                                                    >
-                                                                        <DeleteIcon fontSize="small" />
-                                                                    </IconButton>
+                                                                    <Box
+                                                                        component="img"
+                                                                        src={getDriveDirectImageUrl(url)}
+                                                                        alt={`Foto ${index + 1}`}
+                                                                        sx={{
+                                                                            width: '100%',
+                                                                            height: '100%',
+                                                                            objectFit: 'cover',
+                                                                            display: 'block',
+                                                                            transition: 'transform 0.3s',
+                                                                            '&:hover': { transform: 'scale(1.05)' },
+                                                                        }}
+                                                                    />
+                                                                    {isGoogleDriveUrl(url) && (
+                                                                        <Chip
+                                                                            icon={<GoogleDriveIcon size={14} />}
+                                                                            label="Drive"
+                                                                            size="small"
+                                                                            sx={{
+                                                                                position: 'absolute',
+                                                                                top: 8,
+                                                                                left: 8,
+                                                                                bgcolor: 'rgba(0, 0, 0, 0.65)',
+                                                                                color: '#ffffff',
+                                                                                backdropFilter: 'blur(4px)',
+                                                                                fontWeight: 700,
+                                                                                fontSize: '0.68rem',
+                                                                                height: 22,
+                                                                                '& .MuiChip-icon': { ml: 0.5 },
+                                                                            }}
+                                                                        />
+                                                                    )}
                                                                 </Box>
-                                                            </Box>
+
+                                                                {/* Barra de información y acciones */}
+                                                                <Box sx={{ p: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                                        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                                                                            Foto / Sede {index + 1}
+                                                                        </Typography>
+                                                                        <Typography variant="caption" noWrap color="text.secondary" sx={{ display: 'block' }}>
+                                                                            {isGoogleDriveUrl(url) ? 'Google Drive' : 'Imagen web'}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        <Tooltip title="Ampliar foto" arrow>
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                onClick={() => setPreviewImageUrl(getDriveDirectImageUrl(url))}
+                                                                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                            >
+                                                                                <VisibilityIcon fontSize="small" />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Abrir en Google Drive" arrow>
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                component="a"
+                                                                                href={url}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                color="primary"
+                                                                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                            >
+                                                                                <LaunchIcon fontSize="small" />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Eliminar foto" arrow>
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                color="error"
+                                                                                onClick={() => handleRemoveFoto(index)}
+                                                                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                            >
+                                                                                <DeleteIcon sx={{ fontSize: 18 }} />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Paper>
                                                         </Grid>
                                                     ))}
                                                     {data.fotos.length === 0 && (
                                                         <Grid size={{ xs: 12 }}>
-                                                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', display: 'block', py: 1 }}>
-                                                                No se han añadido fotos a la galería.
-                                                            </Typography>
+                                                            <Box sx={{ textAlign: 'center', py: 4, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
+                                                                <PhotoLibraryIcon sx={{ fontSize: 40, color: 'text.secondary', opacity: 0.4, mb: 1 }} />
+                                                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                                                    No hay fotos agregadas.
+                                                                </Typography>
+                                                                <Typography variant="caption" color="text.secondary">
+                                                                    Pega arriba el enlace de Google Drive de una foto o cualquier URL de imagen.
+                                                                </Typography>
+                                                            </Box>
                                                         </Grid>
                                                     )}
                                                 </Grid>
@@ -1471,7 +1601,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                             titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             action={
                                                 <Link
-                                                    href={`/${currentTeamSlug}/admin/carreras?comercio_id=${comercio.id}`}
+                                                    href={`/admin/carreras?comercio_id=${comercio.id}`}
                                                     style={{ textDecoration: 'none' }}
                                                 >
                                                     <Button
@@ -1595,7 +1725,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                                             <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
                                                                             DIPLOMADOS DE LA CARRERA ({carrera.diplomados?.length || 0})
                                                                         </Typography>
-                                                                        <Link href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                        <Link href={`/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
                                                                             <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
                                                                                 + Administrar Diplomados
                                                                             </Typography>
@@ -1669,7 +1799,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                                             <MenuBookIcon sx={{ fontSize: 16 }} />
                                                                             CURSOS DE LA CARRERA ({carrera.cursos?.length || 0})
                                                                         </Typography>
-                                                                        <Link href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                        <Link href={`/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
                                                                             <Typography variant="caption" sx={{ color: '#0f766e', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
                                                                                 + Administrar Cursos
                                                                             </Typography>
@@ -1761,7 +1891,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                             titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             action={
                                                 <Link
-                                                    href={`/${currentTeamSlug}/admin/diplomados?comercio_id=${comercio.id}`}
+                                                    href={`/admin/diplomados?comercio_id=${comercio.id}`}
                                                     style={{ textDecoration: 'none' }}
                                                 >
                                                     <Button
@@ -1808,14 +1938,27 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                             onChange={(e) => setFilterDiplomadoTipo(e.target.value)}
                                                         >
                                                             <MenuItem value="all">Todos los rubros</MenuItem>
-                                                            <MenuItem value="ambientales">Ambientales</MenuItem>
-                                                            <MenuItem value="calidad_isos">Calidad ISOs</MenuItem>
-                                                            <MenuItem value="mineros">Mineros</MenuItem>
-                                                            <MenuItem value="administracion">Administración</MenuItem>
-                                                            <MenuItem value="arquitectura_ingenieria">Arq. e Ingeniería</MenuItem>
-                                                            <MenuItem value="osha">OSHA</MenuItem>
-                                                            <MenuItem value="comercio_exterior">Comercio Exterior</MenuItem>
-                                                            <MenuItem value="rubro_legal">Rubro Legal</MenuItem>
+                                                            {rubros && rubros.length > 0 ? (
+                                                                rubros.map((r) => (
+                                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: r.color_hex || '#7c3aed', flexShrink: 0 }} />
+                                                                            {r.nombre}
+                                                                        </Box>
+                                                                    </MenuItem>
+                                                                ))
+                                                            ) : (
+                                                                <>
+                                                                    <MenuItem value="ambientales">Ambientales</MenuItem>
+                                                                    <MenuItem value="calidad_isos">Calidad ISOs</MenuItem>
+                                                                    <MenuItem value="mineros">Mineros</MenuItem>
+                                                                    <MenuItem value="administracion">Administración</MenuItem>
+                                                                    <MenuItem value="arquitectura_ingenieria">Arq. e Ingeniería</MenuItem>
+                                                                    <MenuItem value="osha">OSHA</MenuItem>
+                                                                    <MenuItem value="comercio_exterior">Comercio Exterior</MenuItem>
+                                                                    <MenuItem value="rubro_legal">Rubro Legal</MenuItem>
+                                                                </>
+                                                            )}
                                                         </Select>
                                                     </FormControl>
                                                 )}
@@ -1902,7 +2045,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                             titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             action={
                                                 <Link
-                                                    href={`/${currentTeamSlug}/admin/cursos?comercio_id=${comercio.id}`}
+                                                    href={`/admin/cursos?comercio_id=${comercio.id}`}
                                                     style={{ textDecoration: 'none' }}
                                                 >
                                                     <Button
@@ -1940,17 +2083,42 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                 />
 
                                                 {!isMatpel && (
-                                                    <FormControl size="small" sx={{ minWidth: 180 }}>
-                                                        <InputLabel id="filtro-cur-label">Tipo de Curso</InputLabel>
+                                                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                                                        <InputLabel id="filtro-cur-label">Filtrar por Rubro</InputLabel>
                                                         <Select
                                                             labelId="filtro-cur-label"
                                                             value={filterCursoTipo}
-                                                            label="Tipo de Curso"
+                                                            label="Filtrar por Rubro"
                                                             onChange={(e) => setFilterCursoTipo(e.target.value)}
                                                         >
-                                                            <MenuItem value="all">Todos los tipos</MenuItem>
-                                                            <MenuItem value="especializado">Especializado</MenuItem>
-                                                            <MenuItem value="tradicional">Tradicional</MenuItem>
+                                                            <MenuItem value="all">Todos los rubros y tipos</MenuItem>
+                                                            {rubros && rubros.length > 0 ? (
+                                                                rubros.map((r) => (
+                                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: r.color_hex || '#0284c7', flexShrink: 0 }} />
+                                                                            {r.nombre}
+                                                                        </Box>
+                                                                    </MenuItem>
+                                                                ))
+                                                            ) : (
+                                                                <>
+                                                                    <MenuItem value="tradicional">Tradicional</MenuItem>
+                                                                    <MenuItem value="especializado">Especializado</MenuItem>
+                                                                    <MenuItem value="ambientales">Ambientales</MenuItem>
+                                                                    <MenuItem value="calidad_isos">Calidad e ISOs</MenuItem>
+                                                                    <MenuItem value="mineros">Mineros</MenuItem>
+                                                                    <MenuItem value="administracion">Administración</MenuItem>
+                                                                    <MenuItem value="arquitectura_ingenieria">Arq. e Ingeniería</MenuItem>
+                                                                    <MenuItem value="osha">OSHA</MenuItem>
+                                                                    <MenuItem value="comercio_exterior">Comercio Exterior</MenuItem>
+                                                                    <MenuItem value="rubro_legal">Rubro Legal</MenuItem>
+                                                                    <MenuItem value="no_actualizados">No Actualizados</MenuItem>
+                                                                    <MenuItem value="nombramiento">Nombramiento</MenuItem>
+                                                                    <MenuItem value="secundaria">Secundaria</MenuItem>
+                                                                    <MenuItem value="generico">Genérico</MenuItem>
+                                                                </>
+                                                            )}
                                                         </Select>
                                                     </FormControl>
                                                 )}
@@ -1962,7 +2130,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                         <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                             <TableRow>
                                                                 {!isMatpel && (
-                                                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 130 }}>Tipo</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 130 }}>Rubro / Tipo</TableCell>
                                                                 )}
                                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 220 }}>Nombre del Curso</TableCell>
                                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Flyer</TableCell>
@@ -1973,26 +2141,14 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
-                                                            {filteredStandaloneCursos.map((curso) => {
-                                                                const isEsp = curso.tipo === 'especializado';
-                                                                return (
-                                                                    <TableRow key={curso.id} hover>
-                                                                        {!isMatpel && (
-                                                                            <TableCell>
-                                                                                <Chip
-                                                                                    label={isEsp ? 'Especializado' : 'Tradicional'}
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        bgcolor: isEsp ? '#f3e8ff' : '#e0f2fe',
-                                                                                        color: isEsp ? '#6b21a8' : '#0369a1',
-                                                                                        fontWeight: 700,
-                                                                                        fontSize: '0.7rem',
-                                                                                        height: 20,
-                                                                                    }}
-                                                                                />
-                                                                            </TableCell>
-                                                                        )}
-                                                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{curso.nombre}</TableCell>
+                                                            {filteredStandaloneCursos.map((curso) => (
+                                                                <TableRow key={curso.id} hover>
+                                                                    {!isMatpel && (
+                                                                        <TableCell>
+                                                                            {getDiplomadoChip(curso.tipo)}
+                                                                        </TableCell>
+                                                                    )}
+                                                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{curso.nombre}</TableCell>
                                                                         <TableCell>
                                                                             {curso.flyer ? (
                                                                                 <IconButton href={curso.flyer} target="_blank" size="small">
@@ -2025,8 +2181,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                                                                             ) : '-'}
                                                                         </TableCell>
                                                                     </TableRow>
-                                                                );
-                                                            })}
+                                                            ))}
                                                         </TableBody>
                                                     </Table>
                                                 </TableContainer>
@@ -2088,7 +2243,7 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
                     </Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Link href={`/${currentTeamSlug}/admin/comercios`} style={{ textDecoration: 'none' }}>
+                        <Link href={`/admin/comercios`} style={{ textDecoration: 'none' }}>
                             <Button variant="outlined" color="inherit" sx={{ textTransform: 'none', fontWeight: 600, px: 2.5, borderRadius: 2 }}>
                                 Cancelar
                             </Button>
@@ -2149,20 +2304,19 @@ export default function EditComercioPage({ comercio, grupos }: EditComercioPageP
     );
 }
 
-EditComercioPage.layout = (props: { currentTeam?: { slug: string } | null; comercio?: Comercio }) => {
-    const teamSlug = props?.currentTeam?.slug || 'default';
+EditComercioPage.layout = (props: { comercio?: Comercio }) => {
     const comercioNombre = props?.comercio?.nombre ? `Editar ${props.comercio.nombre}` : 'Editar Comercio';
-    const editHref = props?.comercio?.id ? `/${teamSlug}/admin/comercios/${props.comercio.id}/edit` : '#';
+    const editHref = props?.comercio?.id ? `/admin/comercios/${props.comercio.id}/edit` : '#';
 
     return {
         breadcrumbs: [
             {
                 title: 'Panel Principal',
-                href: dashboard(teamSlug),
+                href: '/dashboard',
             },
             {
                 title: 'Comercios e Institutos',
-                href: `/${teamSlug}/admin/comercios`,
+                href: '/admin/comercios',
             },
             {
                 title: comercioNombre,

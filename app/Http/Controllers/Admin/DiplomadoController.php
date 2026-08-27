@@ -7,6 +7,7 @@ use App\Models\Carrera;
 use App\Models\Comercio;
 use App\Models\Diplomado;
 use App\Models\Grupo;
+use App\Models\Rubro;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -59,6 +60,7 @@ class DiplomadoController extends Controller
             'comercios' => $comercios,
             'carreras' => $carreras,
             'grupos' => $grupos,
+            'rubros' => Rubro::where('activo', true)->orderBy('orden')->orderBy('nombre')->get(),
             'filters' => [
                 'comercio_id' => $comercioId,
                 'carrera_id' => $carreraId,
@@ -124,7 +126,7 @@ class DiplomadoController extends Controller
     /**
      * Update the specified diplomado in storage.
      */
-    public function update(Request $request, string $current_team, $diplomado): RedirectResponse
+    public function update(Request $request, $diplomado): RedirectResponse
     {
         $diplomadoModel = $diplomado instanceof Diplomado ? $diplomado : Diplomado::findOrFail($diplomado);
 
@@ -182,7 +184,7 @@ class DiplomadoController extends Controller
     /**
      * Remove the specified diplomado from storage.
      */
-    public function destroy(Request $request, string $current_team, $diplomado): RedirectResponse
+    public function destroy(Request $request, $diplomado): RedirectResponse
     {
         $diplomadoModel = $diplomado instanceof Diplomado ? $diplomado : Diplomado::findOrFail($diplomado);
         $nombre = $diplomadoModel->nombre;

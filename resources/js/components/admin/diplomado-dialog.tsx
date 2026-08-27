@@ -18,10 +18,10 @@ import {
     FormHelperText,
     Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength } from '@/lib/validation';
-import type { Diplomado, Comercio } from '@/types';
+import type { Diplomado, Comercio, Rubro } from '@/types';
 
 interface DiplomadoDialogProps {
     open: boolean;
@@ -29,9 +29,9 @@ interface DiplomadoDialogProps {
     diplomado?: Diplomado | null;
     comercios: Comercio[];
     carreras?: { id: number; comercio_id: number; nombre: string; codigo?: string | null }[];
+    rubros?: Rubro[];
     defaultComercioId?: number | null;
     defaultCarreraId?: number | null;
-    currentTeamSlug: string;
 }
 
 export function DiplomadoDialog({
@@ -40,9 +40,10 @@ export function DiplomadoDialog({
     diplomado,
     comercios,
     carreras = [],
+    rubros = [],
     defaultComercioId,
     defaultCarreraId,
-    currentTeamSlug,
+    
 }: DiplomadoDialogProps) {
     const isEditing = !!diplomado;
     const { notify } = useNotification();
@@ -139,7 +140,7 @@ export function DiplomadoDialog({
         }
 
         if (isEditing && diplomado) {
-            put(`/${currentTeamSlug}/admin/diplomados/${diplomado.id}`, {
+            put(`/admin/diplomados/${diplomado.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Diplomado "${data.nombre}" actualizado con éxito.`);
@@ -151,7 +152,7 @@ export function DiplomadoDialog({
                 },
             });
         } else {
-            post(`/${currentTeamSlug}/admin/diplomados`, {
+            post(`/admin/diplomados`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Diplomado "${data.nombre}" registrado exitosamente.`);
@@ -164,6 +165,17 @@ export function DiplomadoDialog({
             });
         }
     };
+
+    const groupedRubros = useMemo(() => {
+        if (!rubros || rubros.length === 0) return null;
+        const groups: Record<string, Rubro[]> = {};
+        for (const r of rubros) {
+            const cat = r.categoria || 'Otros Rubros';
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(r);
+        }
+        return Object.entries(groups);
+    }, [rubros]);
 
     return (
         <Dialog
@@ -238,25 +250,43 @@ export function DiplomadoDialog({
                                     >
                                         <MenuItem value="">🎓 Sin Categoría / Diplomado Libre</MenuItem>
 
-                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
-                                            CECAVA (Rubros Técnicos)
-                                        </ListSubheader>
-                                        <MenuItem value="ambientales">🌿 Diplomados Ambientales</MenuItem>
-                                        <MenuItem value="calidad_isos">🏆 Diplomados Calidad e ISOs</MenuItem>
-                                        <MenuItem value="mineros">⛏️ Diplomados Mineros</MenuItem>
-                                        <MenuItem value="administracion">💼 Diplomados Administración</MenuItem>
-                                        <MenuItem value="arquitectura_ingenieria">📐 Diplomados Arquitectura e Ingeniería</MenuItem>
-                                        <MenuItem value="osha">🦺 Diplomados OSHA</MenuItem>
-                                        <MenuItem value="comercio_exterior">🚢 Diplomados Comercio Exterior</MenuItem>
-                                        <MenuItem value="rubro_legal">⚖️ Diplomados Rubro Legal</MenuItem>
-                                        <MenuItem value="no_actualizados">📁 Diplomados No Actualizados</MenuItem>
+                                        {groupedRubros ? (
+                                            groupedRubros.map(([catName, items]) => [
+                                                <ListSubheader key={catName} sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    {catName}
+                                                </ListSubheader>,
+                                                ...items.map((r) => (
+                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#7c3aed', flexShrink: 0 }} />
+                                                            {r.nombre}
+                                                        </Box>
+                                                    </MenuItem>
+                                                )),
+                                            ])
+                                        ) : (
+                                            <>
+                                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    CECAVA (Rubros Técnicos)
+                                                </ListSubheader>
+                                                <MenuItem value="ambientales">🌿 Diplomados Ambientales</MenuItem>
+                                                <MenuItem value="calidad_isos">🏆 Diplomados Calidad e ISOs</MenuItem>
+                                                <MenuItem value="mineros">⛏️ Diplomados Mineros</MenuItem>
+                                                <MenuItem value="administracion">💼 Diplomados Administración</MenuItem>
+                                                <MenuItem value="arquitectura_ingenieria">📐 Diplomados Arquitectura e Ingeniería</MenuItem>
+                                                <MenuItem value="osha">🦺 Diplomados OSHA</MenuItem>
+                                                <MenuItem value="comercio_exterior">🚢 Diplomados Comercio Exterior</MenuItem>
+                                                <MenuItem value="rubro_legal">⚖️ Diplomados Rubro Legal</MenuItem>
+                                                <MenuItem value="no_actualizados">📁 Diplomados No Actualizados</MenuItem>
 
-                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
-                                            MAGISTER (Educación)
-                                        </ListSubheader>
-                                        <MenuItem value="nombramiento">📝 Nombramiento Docente</MenuItem>
-                                        <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
-                                        <MenuItem value="generico">🎓 Genérico / Otros</MenuItem>
+                                                <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
+                                                    MAGISTER (Educación)
+                                                </ListSubheader>
+                                                <MenuItem value="nombramiento">📝 Nombramiento Docente</MenuItem>
+                                                <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
+                                                <MenuItem value="generico">🎓 Genérico / Otros</MenuItem>
+                                            </>
+                                        )}
                                     </Select>
                                     {isCecavaMin && (
                                         <FormHelperText sx={{ color: 'text.secondary' }}>

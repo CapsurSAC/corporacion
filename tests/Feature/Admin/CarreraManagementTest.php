@@ -15,14 +15,13 @@ class CarreraManagementTest extends TestCase
 
     public function test_guests_cannot_access_carreras_index(): void
     {
-        $response = $this->get('/default/admin/carreras');
+        $response = $this->get('/admin/carreras');
         $response->assertRedirect(route('login'));
     }
 
     public function test_authenticated_user_can_view_carreras_index_and_filter(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercioA = Comercio::factory()->create(['nombre' => 'ISTP SIS']);
         $comercioB = Comercio::factory()->create(['nombre' => 'ISTP AVANTI']);
@@ -32,7 +31,7 @@ class CarreraManagementTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.carreras.index', ['current_team' => $team->slug]));
+            ->get(route('admin.carreras.index', ));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -43,9 +42,7 @@ class CarreraManagementTest extends TestCase
 
         $filterResponse = $this
             ->actingAs($user)
-            ->get(route('admin.carreras.index', [
-                'current_team' => $team->slug,
-                'comercio_id' => $comercioA->id,
+            ->get(route('admin.carreras.index', ['comercio_id' => $comercioA->id,
             ]));
 
         $filterResponse->assertOk();
@@ -59,12 +56,11 @@ class CarreraManagementTest extends TestCase
     public function test_user_can_create_a_carrera(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
         $comercio = Comercio::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.carreras.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.carreras.store', ), [
                 'comercio_id' => $comercio->id,
                 'nombre' => 'Administración de Negocios Bancarios y Financieros',
                 'url_malla_curricular' => 'https://drive.google.com/malla.pdf',
@@ -83,11 +79,10 @@ class CarreraManagementTest extends TestCase
     public function test_carrera_validation_requires_comercio_and_name(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.carreras.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.carreras.store', ), [
                 'comercio_id' => '',
                 'nombre' => 'A',
             ]);
@@ -98,15 +93,12 @@ class CarreraManagementTest extends TestCase
     public function test_user_can_update_a_carrera(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $carrera = Carrera::factory()->create(['nombre' => 'Diseño Gráfico']);
 
         $response = $this
             ->actingAs($user)
-            ->put(route('admin.carreras.update', [
-                'current_team' => $team->slug,
-                'carrera' => $carrera->id,
+            ->put(route('admin.carreras.update', ['carrera' => $carrera->id,
             ]), [
                 'comercio_id' => $carrera->comercio_id,
                 'nombre' => 'Diseño Digital Publicitario y Web',
@@ -123,15 +115,12 @@ class CarreraManagementTest extends TestCase
     public function test_user_can_delete_a_carrera(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $carrera = Carrera::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->delete(route('admin.carreras.destroy', [
-                'current_team' => $team->slug,
-                'carrera' => $carrera->id,
+            ->delete(route('admin.carreras.destroy', ['carrera' => $carrera->id,
             ]));
 
         $response->assertRedirect();

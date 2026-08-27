@@ -15,14 +15,13 @@ class DiplomadoManagementTest extends TestCase
 
     public function test_guests_cannot_access_diplomados_index(): void
     {
-        $response = $this->get('/default/admin/diplomados');
+        $response = $this->get('/admin/diplomados');
         $response->assertRedirect(route('login'));
     }
 
     public function test_authenticated_user_can_view_diplomados_index_and_filter_by_tipo(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercio = Comercio::factory()->create();
 
@@ -39,7 +38,7 @@ class DiplomadoManagementTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.diplomados.index', ['current_team' => $team->slug]));
+            ->get(route('admin.diplomados.index', ));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -49,9 +48,7 @@ class DiplomadoManagementTest extends TestCase
 
         $filteredResponse = $this
             ->actingAs($user)
-            ->get(route('admin.diplomados.index', [
-                'current_team' => $team->slug,
-                'tipo' => 'ambientales',
+            ->get(route('admin.diplomados.index', ['tipo' => 'ambientales',
             ]));
 
         $filteredResponse->assertOk();
@@ -65,12 +62,11 @@ class DiplomadoManagementTest extends TestCase
     public function test_user_can_create_a_diplomado(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
         $comercio = Comercio::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.diplomados.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.diplomados.store', ), [
                 'comercio_id' => $comercio->id,
                 'nombre' => 'Diplomado de Especialización en Auditorías ISO 14001',
                 'tipo' => 'calidad_isos',
@@ -93,7 +89,6 @@ class DiplomadoManagementTest extends TestCase
     public function test_user_can_update_a_diplomado(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $diplomado = Diplomado::factory()->create([
             'nombre' => 'Diplomado Básico',
@@ -102,9 +97,7 @@ class DiplomadoManagementTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->put(route('admin.diplomados.update', [
-                'current_team' => $team->slug,
-                'diplomado' => $diplomado->id,
+            ->put(route('admin.diplomados.update', ['diplomado' => $diplomado->id,
             ]), [
                 'comercio_id' => $diplomado->comercio_id,
                 'nombre' => 'Diplomado Avanzado y Certificado',
@@ -123,15 +116,12 @@ class DiplomadoManagementTest extends TestCase
     public function test_user_can_delete_a_diplomado(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $diplomado = Diplomado::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->delete(route('admin.diplomados.destroy', [
-                'current_team' => $team->slug,
-                'diplomado' => $diplomado->id,
+            ->delete(route('admin.diplomados.destroy', ['diplomado' => $diplomado->id,
             ]));
 
         $response->assertRedirect();

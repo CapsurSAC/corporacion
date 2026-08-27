@@ -7,6 +7,7 @@ use App\Models\Comercio;
 use App\Models\Curso;
 use App\Models\Diplomado;
 use App\Models\Grupo;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,9 +44,15 @@ class PublicCatalogController extends Controller
             'totalCursos' => Curso::count(),
         ];
 
+        $driveLinks = [
+            'escifor' => Setting::get('drive_escifor', '') ?? '',
+            'multimarca' => Setting::get('drive_multimarca', '') ?? '',
+        ];
+
         return Inertia::render('welcome', [
             'grupos' => $grupos,
             'stats' => $stats,
+            'driveLinks' => $driveLinks,
         ]);
     }
 
@@ -89,10 +96,16 @@ class PublicCatalogController extends Controller
             'totalCursos' => Curso::count(),
         ];
 
+        $driveLinks = [
+            'escifor' => Setting::get('drive_escifor', '') ?? '',
+            'multimarca' => Setting::get('drive_multimarca', '') ?? '',
+        ];
+
         return Inertia::render('welcome', [
             'grupos' => $grupos,
             'initialComercio' => $comercio,
             'stats' => $stats,
+            'driveLinks' => $driveLinks,
         ]);
     }
 }

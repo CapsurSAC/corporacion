@@ -1,4 +1,4 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import BusinessIcon from '@mui/icons-material/Business';
 import LaunchIcon from '@mui/icons-material/Launch';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -12,13 +12,9 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
-import PendingInvitationsModal from '@/components/pending-invitations-modal';
-import { dashboard } from '@/routes';
-import type { DashboardInvitation, Grupo } from '@/types';
+import type { Grupo } from '@/types';
 
 type Props = {
-    pendingInvitations?: DashboardInvitation[];
     grupos?: Grupo[];
 };
 
@@ -37,26 +33,11 @@ const getGrupoColor = (slug: string): string => {
 };
 
 export default function Dashboard({
-    pendingInvitations = [],
     grupos = [],
 }: Props) {
-    const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string; name: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
-
-    const [showInvitations, setShowInvitations] = useState(
-        pendingInvitations.length > 0
-    );
-
     return (
         <>
             <Head title="Panel Principal - Grupo Capsur" />
-
-            <PendingInvitationsModal
-                invitations={pendingInvitations}
-                open={pendingInvitations.length > 0 && showInvitations}
-                onOpenChange={setShowInvitations}
-            />
 
             <Box
                 sx={{
@@ -263,7 +244,7 @@ export default function Dashboard({
                                             </Box>
 
                                             <Link
-                                                href={`/${currentTeamSlug}/admin/comercios?grupo_id=${grupo.id}`}
+                                                href={`/admin/comercios?grupo_id=${grupo.id}`}
                                                 style={{ textDecoration: 'none' }}
                                             >
                                                 <Tooltip title="Ver listado completo del grupo" arrow>
@@ -302,7 +283,7 @@ export default function Dashboard({
                                             {comercios.length > 0 ? (
                                                 comercios.map((comercio) => {
                                                     const comColor = comercio.color_hex || brandColor;
-                                                    const targetUrl = `/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`;
+                                                    const targetUrl = `/admin/comercios/${comercio.id}/edit`;
 
                                                     return (
                                                         <Link
@@ -401,11 +382,11 @@ export default function Dashboard({
     );
 }
 
-Dashboard.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+Dashboard.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
     ],
 });

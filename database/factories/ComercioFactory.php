@@ -39,7 +39,7 @@ class ComercioFactory extends Factory
             'link_directo_escale' => fake()->url(),
             'malla_curricular_url' => fake()->url(),
             'catalogo_url' => fake()->url(),
-            'como_ingresar_plataforma' => fake()->paragraph(),
+            'como_ingresar_plataforma' => fake()->sentence(),
             'reconocimiento_director' => fake()->sentence(),
             'seminario' => fake()->sentence(),
             'convenio' => fake()->company(),

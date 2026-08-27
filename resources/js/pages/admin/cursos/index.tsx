@@ -40,13 +40,14 @@ import { CursoDialog } from '@/components/admin/curso-dialog';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
-import type { Curso, Comercio, Grupo, Carrera } from '@/types';
+import type { Carrera, Comercio, Curso, Grupo, Rubro } from '@/types';
 
 interface Props {
     cursos: Curso[];
     comercios: Comercio[];
     carreras?: Carrera[];
     grupos?: Grupo[];
+    rubros?: Rubro[];
     filters: {
         comercio_id?: string;
         tipo?: string;
@@ -58,11 +59,12 @@ export default function CursosIndex({
     cursos = [],
     comercios = [],
     carreras = [],
+    rubros = [],
     filters,
 }: Props) {
     const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+    
+    
     const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
@@ -79,7 +81,7 @@ export default function CursosIndex({
         search?: string;
     }) => {
         router.get(
-            `/${currentTeamSlug}/admin/cursos`,
+            `/admin/cursos`,
             {
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
                 tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
@@ -127,7 +129,7 @@ export default function CursosIndex({
         });
 
         if (confirmed) {
-            router.delete(`/${currentTeamSlug}/admin/cursos/${curso.id}`, {
+            router.delete(`/admin/cursos/${curso.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Curso "${curso.nombre}" eliminado exitosamente.`);
@@ -137,6 +139,71 @@ export default function CursosIndex({
                 },
             });
         }
+    };
+
+    const getTipoChip = (tipo?: string | null) => {
+        if (!tipo || tipo === 'general' || tipo === 'libre' || tipo === 'sin_categoria') {
+            return (
+                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
+                    General / Libre
+                </Typography>
+            );
+        }
+
+        const rubroMatch = rubros.find((r) => r.clave === tipo);
+        if (rubroMatch) {
+            const color = rubroMatch.color_hex || '#0284c7';
+            return (
+                <Chip
+                    label={rubroMatch.nombre}
+                    size="small"
+                    sx={{
+                        bgcolor: `${color}15`,
+                        color: color,
+                        border: `1px solid ${color}35`,
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        height: 22,
+                        borderRadius: 0.8,
+                    }}
+                />
+            );
+        }
+
+        const tipoLabels: Record<string, { label: string; color: string }> = {
+            tradicional: { label: 'Tradicional', color: '#0284c7' },
+            especializado: { label: 'Especializado', color: '#7c3aed' },
+            ambientales: { label: 'Ambientales', color: '#059669' },
+            calidad_isos: { label: 'Calidad ISOs', color: '#0284c7' },
+            mineros: { label: 'Mineros', color: '#d97706' },
+            administracion: { label: 'Administración', color: '#0d9488' },
+            arquitectura_ingenieria: { label: 'Arq. e Ingeniería', color: '#6366f1' },
+            osha: { label: 'OSHA', color: '#dc2626' },
+            comercio_exterior: { label: 'Comex', color: '#0891b2' },
+            rubro_legal: { label: 'Rubro Legal', color: '#7c3aed' },
+            no_actualizados: { label: 'No Actualizado', color: '#64748b' },
+            nombramiento: { label: 'Nombramiento', color: '#7c3aed' },
+            secundaria: { label: 'Secundaria', color: '#059669' },
+            generico: { label: 'Genérico', color: '#0284c7' },
+        };
+
+        const config = tipoLabels[tipo] || { label: tipo, color: '#4f46e5' };
+
+        return (
+            <Chip
+                label={config.label}
+                size="small"
+                sx={{
+                    bgcolor: `${config.color}15`,
+                    color: config.color,
+                    border: `1px solid ${config.color}35`,
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    height: 22,
+                    borderRadius: 0.8,
+                }}
+            />
+        );
     };
 
     return (
@@ -226,7 +293,7 @@ export default function CursosIndex({
                                     />
                                 </Box>
                                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2, fontSize: '0.82rem' }}>
-                                    Gestión de cursos tradicionales y especializados, brochures, flyers, videos y enlaces Drive.
+                                    Gestión de cursos por rubros técnicos, especialidades, brochures, flyers, videos y enlaces Drive.
                                 </Typography>
                             </Box>
                         </Box>
@@ -316,21 +383,46 @@ export default function CursosIndex({
                             </Select>
                         </FormControl>
 
-                        <FormControl size="small" sx={{ minWidth: 190 }}>
-                            <InputLabel id="filter-tipo-label">Tipo de Curso</InputLabel>
+                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 } }}>
+                            <InputLabel id="filter-tipo-label">Rubro / Categoría</InputLabel>
                             <Select
                                 labelId="filter-tipo-label"
                                 value={selectedTipo}
-                                label="Tipo de Curso"
+                                label="Rubro / Categoría"
                                 onChange={(e) => {
                                     setSelectedTipo(e.target.value);
                                     applyFilters({ tipo: e.target.value });
                                 }}
                             >
-                                <MenuItem value="all">Todos los Tipos</MenuItem>
-                                <MenuItem value="sin_categoria">Libre / Sin Tipo</MenuItem>
-                                <MenuItem value="tradicional">Tradicional</MenuItem>
-                                <MenuItem value="especializado">Especializado</MenuItem>
+                                <MenuItem value="all">🎓 Todos los rubros y tipos</MenuItem>
+                                <MenuItem value="sin_categoria">Libre / Sin Categoría</MenuItem>
+                                {rubros && rubros.length > 0 ? (
+                                    rubros.map((r) => (
+                                        <MenuItem key={r.clave} value={r.clave}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#0284c7', flexShrink: 0 }} />
+                                                {r.nombre}
+                                            </Box>
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <>
+                                        <MenuItem value="tradicional">📘 Tradicional</MenuItem>
+                                        <MenuItem value="especializado">⭐ Especializado</MenuItem>
+                                        <MenuItem value="ambientales">🌿 Ambientales</MenuItem>
+                                        <MenuItem value="calidad_isos">🏆 Calidad e ISOs</MenuItem>
+                                        <MenuItem value="mineros">⛏️ Mineros</MenuItem>
+                                        <MenuItem value="administracion">💼 Administración</MenuItem>
+                                        <MenuItem value="arquitectura_ingenieria">📐 Arq. e Ingeniería</MenuItem>
+                                        <MenuItem value="osha">🦺 OSHA</MenuItem>
+                                        <MenuItem value="comercio_exterior">🚢 Comercio Exterior</MenuItem>
+                                        <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
+                                        <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
+                                        <MenuItem value="nombramiento">📝 Nombramiento</MenuItem>
+                                        <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
+                                        <MenuItem value="generico">🎓 Genérico</MenuItem>
+                                    </>
+                                )}
                             </Select>
                         </FormControl>
                     </Box>
@@ -368,8 +460,8 @@ export default function CursosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 150 }}>
                                     COMERCIO
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 130 }}>
-                                    TIPO
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140 }}>
+                                    RUBRO / TIPO
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
                                     RECURSOS MULTIMEDIA
@@ -420,7 +512,6 @@ export default function CursosIndex({
                             ) : (
                                 cursos.map((curso) => {
                                     const brandColor = curso.comercio?.color_hex || '#0284c7';
-                                    const isEspecializado = curso.tipo === 'especializado';
 
                                     return (
                                         <TableRow
@@ -484,27 +575,9 @@ export default function CursosIndex({
                                                 )}
                                             </TableCell>
 
-                                            {/* Columna 3: Tipo */}
+                                            {/* Columna 3: Rubro / Tipo */}
                                             <TableCell>
-                                                {!curso.tipo ? (
-                                                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
-                                                        Libre / General
-                                                    </Typography>
-                                                ) : (
-                                                    <Chip
-                                                        label={isEspecializado ? 'Especializado' : 'Tradicional'}
-                                                        size="small"
-                                                        sx={{
-                                                            bgcolor: isEspecializado ? 'rgba(124, 58, 237, 0.12)' : 'rgba(2, 132, 199, 0.12)',
-                                                            color: isEspecializado ? '#7c3aed' : '#0284c7',
-                                                            fontWeight: 700,
-                                                            fontSize: '0.72rem',
-                                                            height: 22,
-                                                            borderRadius: 0.8,
-                                                            border: `1px solid ${isEspecializado ? 'rgba(124, 58, 237, 0.3)' : 'rgba(2, 132, 199, 0.3)'}`,
-                                                        }}
-                                                    />
-                                                )}
+                                                {getTipoChip(curso.tipo)}
                                             </TableCell>
 
                                             {/* Columna 4: Recursos */}
@@ -667,21 +740,22 @@ export default function CursosIndex({
                 curso={selectedCurso}
                 comercios={comercios}
                 carreras={carreras}
-                currentTeamSlug={currentTeamSlug}
+                rubros={rubros}
+                
             />
         </>
     );
 }
 
-CursosIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+CursosIndex.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
         {
-            title: 'Cursos y Talleres',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/cursos` : '#',
+            title: 'Cursos',
+            href: '/admin/cursos',
         },
     ],
 });

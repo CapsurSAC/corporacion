@@ -23,6 +23,8 @@ export interface Comercio {
     codigo: string | null;
     sigla: string | null;
     color_hex: string | null;
+    logo_modo_claro?: string | null;
+    logo_modo_oscuro?: string | null;
     pagina_web: string | null;
     plataforma_carrera: string | null;
     certificado_url: string | null;
@@ -32,6 +34,7 @@ export interface Comercio {
     link_directo_escale: string | null;
     malla_curricular_url: string | null;
     catalogo_url?: string | null;
+    brochure_vacaciones_utiles?: string | null;
     como_ingresar_plataforma?: string | null;
     reconocimiento_director: string | null;
     seminario: string | null;
@@ -100,6 +103,7 @@ export interface Diplomado {
         | 'secundaria'
         | 'generico'
         | string;
+    rubros?: string | null;
     flyer?: string | null;
     brochure?: string | null;
     youtube?: string | null;
@@ -117,7 +121,23 @@ export interface Curso {
     carrera_id?: number | null;
     nombre: string;
     slug: string;
-    tipo?: 'tradicional' | 'especializado' | string;
+    tipo?:
+        | 'tradicional'
+        | 'especializado'
+        | 'ambientales'
+        | 'calidad_isos'
+        | 'mineros'
+        | 'administracion'
+        | 'arquitectura_ingenieria'
+        | 'osha'
+        | 'comercio_exterior'
+        | 'rubro_legal'
+        | 'no_actualizados'
+        | 'nombramiento'
+        | 'secundaria'
+        | 'generico'
+        | string;
+    rubros?: string | null;
     flyer?: string | null;
     brochure?: string | null;
     youtube?: string | null;
@@ -136,3 +156,19 @@ export interface CapsurStats {
     carrerasActivas: number;
     carrerasEnConvocatoria: number;
 }
+
+export interface Rubro {
+    id: number;
+    nombre: string;
+    clave: string;
+    color_hex?: string | null;
+    categoria?: string | null;
+    descripcion?: string | null;
+    activo: boolean;
+    orden: number;
+    diplomados_count?: number;
+    cursos_count?: number;
+    created_at?: string;
+    updated_at?: string;
+}
+

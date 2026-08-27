@@ -15,14 +15,13 @@ class ComercioManagementTest extends TestCase
 
     public function test_guests_cannot_access_comercios_index(): void
     {
-        $response = $this->get('/default/admin/comercios');
+        $response = $this->get('/admin/comercios');
         $response->assertRedirect(route('login'));
     }
 
     public function test_authenticated_user_can_view_comercios_index_and_filter(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $grupoA = Grupo::factory()->create(['nombre' => 'Grupo A']);
         $grupoB = Grupo::factory()->create(['nombre' => 'Grupo B']);
@@ -33,7 +32,7 @@ class ComercioManagementTest extends TestCase
         // Sin filtro
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.comercios.index', ['current_team' => $team->slug]));
+            ->get(route('admin.comercios.index', ));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -45,9 +44,7 @@ class ComercioManagementTest extends TestCase
         // Con filtro por grupo
         $filterResponse = $this
             ->actingAs($user)
-            ->get(route('admin.comercios.index', [
-                'current_team' => $team->slug,
-                'grupo_id' => $grupoA->id,
+            ->get(route('admin.comercios.index', ['grupo_id' => $grupoA->id,
             ]));
 
         $filterResponse->assertOk();
@@ -61,15 +58,12 @@ class ComercioManagementTest extends TestCase
     public function test_user_can_view_comercio_edit_page(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercio = Comercio::factory()->create(['nombre' => 'CECAVA Centro Minero']);
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.comercios.edit', [
-                'current_team' => $team->slug,
-                'comercio' => $comercio->id,
+            ->get(route('admin.comercios.edit', ['comercio' => $comercio->id,
             ]));
 
         $response->assertOk();
@@ -83,12 +77,11 @@ class ComercioManagementTest extends TestCase
     public function test_user_can_create_a_comercio(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
         $grupo = Grupo::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.comercios.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.comercios.store', ), [
                 'grupo_id' => $grupo->id,
                 'nombre' => 'Escuela Superior de Negocios NEXT',
                 'codigo' => 'NEXT',
@@ -111,12 +104,11 @@ class ComercioManagementTest extends TestCase
     public function test_comercio_validation_rejects_invalid_color_and_short_name(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
         $grupo = Grupo::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.comercios.store', ['current_team' => $team->slug]), [
+            ->post(route('admin.comercios.store', ), [
                 'grupo_id' => $grupo->id,
                 'nombre' => 'X',
                 'color_hex' => 'no-hex-color',
@@ -128,15 +120,12 @@ class ComercioManagementTest extends TestCase
     public function test_user_can_update_a_comercio(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercio = Comercio::factory()->create(['nombre' => 'Nombre Antiguo']);
 
         $response = $this
             ->actingAs($user)
-            ->put(route('admin.comercios.update', [
-                'current_team' => $team->slug,
-                'comercio' => $comercio->id,
+            ->put(route('admin.comercios.update', ['comercio' => $comercio->id,
             ]), [
                 'grupo_id' => $comercio->grupo_id,
                 'nombre' => 'Instituto Renovado 2026',
@@ -157,15 +146,12 @@ class ComercioManagementTest extends TestCase
     public function test_user_can_delete_a_comercio(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         $comercio = Comercio::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->delete(route('admin.comercios.destroy', [
-                'current_team' => $team->slug,
-                'comercio' => $comercio->id,
+            ->delete(route('admin.comercios.destroy', ['comercio' => $comercio->id,
             ]));
 
         $response->assertRedirect();

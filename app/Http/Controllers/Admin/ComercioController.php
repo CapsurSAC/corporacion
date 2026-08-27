@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Comercio;
 use App\Models\Grupo;
+use App\Models\Rubro;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -55,7 +56,7 @@ class ComercioController extends Controller
     /**
      * Show the form for editing the specified comercio.
      */
-    public function edit(Request $request, string $current_team, $comercio): Response
+    public function edit(Request $request, $comercio): Response
     {
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
         $comercioModel->load([
@@ -73,6 +74,7 @@ class ComercioController extends Controller
         return Inertia::render('admin/comercios/edit', [
             'comercio' => $comercioModel,
             'grupos' => $grupos,
+            'rubros' => Rubro::where('activo', true)->orderBy('orden')->orderBy('nombre')->get(),
         ]);
     }
 
@@ -87,6 +89,8 @@ class ComercioController extends Controller
             'codigo' => ['nullable', 'string', 'max:50'],
             'sigla' => ['nullable', 'string', 'max:50'],
             'color_hex' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/i'],
+            'logo_modo_claro' => ['nullable', 'string', 'max:500'],
+            'logo_modo_oscuro' => ['nullable', 'string', 'max:500'],
             'pagina_web' => ['nullable', 'string', 'max:500'],
             'plataforma_carrera' => ['nullable', 'string', 'max:500'],
             'certificado_url' => ['nullable', 'string', 'max:500'],
@@ -96,6 +100,7 @@ class ComercioController extends Controller
             'link_directo_escale' => ['nullable', 'string', 'max:500'],
             'malla_curricular_url' => ['nullable', 'string', 'max:500'],
             'catalogo_url' => ['nullable', 'string', 'max:500'],
+            'brochure_vacaciones_utiles' => ['nullable', 'string', 'max:500'],
             'como_ingresar_plataforma' => ['nullable', 'string', 'max:500'],
             'reconocimiento_director' => ['nullable', 'string', 'max:500'],
             'seminario' => ['nullable', 'string', 'max:500'],
@@ -136,6 +141,8 @@ class ComercioController extends Controller
             'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
             'sigla' => !empty($validated['sigla']) ? trim($validated['sigla']) : null,
             'color_hex' => $validated['color_hex'] ?? '#1d4ed8',
+            'logo_modo_claro' => !empty($validated['logo_modo_claro']) ? trim($validated['logo_modo_claro']) : null,
+            'logo_modo_oscuro' => !empty($validated['logo_modo_oscuro']) ? trim($validated['logo_modo_oscuro']) : null,
             'pagina_web' => !empty($validated['pagina_web']) ? trim($validated['pagina_web']) : null,
             'plataforma_carrera' => !empty($validated['plataforma_carrera']) ? trim($validated['plataforma_carrera']) : null,
             'certificado_url' => !empty($validated['certificado_url']) ? trim($validated['certificado_url']) : null,
@@ -145,6 +152,7 @@ class ComercioController extends Controller
             'link_directo_escale' => !empty($validated['link_directo_escale']) ? trim($validated['link_directo_escale']) : null,
             'malla_curricular_url' => !empty($validated['malla_curricular_url']) ? trim($validated['malla_curricular_url']) : null,
             'catalogo_url' => !empty($validated['catalogo_url']) ? trim($validated['catalogo_url']) : null,
+            'brochure_vacaciones_utiles' => !empty($validated['brochure_vacaciones_utiles']) ? trim($validated['brochure_vacaciones_utiles']) : null,
             'como_ingresar_plataforma' => !empty($validated['como_ingresar_plataforma']) ? trim($validated['como_ingresar_plataforma']) : null,
             'reconocimiento_director' => !empty($validated['reconocimiento_director']) ? trim($validated['reconocimiento_director']) : null,
             'seminario' => !empty($validated['seminario']) ? trim($validated['seminario']) : null,
@@ -168,7 +176,7 @@ class ComercioController extends Controller
     /**
      * Update the specified comercio in storage.
      */
-    public function update(Request $request, string $current_team, $comercio): RedirectResponse
+    public function update(Request $request, $comercio): RedirectResponse
     {
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
 
@@ -178,6 +186,8 @@ class ComercioController extends Controller
             'codigo' => ['nullable', 'string', 'max:50'],
             'sigla' => ['nullable', 'string', 'max:50'],
             'color_hex' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/i'],
+            'logo_modo_claro' => ['nullable', 'string', 'max:500'],
+            'logo_modo_oscuro' => ['nullable', 'string', 'max:500'],
             'pagina_web' => ['nullable', 'string', 'max:500'],
             'plataforma_carrera' => ['nullable', 'string', 'max:500'],
             'certificado_url' => ['nullable', 'string', 'max:500'],
@@ -187,6 +197,7 @@ class ComercioController extends Controller
             'link_directo_escale' => ['nullable', 'string', 'max:500'],
             'malla_curricular_url' => ['nullable', 'string', 'max:500'],
             'catalogo_url' => ['nullable', 'string', 'max:500'],
+            'brochure_vacaciones_utiles' => ['nullable', 'string', 'max:500'],
             'como_ingresar_plataforma' => ['nullable', 'string', 'max:500'],
             'reconocimiento_director' => ['nullable', 'string', 'max:500'],
             'seminario' => ['nullable', 'string', 'max:500'],
@@ -230,6 +241,8 @@ class ComercioController extends Controller
             'codigo' => !empty($validated['codigo']) ? trim($validated['codigo']) : null,
             'sigla' => !empty($validated['sigla']) ? trim($validated['sigla']) : null,
             'color_hex' => $validated['color_hex'] ?? $comercioModel->color_hex,
+            'logo_modo_claro' => !empty($validated['logo_modo_claro']) ? trim($validated['logo_modo_claro']) : null,
+            'logo_modo_oscuro' => !empty($validated['logo_modo_oscuro']) ? trim($validated['logo_modo_oscuro']) : null,
             'pagina_web' => !empty($validated['pagina_web']) ? trim($validated['pagina_web']) : null,
             'plataforma_carrera' => !empty($validated['plataforma_carrera']) ? trim($validated['plataforma_carrera']) : null,
             'certificado_url' => !empty($validated['certificado_url']) ? trim($validated['certificado_url']) : null,
@@ -239,6 +252,7 @@ class ComercioController extends Controller
             'link_directo_escale' => !empty($validated['link_directo_escale']) ? trim($validated['link_directo_escale']) : null,
             'malla_curricular_url' => !empty($validated['malla_curricular_url']) ? trim($validated['malla_curricular_url']) : null,
             'catalogo_url' => !empty($validated['catalogo_url']) ? trim($validated['catalogo_url']) : null,
+            'brochure_vacaciones_utiles' => !empty($validated['brochure_vacaciones_utiles']) ? trim($validated['brochure_vacaciones_utiles']) : null,
             'como_ingresar_plataforma' => !empty($validated['como_ingresar_plataforma']) ? trim($validated['como_ingresar_plataforma']) : null,
             'reconocimiento_director' => !empty($validated['reconocimiento_director']) ? trim($validated['reconocimiento_director']) : null,
             'seminario' => !empty($validated['seminario']) ? trim($validated['seminario']) : null,
@@ -262,7 +276,7 @@ class ComercioController extends Controller
     /**
      * Remove the specified comercio from storage.
      */
-    public function destroy(Request $request, string $current_team, $comercio): RedirectResponse
+    public function destroy(Request $request, $comercio): RedirectResponse
     {
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
         $nombre = $comercioModel->nombre;

@@ -7,14 +7,18 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import GoogleDriveIcon from '@/components/google-drive-icon';
+import { getDriveDirectImageUrl, isGoogleDriveUrl } from '@/lib/utils';
 import {
     Avatar,
     Box,
@@ -37,6 +41,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useState, useMemo } from 'react';
 import type { Comercio } from '@/types';
 
@@ -51,6 +56,8 @@ export default function ComercioDetailModal({
     comercio,
     onClose,
 }: ComercioDetailModalProps) {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const [currentTab, setCurrentTab] = useState(0);
     const [offerSearch, setOfferSearch] = useState('');
     const [offerTypeFilter, setOfferTypeFilter] = useState<'all' | 'carreras' | 'diplomados' | 'cursos'>('all');
@@ -160,20 +167,60 @@ export default function ComercioDetailModal({
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
-                        <Avatar
-                            sx={{
-                                width: 54,
-                                height: 54,
-                                bgcolor: brandColor,
-                                color: '#ffffff',
-                                fontWeight: 900,
-                                fontSize: '1.2rem',
-                                boxShadow: `0 4px 14px ${brandColor}40`,
-                                border: '2px solid rgba(255, 255, 255, 0.4)',
-                            }}
-                        >
-                            {(comercio.sigla || comercio.nombre || 'C').substring(0, 3).toUpperCase()}
-                        </Avatar>
+                        {(() => {
+                            const logoSrc = isDark
+                                ? (comercio.logo_modo_oscuro || comercio.logo_modo_claro)
+                                : (comercio.logo_modo_claro || comercio.logo_modo_oscuro);
+
+                            if (logoSrc) {
+                                return (
+                                    <Box
+                                        sx={{
+                                            height: 56,
+                                            width: 95,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            p: 0.8,
+                                            bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#ffffff',
+                                            borderRadius: 2,
+                                            border: '1px solid',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <Box
+                                            component="img"
+                                            src={logoSrc}
+                                            alt={`Logo ${comercio.nombre}`}
+                                            sx={{
+                                                maxHeight: 46,
+                                                maxWidth: '100%',
+                                                objectFit: 'contain',
+                                            }}
+                                        />
+                                    </Box>
+                                );
+                            }
+
+                            return (
+                                <Avatar
+                                    sx={{
+                                        width: 54,
+                                        height: 54,
+                                        bgcolor: brandColor,
+                                        color: '#ffffff',
+                                        fontWeight: 900,
+                                        fontSize: '1.2rem',
+                                        boxShadow: `0 4px 14px ${brandColor}40`,
+                                        border: '2px solid rgba(255, 255, 255, 0.4)',
+                                    }}
+                                >
+                                    {(comercio.sigla || comercio.nombre || 'C').substring(0, 3).toUpperCase()}
+                                </Avatar>
+                            );
+                        })()}
 
                         <Box sx={{ minWidth: 0 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
@@ -377,13 +424,79 @@ export default function ComercioDetailModal({
 
                                 {comercio.promocion_vigente && (
                                     <Grid size={{ xs: 12, sm: 6 }}>
-                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'success.light', color: 'success.dark', borderColor: 'success.main' }}>
-                                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase' }}>
-                                                Promoción Vigente
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, mt: 0.5 }}>
-                                                {comercio.promocion_vigente}
-                                            </Typography>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2,
+                                                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(234, 88, 12, 0.08)' : '#fff7ed',
+                                                borderColor: '#ea580c',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'space-between',
+                                                gap: 1.5,
+                                            }}
+                                        >
+                                            <Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 0.5 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LocalOfferIcon sx={{ fontSize: 18, color: '#ea580c' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: '#ea580c' }}>
+                                                            Promoción Vigente
+                                                        </Typography>
+                                                    </Box>
+                                                    <Chip
+                                                        label="Link Oficial"
+                                                        size="small"
+                                                        sx={{ bgcolor: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', fontWeight: 800, height: 20, fontSize: '0.65rem' }}
+                                                    />
+                                                </Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                    Campaña de Beneficios y Descuentos
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                    Enlace oficial a promociones y becas activas del comercio.
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    component="a"
+                                                    href={comercio.promocion_vigente.startsWith('http') ? comercio.promocion_vigente : `https://${comercio.promocion_vigente}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    startIcon={<LocalOfferIcon fontSize="small" />}
+                                                    endIcon={<LaunchIcon sx={{ fontSize: '14px !important' }} />}
+                                                    sx={{
+                                                        bgcolor: '#ea580c',
+                                                        color: '#ffffff',
+                                                        '&:hover': { bgcolor: '#c2410c' },
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.8rem',
+                                                    }}
+                                                >
+                                                    Ver Promoción
+                                                </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    startIcon={<ContentCopyIcon fontSize="small" />}
+                                                    onClick={() => handleCopy(comercio.promocion_vigente || '', 'Promoción')}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontSize: '0.78rem',
+                                                        color: '#ea580c',
+                                                        borderColor: '#ea580c',
+                                                        '&:hover': { borderColor: '#c2410c', bgcolor: 'rgba(234, 88, 12, 0.04)' },
+                                                    }}
+                                                >
+                                                    {copiedText === 'Promoción' ? '¡Enlace Copiado!' : 'Copiar enlace'}
+                                                </Button>
+                                            </Box>
                                         </Paper>
                                     </Grid>
                                 )}
@@ -520,60 +633,207 @@ export default function ComercioDetailModal({
                             <Grid container spacing={2.5}>
                                 {/* Resolución de Creación */}
                                 <Grid size={{ xs: 12, md: 6 }}>
-                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%', p: 2.5, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <Card
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: 2.5,
+                                            height: '100%',
+                                            p: 2.5,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'space-between',
+                                            gap: 2,
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                borderColor: 'primary.main',
+                                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+                                            },
+                                        }}
+                                    >
                                         <Box>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                <WorkspacePremiumIcon color="primary" fontSize="small" />
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                                    Resolución de Creación
-                                                </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <WorkspacePremiumIcon color="primary" fontSize="small" />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                                        Resolución de Creación
+                                                    </Typography>
+                                                </Box>
+                                                {comercio.resolucion_creacion && (
+                                                    <Chip
+                                                        label="Documento Oficial"
+                                                        size="small"
+                                                        color="primary"
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem' }}
+                                                    />
+                                                )}
                                             </Box>
-                                            <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary', mt: 1 }}>
-                                                {comercio.resolucion_creacion || 'En trámite / No especificada'}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                 Acto resolutivo oficial emitido por el Ministerio de Educación / DRE.
                                             </Typography>
+
+                                            {comercio.resolucion_creacion ? (
+                                                <Box
+                                                    sx={{
+                                                        p: 1.5,
+                                                        borderRadius: 2,
+                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#f8fafc',
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1.5,
+                                                    }}
+                                                >
+                                                    <Avatar sx={{ bgcolor: 'primary.main', color: '#ffffff', width: 38, height: 38 }}>
+                                                        <PictureAsPdfIcon fontSize="small" />
+                                                    </Avatar>
+                                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                            Documento Oficial de Creación
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                            Archivo digital normativo oficial
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic', py: 1 }}>
+                                                    En trámite / No especificada
+                                                </Typography>
+                                            )}
                                         </Box>
+
                                         {comercio.resolucion_creacion && (
-                                            <Button
-                                                size="small"
-                                                startIcon={<ContentCopyIcon fontSize="small" />}
-                                                onClick={() => handleCopy(comercio.resolucion_creacion || '', 'R. Creación')}
-                                                sx={{ mt: 2, alignSelf: 'flex-start', textTransform: 'none' }}
-                                            >
-                                                {copiedText === 'R. Creación' ? '¡Resolución Copiada!' : 'Copiar Resolución'}
-                                            </Button>
+                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    component="a"
+                                                    href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                    endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
+                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                >
+                                                    Ver documento
+                                                </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    startIcon={<ContentCopyIcon fontSize="small" />}
+                                                    onClick={() => handleCopy(comercio.resolucion_creacion || '', 'R. Creación')}
+                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
+                                                >
+                                                    {copiedText === 'R. Creación' ? '¡Enlace Copiado!' : 'Copiar enlace'}
+                                                </Button>
+                                            </Box>
                                         )}
                                     </Card>
                                 </Grid>
 
                                 {/* Resolución de Revalidación */}
                                 <Grid size={{ xs: 12, md: 6 }}>
-                                    <Card variant="outlined" sx={{ borderRadius: 2.5, height: '100%', p: 2.5, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <Card
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: 2.5,
+                                            height: '100%',
+                                            p: 2.5,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'space-between',
+                                            gap: 2,
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                borderColor: 'success.main',
+                                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+                                            },
+                                        }}
+                                    >
                                         <Box>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                <CheckCircleIcon color="success" fontSize="small" />
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                                    Resolución de Revalidación
-                                                </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                                        Resolución de Revalidación
+                                                    </Typography>
+                                                </Box>
+                                                {comercio.resolucion_revalidacion && (
+                                                    <Chip
+                                                        label="Documento Oficial"
+                                                        size="small"
+                                                        color="success"
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem' }}
+                                                    />
+                                                )}
                                             </Box>
-                                            <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary', mt: 1 }}>
-                                                {comercio.resolucion_revalidacion || 'En proceso de revalidación'}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                 Actualización de condiciones básicas de calidad pedagógica e institucional.
                                             </Typography>
+
+                                            {comercio.resolucion_revalidacion ? (
+                                                <Box
+                                                    sx={{
+                                                        p: 1.5,
+                                                        borderRadius: 2,
+                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#f8fafc',
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1.5,
+                                                    }}
+                                                >
+                                                    <Avatar sx={{ bgcolor: 'success.main', color: '#ffffff', width: 38, height: 38 }}>
+                                                        <PictureAsPdfIcon fontSize="small" />
+                                                    </Avatar>
+                                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                            Documento Oficial de Revalidación
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                            Archivo digital normativo oficial
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic', py: 1 }}>
+                                                    En proceso de revalidación / No registrada
+                                                </Typography>
+                                            )}
                                         </Box>
+
                                         {comercio.resolucion_revalidacion && (
-                                            <Button
-                                                size="small"
-                                                startIcon={<ContentCopyIcon fontSize="small" />}
-                                                onClick={() => handleCopy(comercio.resolucion_revalidacion || '', 'R. Revalidación')}
-                                                sx={{ mt: 2, alignSelf: 'flex-start', textTransform: 'none' }}
-                                            >
-                                                {copiedText === 'R. Revalidación' ? '¡Resolución Copiada!' : 'Copiar Resolución'}
-                                            </Button>
+                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    color="success"
+                                                    component="a"
+                                                    href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                    endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
+                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                >
+                                                    Ver documento
+                                                </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color="success"
+                                                    startIcon={<ContentCopyIcon fontSize="small" />}
+                                                    onClick={() => handleCopy(comercio.resolucion_revalidacion || '', 'R. Revalidación')}
+                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
+                                                >
+                                                    {copiedText === 'R. Revalidación' ? '¡Enlace Copiado!' : 'Copiar enlace'}
+                                                </Button>
+                                            </Box>
                                         )}
                                     </Card>
                                 </Grid>
@@ -937,6 +1197,37 @@ export default function ComercioDetailModal({
                                         </Paper>
                                     </Grid>
                                 )}
+                                {comercio.brochure_vacaciones_utiles && (
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <PictureAsPdfIcon color="secondary" />
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                        Brochure Vacaciones Útiles
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        Programa de vacaciones útiles
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                color="secondary"
+                                                component="a"
+                                                href={comercio.brochure_vacaciones_utiles.startsWith('http') ? comercio.brochure_vacaciones_utiles : `https://${comercio.brochure_vacaciones_utiles}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                endIcon={<LaunchIcon fontSize="small" />}
+                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                            >
+                                                Ver documento
+                                            </Button>
+                                        </Paper>
+                                    </Grid>
+                                )}
 
                                 {comercio.malla_curricular_url && (
                                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -1027,7 +1318,226 @@ export default function ComercioDetailModal({
                                         </Paper>
                                     </Grid>
                                 )}
+                                {comercio.resolucion_creacion && (
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <WorkspacePremiumIcon color="primary" />
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                        Resolución de Creación
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        Acto normativo oficial MINEDU
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                color="primary"
+                                                component="a"
+                                                href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
+                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                            >
+                                                Ver documento
+                                            </Button>
+                                        </Paper>
+                                    </Grid>
+                                )}
+
+                                {comercio.resolucion_revalidacion && (
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <CheckCircleIcon color="success" />
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                        Resolución de Revalidación
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        Actualización de calidad MINEDU
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                color="success"
+                                                component="a"
+                                                href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
+                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                            >
+                                                Ver documento
+                                            </Button>
+                                        </Paper>
+                                    </Grid>
+                                )}
+                                {comercio.promocion_vigente && (
+                                    <Grid size={{ xs: 12, sm: 6 }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                borderColor: '#ea580c',
+                                                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(234, 88, 12, 0.05)' : '#fffaf5',
+                                            }}
+                                        >
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <LocalOfferIcon sx={{ color: '#ea580c' }} />
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ea580c' }}>
+                                                        Promoción Vigente
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        Campaña y descuentos activos
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                component="a"
+                                                href={comercio.promocion_vigente.startsWith('http') ? comercio.promocion_vigente : `https://${comercio.promocion_vigente}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                startIcon={<LocalOfferIcon fontSize="small" />}
+                                                endIcon={<LaunchIcon fontSize="small" />}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    bgcolor: '#ea580c',
+                                                    color: '#fff',
+                                                    '&:hover': { bgcolor: '#c2410c' },
+                                                }}
+                                            >
+                                                Ver Promoción
+                                            </Button>
+                                        </Paper>
+                                    </Grid>
+                                )}
                             </Grid>
+
+                            {comercio.fotos && comercio.fotos.length > 0 && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                                        <PhotoLibraryIcon color="primary" sx={{ fontSize: 20 }} />
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            Galería Fotográfica y Sedes ({comercio.fotos.length})
+                                        </Typography>
+                                    </Box>
+                                    <Grid container spacing={2}>
+                                        {comercio.fotos.map((fotoUrl, idx) => (
+                                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
+                                                <Card
+                                                    variant="outlined"
+                                                    sx={{
+                                                        borderRadius: 2.5,
+                                                        overflow: 'hidden',
+                                                        transition: 'all 0.2s',
+                                                        '&:hover': {
+                                                            transform: 'translateY(-3px)',
+                                                            boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+                                                        },
+                                                    }}
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            position: 'relative',
+                                                            height: 160,
+                                                            width: '100%',
+                                                            overflow: 'hidden',
+                                                            bgcolor: 'action.hover',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onClick={() => setPreviewImage(getDriveDirectImageUrl(fotoUrl))}
+                                                    >
+                                                        <Box
+                                                            component="img"
+                                                            src={getDriveDirectImageUrl(fotoUrl)}
+                                                            alt={`Sede o foto ${idx + 1}`}
+                                                            sx={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover',
+                                                                display: 'block',
+                                                                transition: 'transform 0.3s',
+                                                                '&:hover': { transform: 'scale(1.05)' },
+                                                            }}
+                                                        />
+                                                        {isGoogleDriveUrl(fotoUrl) && (
+                                                            <Chip
+                                                                icon={<GoogleDriveIcon size={14} />}
+                                                                label="Drive"
+                                                                size="small"
+                                                                sx={{
+                                                                    position: 'absolute',
+                                                                    top: 8,
+                                                                    left: 8,
+                                                                    bgcolor: 'rgba(0, 0, 0, 0.65)',
+                                                                    color: '#ffffff',
+                                                                    backdropFilter: 'blur(4px)',
+                                                                    fontWeight: 700,
+                                                                    fontSize: '0.65rem',
+                                                                    height: 22,
+                                                                    '& .MuiChip-icon': { ml: 0.5 },
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                    <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 }, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.85rem' }} noWrap>
+                                                                Foto / Sede {idx + 1}
+                                                            </Typography>
+                                                            <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+                                                                {isGoogleDriveUrl(fotoUrl) ? 'Google Drive' : 'Foto institucional'}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
+                                                            <Tooltip title="Ampliar foto" arrow>
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => setPreviewImage(getDriveDirectImageUrl(fotoUrl))}
+                                                                    sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                >
+                                                                    <VisibilityIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Abrir en Google Drive" arrow>
+                                                                <IconButton
+                                                                    size="small"
+                                                                    component="a"
+                                                                    href={fotoUrl.startsWith('http') ? fotoUrl : `https://${fotoUrl}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    color="primary"
+                                                                    sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                >
+                                                                    <LaunchIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </Box>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </DialogContent>

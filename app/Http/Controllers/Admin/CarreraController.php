@@ -139,7 +139,7 @@ class CarreraController extends Controller
     /**
      * Update the specified carrera in storage.
      */
-    public function update(Request $request, string $current_team, $carrera): RedirectResponse
+    public function update(Request $request, $carrera): RedirectResponse
     {
         $carreraModel = $carrera instanceof Carrera ? $carrera : Carrera::findOrFail($carrera);
 
@@ -210,7 +210,7 @@ class CarreraController extends Controller
     /**
      * Remove the specified carrera from storage.
      */
-    public function destroy(Request $request, string $current_team, $carrera): RedirectResponse
+    public function destroy(Request $request, $carrera): RedirectResponse
     {
         $carreraModel = $carrera instanceof Carrera ? $carrera : Carrera::findOrFail($carrera);
         $nombre = $carreraModel->nombre;

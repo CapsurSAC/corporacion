@@ -23,17 +23,16 @@ class CatalogTest extends TestCase
         );
     }
 
-    public function test_authenticated_user_can_access_dashboard_with_their_team(): void
+    public function test_authenticated_user_can_access_dashboard(): void
     {
         $user = User::factory()->create();
-        $team = $user->currentTeam;
 
         Grupo::factory()->create();
         Comercio::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->get(route('dashboard', ['current_team' => $team->slug]));
+            ->get(route('dashboard'));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page

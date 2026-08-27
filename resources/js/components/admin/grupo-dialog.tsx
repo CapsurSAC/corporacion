@@ -22,14 +22,13 @@ interface GrupoDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     grupo?: Grupo | null;
-    currentTeamSlug: string;
 }
 
 export function GrupoDialog({
     open,
     onOpenChange,
     grupo,
-    currentTeamSlug,
+    
 }: GrupoDialogProps) {
     const isEditing = !!grupo;
     const { notify } = useNotification();
@@ -77,7 +76,7 @@ export function GrupoDialog({
         if (!validate()) return;
 
         if (isEditing && grupo) {
-            put(`/${currentTeamSlug}/admin/grupos/${grupo.id}`, {
+            put(`/admin/grupos/${grupo.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Grupo "${data.nombre}" actualizado correctamente.`);
@@ -89,7 +88,7 @@ export function GrupoDialog({
                 },
             });
         } else {
-            post(`/${currentTeamSlug}/admin/grupos`, {
+            post(`/admin/grupos`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Grupo "${data.nombre}" creado exitosamente.`);

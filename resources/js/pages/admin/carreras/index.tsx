@@ -57,8 +57,8 @@ export default function CarrerasIndex({
     filters,
 }: Props) {
     const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+    
+    
     const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
@@ -73,7 +73,7 @@ export default function CarrerasIndex({
         search?: string;
     }) => {
         router.get(
-            `/${currentTeamSlug}/admin/carreras`,
+            `/admin/carreras`,
             {
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
                 search: newFilters.search !== undefined ? (newFilters.search || undefined) : (search || undefined),
@@ -115,7 +115,7 @@ export default function CarrerasIndex({
         });
 
         if (confirmed) {
-            router.delete(`/${currentTeamSlug}/admin/carreras/${carrera.id}`, {
+            router.delete(`/admin/carreras/${carrera.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Carrera "${carrera.nombre}" eliminada exitosamente.`);
@@ -221,7 +221,7 @@ export default function CarrerasIndex({
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
                             <Link
-                                href={`/${currentTeamSlug}/admin/comercios`}
+                                href={`/admin/comercios`}
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
@@ -588,25 +588,25 @@ export default function CarrerasIndex({
                 onOpenChange={setDialogOpen}
                 carrera={selectedCarrera}
                 comercios={comercios}
-                currentTeamSlug={currentTeamSlug}
+                
             />
         </>
     );
 }
 
-CarrerasIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+CarrerasIndex.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
         {
             title: 'Comercios e Institutos',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/comercios` : '#',
+            href: '/admin/comercios',
         },
         {
-            title: 'Carreras Profesionales',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/carreras` : '#',
+            title: 'Carreras Técnicas',
+            href: '/admin/carreras',
         },
     ],
 });

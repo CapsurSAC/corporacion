@@ -25,6 +25,40 @@ class Curso extends Model
         'actualizado_drive',
     ];
 
+    protected $appends = ['rubros'];
+
+    /**
+     * Accesor para el campo rubros (equivalente a tipo).
+     */
+    public function getRubrosAttribute(): ?string
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * Mutador para el campo rubros.
+     */
+    public function setRubrosAttribute(?string $value): void
+    {
+        $this->attributes['tipo'] = $value;
+    }
+
+    /**
+     * Accesor para rubro en singular.
+     */
+    public function getRubroAttribute(): ?string
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * Mutador para rubro en singular.
+     */
+    public function setRubroAttribute(?string $value): void
+    {
+        $this->attributes['tipo'] = $value;
+    }
+
     /**
      * Comercio al que pertenece el curso.
      */

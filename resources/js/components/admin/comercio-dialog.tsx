@@ -4,9 +4,12 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DomainIcon from '@mui/icons-material/Domain';
 import LanguageIcon from '@mui/icons-material/Language';
+import LaunchIcon from '@mui/icons-material/Launch';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import GoogleDriveIcon from '@/components/google-drive-icon';
 import {
+    Avatar,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -22,6 +25,8 @@ import {
     Checkbox,
     Button,
     IconButton,
+    InputAdornment,
+    Tooltip,
     Box,
     Grid,
     Typography,
@@ -31,6 +36,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength, isValidHexColor } from '@/lib/validation';
+import { getDriveDirectImageUrl, isGoogleDriveUrl } from '@/lib/utils';
 import type { Comercio, Grupo } from '@/types';
 
 const COLOR_PRESETS = [
@@ -52,7 +58,6 @@ interface ComercioDialogProps {
     comercio?: Comercio | null;
     grupos: Grupo[];
     defaultGrupoId?: number | null;
-    currentTeamSlug: string;
 }
 
 export function ComercioDialog({
@@ -61,7 +66,7 @@ export function ComercioDialog({
     comercio,
     grupos,
     defaultGrupoId,
-    currentTeamSlug,
+    
 }: ComercioDialogProps) {
     const isEditing = !!comercio;
     const { notify } = useNotification();
@@ -75,6 +80,8 @@ export function ComercioDialog({
             codigo: string;
             sigla: string;
             color_hex: string;
+            logo_modo_claro: string;
+            logo_modo_oscuro: string;
             pagina_web: string;
             plataforma_carrera: string;
             como_ingresar_plataforma: string;
@@ -85,6 +92,7 @@ export function ComercioDialog({
             link_directo_escale: string;
             malla_curricular_url: string;
             catalogo_url: string;
+            brochure_vacaciones_utiles: string;
             reconocimiento_director: string;
             seminario: string;
             convenio: string;
@@ -99,6 +107,8 @@ export function ComercioDialog({
             codigo: '',
             sigla: '',
             color_hex: '#1d4ed8',
+            logo_modo_claro: '',
+            logo_modo_oscuro: '',
             pagina_web: '',
             plataforma_carrera: '',
             como_ingresar_plataforma: '',
@@ -109,6 +119,7 @@ export function ComercioDialog({
             link_directo_escale: '',
             malla_curricular_url: '',
             catalogo_url: '',
+            brochure_vacaciones_utiles: '',
             reconocimiento_director: '',
             seminario: '',
             convenio: '',
@@ -127,6 +138,8 @@ export function ComercioDialog({
                 codigo: comercio.codigo || '',
                 sigla: comercio.sigla || '',
                 color_hex: comercio.color_hex || '#1d4ed8',
+                logo_modo_claro: comercio.logo_modo_claro || '',
+                logo_modo_oscuro: comercio.logo_modo_oscuro || '',
                 pagina_web: comercio.pagina_web || '',
                 plataforma_carrera: comercio.plataforma_carrera || '',
                 como_ingresar_plataforma: comercio.como_ingresar_plataforma || '',
@@ -137,6 +150,7 @@ export function ComercioDialog({
                 link_directo_escale: comercio.link_directo_escale || '',
                 malla_curricular_url: comercio.malla_curricular_url || '',
                 catalogo_url: comercio.catalogo_url || '',
+                brochure_vacaciones_utiles: comercio.brochure_vacaciones_utiles || '',
                 reconocimiento_director: comercio.reconocimiento_director || '',
                 seminario: comercio.seminario || '',
                 convenio: comercio.convenio || '',
@@ -227,7 +241,7 @@ export function ComercioDialog({
         }
 
         if (isEditing && comercio) {
-            put(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
+            put(`/admin/comercios/${comercio.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Ficha de "${data.nombre}" actualizada con éxito.`);
@@ -239,7 +253,7 @@ export function ComercioDialog({
                 },
             });
         } else {
-            post(`/${currentTeamSlug}/admin/comercios`, {
+            post(`/admin/comercios`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Comercio "${data.nombre}" creado exitosamente.`);
@@ -405,6 +419,32 @@ export function ComercioDialog({
                                 </Box>
                             </Box>
 
+                            {/* Logotipos para Fondo Claro y Fondo Oscuro */}
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Logo Modo Claro (Ruta / URL)"
+                                        value={data.logo_modo_claro}
+                                        onChange={(e) => setData('logo_modo_claro', e.target.value)}
+                                        placeholder="/logos-comercios/..."
+                                        fullWidth
+                                        size="small"
+                                        helperText="Para fondos blancos (ej. catálogo público)"
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Logo Modo Oscuro (Ruta / URL)"
+                                        value={data.logo_modo_oscuro}
+                                        onChange={(e) => setData('logo_modo_oscuro', e.target.value)}
+                                        placeholder="/logos-comercios/..."
+                                        fullWidth
+                                        size="small"
+                                        helperText="Para fondos oscuros (ej. modo noche)"
+                                    />
+                                </Grid>
+                            </Grid>
+
                             <TextField
                                 label="Descripción"
                                 value={data.descripcion}
@@ -435,15 +475,30 @@ export function ComercioDialog({
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label="Catálogo Oficial (Ej. Catálogo AVANTI 2026)"
+                                        label="Catálogo Institucional (URL / PDF)"
                                         value={data.catalogo_url}
                                         onChange={(e) => setData('catalogo_url', e.target.value)}
                                         placeholder="https://.../catalogo-2026.pdf"
                                         fullWidth
                                         size="small"
+                                        helperText="Catálogo oficial o brochure institucional"
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Brochure Vacaciones Útiles (Link / URL)"
+                                        value={data.brochure_vacaciones_utiles}
+                                        onChange={(e) => setData('brochure_vacaciones_utiles', e.target.value)}
+                                        placeholder="https://.../vacaciones-utiles.pdf"
+                                        fullWidth
+                                        size="small"
+                                        helperText="Folleto o documento de temporada de vacaciones útiles"
+                                    />
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12 }}>
                                     <TextField
                                         label="Reconocimiento de Director"
                                         value={data.reconocimiento_director}
@@ -562,14 +617,26 @@ export function ComercioDialog({
                             />
 
                             <TextField
-                                label="Promoción Vigente (Opcional)"
+                                label="Link de Promoción Vigente (URL / Enlace)"
                                 value={data.promocion_vigente}
                                 onChange={(e) => setData('promocion_vigente', e.target.value)}
-                                placeholder="Detalles de descuentos especiales, becas o promociones..."
+                                placeholder="https://.../promocion-vigente"
                                 fullWidth
-                                multiline
-                                rows={2}
                                 size="small"
+                                helperText="Enlace directo a la promoción, afiche, flyer o documento de ofertas"
+                                slotProps={{
+                                    input: {
+                                        endAdornment: data.promocion_vigente ? (
+                                            <InputAdornment position="end">
+                                                <Tooltip title="Abrir enlace de promoción" arrow>
+                                                    <IconButton href={data.promocion_vigente} target="_blank" size="small">
+                                                        <LaunchIcon fontSize="small" color="primary" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </InputAdornment>
+                                        ) : null,
+                                    },
+                                }}
                             />
 
                             <TextField
@@ -634,8 +701,9 @@ export function ComercioDialog({
 
                             <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                        Galería de Fotos Institucionales
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <GoogleDriveIcon size={20} />
+                                        <span>Galería Fotográfica y Sedes ({data.fotos.filter(Boolean).length})</span>
                                     </Typography>
                                     <Button
                                         size="small"
@@ -646,14 +714,46 @@ export function ComercioDialog({
                                         Agregar Foto
                                     </Button>
                                 </Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+                                    Pega el enlace de Google Drive de una foto o la URL de una imagen para mostrarla en el catálogo.
+                                </Typography>
                                 {data.fotos.map((foto, idx) => (
                                     <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                        {foto ? (
+                                            <Avatar
+                                                variant="rounded"
+                                                src={getDriveDirectImageUrl(foto)}
+                                                sx={{ width: 40, height: 40, border: '1px solid', borderColor: 'divider', flexShrink: 0 }}
+                                            >
+                                                <GoogleDriveIcon size={20} />
+                                            </Avatar>
+                                        ) : (
+                                            <Avatar
+                                                variant="rounded"
+                                                sx={{ width: 40, height: 40, bgcolor: 'action.hover', border: '1px dashed', borderColor: 'divider', flexShrink: 0 }}
+                                            >
+                                                <GoogleDriveIcon size={20} />
+                                            </Avatar>
+                                        )}
                                         <TextField
                                             value={foto}
                                             onChange={(e) => handleFotoChange(e.target.value, idx)}
-                                            placeholder={`Foto${idx + 1} URL (https://...)`}
+                                            placeholder={`Enlace Drive de Foto ${idx + 1} (https://drive.google.com/...)`}
                                             fullWidth
                                             size="small"
+                                            slotProps={{
+                                                input: {
+                                                    endAdornment: foto ? (
+                                                        <InputAdornment position="end">
+                                                            <Tooltip title="Abrir foto en Google Drive" arrow>
+                                                                <IconButton href={foto} target="_blank" size="small">
+                                                                    <LaunchIcon fontSize="small" color="primary" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </InputAdornment>
+                                                    ) : null,
+                                                },
+                                            }}
                                         />
                                         <IconButton
                                             onClick={() => handleRemoveFoto(idx)}

@@ -59,8 +59,8 @@ interface Props {
 
 export default function ComerciosIndex({ comercios = [], grupos = [], filters = {} }: Props) {
     const page = usePage();
-    const currentTeam = page.props.currentTeam as { slug: string } | undefined;
-    const currentTeamSlug = currentTeam?.slug || 'default';
+    
+    
     const { notify } = useNotification();
 
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
@@ -96,7 +96,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
     const handleFilterChange = (grupoId: string) => {
         setSelectedGrupoFilter(grupoId);
         router.get(
-            `/${currentTeamSlug}/admin/comercios`,
+            `/admin/comercios`,
             {
                 grupo_id: grupoId === 'all' ? undefined : grupoId,
                 search: search || undefined,
@@ -108,7 +108,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
-            `/${currentTeamSlug}/admin/comercios`,
+            `/admin/comercios`,
             {
                 grupo_id: selectedGrupoFilter === 'all' ? undefined : selectedGrupoFilter,
                 search: search || undefined,
@@ -120,7 +120,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
     const handleClearSearch = () => {
         setSearch('');
         router.get(
-            `/${currentTeamSlug}/admin/comercios`,
+            `/admin/comercios`,
             {
                 grupo_id: selectedGrupoFilter === 'all' ? undefined : selectedGrupoFilter,
             },
@@ -146,7 +146,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
         });
 
         if (confirmed) {
-            router.delete(`/${currentTeamSlug}/admin/comercios/${comercio.id}`, {
+            router.delete(`/admin/comercios/${comercio.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     notify.success(`Comercio "${comercio.nombre}" eliminado exitosamente.`);
@@ -598,7 +598,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
 
                                                         <Tooltip title="Editar Ficha de Comercio" arrow>
                                                             <Link
-                                                                href={`/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`}
+                                                                href={`/admin/comercios/${comercio.id}/edit`}
                                                                 style={{ textDecoration: 'none' }}
                                                             >
                                                                 <IconButton
@@ -711,7 +711,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                 </Box>
 
                                                 <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                                    <Link href={`/${currentTeamSlug}/admin/comercios/${comercio.id}/edit`} style={{ textDecoration: 'none' }}>
+                                                    <Link href={`/admin/comercios/${comercio.id}/edit`} style={{ textDecoration: 'none' }}>
                                                         <IconButton size="small" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 0.8 }}>
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
@@ -817,7 +817,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                         </Grid>
 
                         <Box sx={{ pt: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Link href={`/${currentTeamSlug}/admin/comercios/${popoverComercio.id}/edit`} style={{ textDecoration: 'none' }}>
+                            <Link href={`/admin/comercios/${popoverComercio.id}/edit`} style={{ textDecoration: 'none' }}>
                                 <Button variant="contained" size="small" startIcon={<EditIcon />} sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 1 }}>
                                     Abrir Edición Completa
                                 </Button>
@@ -833,7 +833,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                 onOpenChange={setDialogOpen}
                 comercio={selectedComercio}
                 grupos={grupos}
-                currentTeamSlug={currentTeamSlug}
+                
             />
 
             <CarreraDialog
@@ -841,21 +841,21 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                 onOpenChange={setCarreraDialogOpen}
                 comercios={comercios}
                 defaultComercioId={quickComercioId}
-                currentTeamSlug={currentTeamSlug}
+                
             />
         </>
     );
 }
 
-ComerciosIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
+ComerciosIndex.layout = () => ({
     breadcrumbs: [
         {
             title: 'Panel Principal',
-            href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
+            href: '/dashboard',
         },
         {
             title: 'Comercios e Institutos',
-            href: props.currentTeam ? `/${props.currentTeam.slug}/admin/comercios` : '#',
+            href: '/admin/comercios',
         },
     ],
 });

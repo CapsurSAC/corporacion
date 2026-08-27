@@ -1,10 +1,13 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     Award,
     BookOpen,
     Building2,
+    HardDrive,
+    Image,
     LayoutGrid,
     Store,
+    Tags,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -19,15 +22,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
-    const page = usePage();
-    const teamSlug = page.props.currentTeam?.slug || 'default';
-    const dashboardUrl = page.props.currentTeam
-        ? dashboard(page.props.currentTeam.slug)
-        : '/';
+    const dashboardUrl = '/dashboard';
 
     const mainNavItems: NavItem[] = [
         {
@@ -37,23 +35,38 @@ export function AppSidebar() {
         },
         {
             title: 'Grupos Comerciales',
-            href: `/${teamSlug}/admin/grupos`,
+            href: '/admin/grupos',
             icon: Building2,
         },
         {
             title: 'Comercios',
-            href: `/${teamSlug}/admin/comercios`,
+            href: '/admin/comercios',
             icon: Store,
         },
         {
             title: 'Diplomados',
-            href: `/${teamSlug}/admin/diplomados`,
+            href: '/admin/diplomados',
             icon: Award,
         },
         {
             title: 'Cursos',
-            href: `/${teamSlug}/admin/cursos`,
+            href: '/admin/cursos',
             icon: BookOpen,
+        },
+        {
+            title: 'Rubros',
+            href: '/admin/rubros',
+            icon: Tags,
+        },
+        {
+            title: 'Drive Capacitaciones',
+            href: '/admin/drive-capacitaciones',
+            icon: HardDrive,
+        },
+        {
+            title: 'Logos',
+            href: '/admin/logos',
+            icon: Image,
         },
     ];
 
