@@ -360,9 +360,6 @@ export default function RubrosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 220, py: 1.5 }}>
                                     RUBRO / DISTINTIVO
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 160 }}>
-                                    CLAVE (SLUG)
-                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 180 }}>
                                     CATEGORÍA / GRUPO
                                 </TableCell>
@@ -383,7 +380,7 @@ export default function RubrosIndex({
                         <TableBody>
                             {rubros.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
                                         <TagsIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron rubros registrados
@@ -483,26 +480,7 @@ export default function RubrosIndex({
                                                 </Box>
                                             </TableCell>
 
-                                            {/* Columna 2: Clave (Slug) */}
-                                            <TableCell>
-                                                <Typography
-                                                    variant="caption"
-                                                    sx={{
-                                                        fontFamily: 'monospace',
-                                                        fontWeight: 700,
-                                                        bgcolor: 'action.hover',
-                                                        px: 1,
-                                                        py: 0.3,
-                                                        borderRadius: 1,
-                                                        border: '1px solid',
-                                                        borderColor: 'divider',
-                                                    }}
-                                                >
-                                                    {rubro.clave}
-                                                </Typography>
-                                            </TableCell>
-
-                                            {/* Columna 3: Categoría */}
+                                            {/* Columna 2: Categoría */}
                                             <TableCell>
                                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                                     {rubro.categoria || (
@@ -513,7 +491,7 @@ export default function RubrosIndex({
                                                 </Typography>
                                             </TableCell>
 
-                                            {/* Columna 4: Programas Vinculados */}
+                                            {/* Columna 3: Programas Vinculados */}
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                                     <Chip
@@ -535,7 +513,7 @@ export default function RubrosIndex({
                                                 </Box>
                                             </TableCell>
 
-                                            {/* Columna 5: Estado */}
+                                            {/* Columna 4: Estado */}
                                             <TableCell sx={{ textAlign: 'center' }}>
                                                 {rubro.activo ? (
                                                     <Chip
@@ -557,14 +535,14 @@ export default function RubrosIndex({
                                                 )}
                                             </TableCell>
 
-                                            {/* Columna 6: Orden */}
+                                            {/* Columna 5: Orden */}
                                             <TableCell sx={{ textAlign: 'center' }}>
                                                 <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                                                     {rubro.orden}
                                                 </Typography>
                                             </TableCell>
 
-                                            {/* Columna 7: Acciones */}
+                                            {/* Columna 6: Acciones */}
                                             <TableCell sx={{ textAlign: 'right' }}>
                                                 <Box sx={{ display: 'flex', gap: 0.8, justifyContent: 'flex-end' }}>
                                                     <Tooltip title="Editar Rubro">

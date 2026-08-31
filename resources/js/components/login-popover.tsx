@@ -12,7 +12,6 @@ import {
     Button,
     Checkbox,
     CircularProgress,
-    Divider,
     FormControlLabel,
     IconButton,
     InputAdornment,
@@ -270,28 +269,6 @@ export default function LoginPopover({ open, anchorEl, onClose }: LoginPopoverPr
                         'Iniciar Sesión'
                     )}
                 </Button>
-
-                <Divider sx={{ my: 0.5 }} />
-
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="caption" color="text.secondary">
-                        ¿No tienes una cuenta?{' '}
-                        <Link href="/register" style={{ textDecoration: 'none' }}>
-                            <Typography
-                                component="span"
-                                variant="caption"
-                                sx={{
-                                    color: 'primary.main',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    '&:hover': { textDecoration: 'underline' },
-                                }}
-                            >
-                                Regístrate
-                            </Typography>
-                        </Link>
-                    </Typography>
-                </Box>
             </Box>
         </Popover>
     );

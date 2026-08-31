@@ -389,9 +389,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 180 }}>
                                         ACREDITACIÓN & PLATAFORMA
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 120, textAlign: 'center' }}>
-                                        PROGRAMAS
-                                    </TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 150, textAlign: 'right' }}>
                                         ACCIONES
                                     </TableCell>
@@ -400,7 +397,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                             <TableBody>
                                 {comercios.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
+                                        <TableCell colSpan={5} sx={{ textAlign: 'center', py: 5 }}>
                                             <StorefrontIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                                 No se encontraron comercios registrados
@@ -567,18 +564,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Columna 5: Programas */}
-                                                <TableCell sx={{ textAlign: 'center' }}>
-                                                    <Chip
-                                                        icon={<SchoolIcon sx={{ fontSize: '13px !important' }} />}
-                                                        label={`${comercio.carreras_count || 0}`}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        sx={{ fontWeight: 700, fontSize: '0.72rem', height: 22, borderRadius: 0.8 }}
-                                                    />
-                                                </TableCell>
-
-                                                {/* Columna 6: Acciones */}
+                                                {/* Columna 5: Acciones */}
                                                 <TableCell sx={{ textAlign: 'right' }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
                                                         <Tooltip title="Ficha Técnica Completa" arrow>
