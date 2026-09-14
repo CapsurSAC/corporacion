@@ -55,4 +55,12 @@ class Carrera extends Model
     {
         return $this->hasMany(Curso::class, 'carrera_id');
     }
+
+    /**
+     * Especialidades pertenecientes a esta carrera.
+     */
+    public function especialidades(): HasMany
+    {
+        return $this->hasMany(Especialidad::class, 'carrera_id');
+    }
 }

@@ -19,9 +19,11 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             AdminUserSeeder::class,
             GrupoYComercioSeeder::class,
+            RubroSeeder::class,
             CarreraSeeder::class,
             DiplomadoSeeder::class,
             CursoSeeder::class,
+            EspecialidadSeeder::class,
         ]);
     }
 }
