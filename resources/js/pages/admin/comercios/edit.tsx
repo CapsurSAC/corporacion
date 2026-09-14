@@ -522,28 +522,6 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                 </Typography>
                             </Box>
                         </Box>
-
-                        {/* Botón de Guardado Superior Rápido */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, alignSelf: { xs: 'stretch', md: 'auto' }, justifyContent: { xs: 'flex-end', md: 'auto' } }}>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                disabled={processing}
-                                startIcon={processing ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
-                                sx={{
-                                    bgcolor: data.color_hex || '#0c43a3',
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    px: 2.8,
-                                    py: 0.9,
-                                    borderRadius: 2,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-                                    '&:hover': { filter: 'brightness(0.92)' },
-                                }}
-                            >
-                                {processing ? 'Guardando...' : 'Guardar Cambios'}
-                            </Button>
-                        </Box>
                     </Box>
                 </Paper>
 
