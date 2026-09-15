@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import TagsIcon from '@mui/icons-material/Sell';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import BlockIcon from '@mui/icons-material/Block';
+import CategoryIcon from '@mui/icons-material/Category';
 import AwardIcon from '@mui/icons-material/EmojiEvents';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import {
@@ -303,10 +304,18 @@ export default function RubrosIndex({
                                     applyFilters({ categoria: e.target.value });
                                 }}
                             >
-                                <MenuItem value="all">📁 Todas las categorías</MenuItem>
+                                <MenuItem value="all">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CategoryIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">Todas las categorías</Typography>
+                                    </Box>
+                                </MenuItem>
                                 {categorias.map((cat) => (
                                     <MenuItem key={cat} value={cat}>
-                                        {cat}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CategoryIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                            <Typography variant="body2">{cat}</Typography>
+                                        </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -324,8 +333,18 @@ export default function RubrosIndex({
                                 }}
                             >
                                 <MenuItem value="all">Todos los estados</MenuItem>
-                                <MenuItem value="true">Activos</MenuItem>
-                                <MenuItem value="false">Inactivos</MenuItem>
+                                <MenuItem value="true">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CheckCircleIcon sx={{ fontSize: '1rem', color: 'success.main' }} />
+                                        <Typography variant="body2">Activos</Typography>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="false">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <BlockIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">Inactivos</Typography>
+                                    </Box>
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     </Box>

@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, Link } from '@inertiajs/react';
+import { Head, useForm, usePage, Link, router } from '@inertiajs/react';
 import { dashboard } from '@/routes';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
@@ -6,14 +6,17 @@ import { isMinLength, isValidHexColor } from '@/lib/validation';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BusinessIcon from '@mui/icons-material/Business';
+import CategoryIcon from '@mui/icons-material/Category';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DomainIcon from '@mui/icons-material/Domain';
+import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ImageIcon from '@mui/icons-material/Image';
+import LabelIcon from '@mui/icons-material/Label';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
@@ -32,6 +35,10 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import GoogleDriveIcon from '@/components/google-drive-icon';
 import { getDriveDirectImageUrl, isGoogleDriveUrl } from '@/lib/utils';
+import { CarreraDialog } from '@/components/admin/carrera-dialog';
+import { EspecialidadDialog } from '@/components/admin/especialidad-dialog';
+import { DiplomadoDialog } from '@/components/admin/diplomado-dialog';
+import { CursoDialog } from '@/components/admin/curso-dialog';
 import {
     Accordion,
     AccordionDetails,
@@ -72,10 +79,19 @@ import {
     Typography,
 } from '@mui/material';
 import { useState, useMemo } from 'react';
-import type { Carrera, Comercio, Curso, Diplomado, Grupo, Rubro } from '@/types';
+import type { Carrera, Comercio, Curso, Diplomado, Especialidad, Grupo, Rubro } from '@/types';
 
 interface EditComercioPageProps {
-    comercio: Comercio & { carreras?: Carrera[]; cursos?: Curso[]; diplomados?: Diplomado[] };
+    comercio: Comercio & {
+        carreras?: (Carrera & {
+            diplomados?: Diplomado[];
+            cursos?: Curso[];
+            especialidades?: (Especialidad & { rubro?: Rubro })[];
+        })[];
+        cursos?: Curso[];
+        diplomados?: Diplomado[];
+        especialidades?: (Especialidad & { carrera?: Carrera; rubro?: Rubro })[];
+    };
     grupos: Grupo[];
     rubros?: Rubro[];
 }
@@ -98,8 +114,43 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
     
     const { notify } = useNotification();
 
-    // Tabs state
-    const [currentTab, setCurrentTab] = useState(0);
+    // Tabs state - initialize from URL ?tab=3 or ?tab=oferta
+    const [currentTab, setCurrentTab] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            if (tab === '3' || tab === 'oferta') return 3;
+            if (tab === '1' || tab === 'medios') return 1;
+            if (tab === '2' || tab === 'acreditacion') return 2;
+            if (tab === '0' || tab === 'datos') return 0;
+        }
+        return 0;
+    });
+
+    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+        setCurrentTab(newValue);
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', String(newValue));
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
+
+    // Dialog states for in-situ CRUD
+    const [carreraDialogOpen, setCarreraDialogOpen] = useState(false);
+    const [selectedCarrera, setSelectedCarrera] = useState<Carrera | null>(null);
+
+    const [especialidadDialogOpen, setEspecialidadDialogOpen] = useState(false);
+    const [selectedEspecialidad, setSelectedEspecialidad] = useState<Especialidad | null>(null);
+    const [defaultCarreraIdForEspecialidad, setDefaultCarreraIdForEspecialidad] = useState<number | null>(null);
+
+    const [diplomadoDialogOpen, setDiplomadoDialogOpen] = useState(false);
+    const [selectedDiplomado, setSelectedDiplomado] = useState<Diplomado | null>(null);
+    const [defaultCarreraIdForDiplomado, setDefaultCarreraIdForDiplomado] = useState<number | null>(null);
+
+    const [cursoDialogOpen, setCursoDialogOpen] = useState(false);
+    const [selectedCurso, setSelectedCurso] = useState<Curso | null>(null);
+    const [defaultCarreraIdForCurso, setDefaultCarreraIdForCurso] = useState<number | null>(null);
 
     // YouTube & Photo addition states
     const [nuevoYoutube, setNuevoYoutube] = useState('');
@@ -199,7 +250,124 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
     const totalCarreras = comercio.carreras?.length || 0;
     const totalDiplomados = comercio.diplomados?.length || 0;
     const totalCursos = comercio.cursos?.length || 0;
-    const totalOferta = totalCarreras + totalDiplomados + totalCursos;
+    const totalEspecialidades =
+        comercio.especialidades?.length ||
+        (comercio.carreras?.reduce((acc, c) => acc + (c.especialidades?.length || 0), 0) || 0);
+    const totalOferta = totalCarreras + totalDiplomados + totalCursos + totalEspecialidades;
+
+    // In-situ CRUD handlers
+    const handleOpenCreateCarrera = () => {
+        setSelectedCarrera(null);
+        setCarreraDialogOpen(true);
+    };
+
+    const handleOpenEditCarrera = (c: Carrera) => {
+        setSelectedCarrera(c);
+        setCarreraDialogOpen(true);
+    };
+
+    const handleDeleteCarrera = async (carrera: Carrera) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar carrera "${carrera.nombre}"?`,
+            text: 'Esta acción no se puede deshacer y podría afectar a los diplomados, cursos y especialidades asociados.',
+            confirmButtonText: 'Sí, eliminar carrera',
+        });
+        if (confirmed) {
+            router.delete(`/admin/carreras/${carrera.id}`, {
+                preserveScroll: true,
+                onSuccess: () => notify.success('Carrera eliminada exitosamente.'),
+                onError: () => notify.error('No se pudo eliminar la carrera.'),
+            });
+        }
+    };
+
+    const handleOpenCreateEspecialidad = (carreraId?: number) => {
+        const availableCarreras = comercio.carreras || [];
+        if (availableCarreras.length === 0) {
+            notify.warning('Para registrar una especialidad, primero debes registrar al menos una Carrera Profesional a la cual pertenecerá.');
+            setSelectedCarrera(null);
+            setCarreraDialogOpen(true);
+            return;
+        }
+        setSelectedEspecialidad(null);
+        setDefaultCarreraIdForEspecialidad(carreraId || availableCarreras[0]?.id || null);
+        setEspecialidadDialogOpen(true);
+    };
+
+    const handleOpenEditEspecialidad = (esp: Especialidad) => {
+        setSelectedEspecialidad(esp);
+        setDefaultCarreraIdForEspecialidad(esp.carrera_id || null);
+        setEspecialidadDialogOpen(true);
+    };
+
+    const handleDeleteEspecialidad = async (especialidad: Especialidad) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar la especialidad "${especialidad.nombre}"?`,
+            text: 'Esta acción no se puede deshacer.',
+            confirmButtonText: 'Sí, eliminar',
+        });
+        if (confirmed) {
+            router.delete(`/admin/especialidades/${especialidad.id}`, {
+                preserveScroll: true,
+                onSuccess: () => notify.success('Especialidad eliminada exitosamente.'),
+                onError: () => notify.error('No se pudo eliminar la especialidad.'),
+            });
+        }
+    };
+
+    const handleOpenCreateDiplomado = (carreraId?: number) => {
+        setSelectedDiplomado(null);
+        setDefaultCarreraIdForDiplomado(carreraId || null);
+        setDiplomadoDialogOpen(true);
+    };
+
+    const handleOpenEditDiplomado = (dip: Diplomado) => {
+        setSelectedDiplomado(dip);
+        setDefaultCarreraIdForDiplomado(dip.carrera_id || null);
+        setDiplomadoDialogOpen(true);
+    };
+
+    const handleDeleteDiplomado = async (diplomado: Diplomado) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar el diplomado "${diplomado.nombre}"?`,
+            text: 'Esta acción no se puede deshacer.',
+            confirmButtonText: 'Sí, eliminar',
+        });
+        if (confirmed) {
+            router.delete(`/admin/diplomados/${diplomado.id}`, {
+                preserveScroll: true,
+                onSuccess: () => notify.success('Diplomado eliminado exitosamente.'),
+                onError: () => notify.error('No se pudo eliminar el diplomado.'),
+            });
+        }
+    };
+
+    const handleOpenCreateCurso = (carreraId?: number) => {
+        setSelectedCurso(null);
+        setDefaultCarreraIdForCurso(carreraId || null);
+        setCursoDialogOpen(true);
+    };
+
+    const handleOpenEditCurso = (cur: Curso) => {
+        setSelectedCurso(cur);
+        setDefaultCarreraIdForCurso(cur.carrera_id || null);
+        setCursoDialogOpen(true);
+    };
+
+    const handleDeleteCurso = async (curso: Curso) => {
+        const confirmed = await confirmDeleteAlert({
+            title: `¿Eliminar el curso "${curso.nombre}"?`,
+            text: 'Esta acción no se puede deshacer.',
+            confirmButtonText: 'Sí, eliminar',
+        });
+        if (confirmed) {
+            router.delete(`/admin/cursos/${curso.id}`, {
+                preserveScroll: true,
+                onSuccess: () => notify.success('Curso eliminado exitosamente.'),
+                onError: () => notify.error('No se pudo eliminar el curso.'),
+            });
+        }
+    };
 
     // Filtered lists
     const filteredCarreras = useMemo(() => {
@@ -540,7 +708,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                 >
                     <Tabs
                         value={currentTab}
-                        onChange={(_, newValue) => setCurrentTab(newValue)}
+                        onChange={handleTabChange}
                         variant="scrollable"
                         scrollButtons="auto"
                         sx={{
@@ -1569,30 +1737,125 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                         {/* ========================================================================= */}
                         {currentTab === 3 && (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5, width: '100%', boxSizing: 'border-box' }}>
-                                {/* 1. CARRERAS PROFESIONALES ACADÉMICAS */}
-                                {isAcademic && (
-                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
-                                        <CardHeader
-                                            avatar={<SchoolIcon color="primary" />}
-                                            title="1. Carreras Profesionales Registradas"
-                                            subheader={`Planes de estudio oficiales registrados para ${comercio.nombre}, junto con sus diplomados y cursos.`}
-                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                {/* PANEL SUPERIOR DE ACCIONES RÁPIDAS DE OFERTA FORMATIVA */}
+                                <Paper
+                                    variant="outlined"
+                                    sx={{
+                                        p: { xs: 2, sm: 2.5 },
+                                        borderRadius: 2.5,
+                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(12, 67, 163, 0.12)' : '#f0f7ff',
+                                        borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(12, 67, 163, 0.3)' : '#bfdbfe',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
+                                        gap: 2,
+                                    }}
+                                >
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <SchoolIcon color="primary" />
+                                            Oferta Formativa de {comercio.nombre}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Gestiona carreras profesionales, especialidades por rubro, diplomados y cursos para esta institución.
+                                        </Typography>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<AddIcon />}
+                                            onClick={handleOpenCreateCarrera}
+                                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                        >
+                                            + Nueva Carrera
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            color="secondary"
+                                            startIcon={<CategoryIcon />}
+                                            onClick={() => handleOpenCreateEspecialidad()}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                borderRadius: 2,
+                                                color: '#7c3aed',
+                                                borderColor: '#7c3aed80',
+                                                '&:hover': { borderColor: '#7c3aed', bgcolor: '#7c3aed0a' },
+                                            }}
+                                        >
+                                            + Nueva Especialidad
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            startIcon={<WorkspacePremiumIcon />}
+                                            onClick={() => handleOpenCreateDiplomado()}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                borderRadius: 2,
+                                                color: '#1e40af',
+                                                borderColor: '#1e40af80',
+                                                '&:hover': { borderColor: '#1e40af', bgcolor: '#1e40af0a' },
+                                            }}
+                                        >
+                                            + Nuevo Diplomado
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            startIcon={<MenuBookIcon />}
+                                            onClick={() => handleOpenCreateCurso()}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                borderRadius: 2,
+                                                color: '#059669',
+                                                borderColor: '#05966980',
+                                                '&:hover': { borderColor: '#059669', bgcolor: '#0596690a' },
+                                            }}
+                                        >
+                                            + Nuevo Curso
+                                        </Button>
+                                    </Box>
+                                </Paper>
+
+                                {/* 1. CARRERAS PROFESIONALES Y ESPECIALIDADES */}
+                                <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                    <CardHeader
+                                        avatar={<SchoolIcon color="primary" />}
+                                        title="1. Carreras Profesionales y Especialidades"
+                                        subheader={`Planes de estudio y carreras técnicas de ${comercio.nombre}. Cada carrera incluye sus especialidades y diplomados.`}
+                                        titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             action={
-                                                <Link
-                                                    href={`/admin/carreras?comercio_id=${comercio.id}`}
-                                                    style={{ textDecoration: 'none' }}
-                                                >
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
                                                     <Button
                                                         size="small"
-                                                        variant="outlined"
+                                                        variant="contained"
                                                         color="primary"
-                                                        startIcon={<SchoolIcon />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        startIcon={<AddIcon />}
+                                                        onClick={handleOpenCreateCarrera}
                                                         sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
                                                     >
-                                                        Administrar Carreras
+                                                        Nueva Carrera
                                                     </Button>
-                                                </Link>
+                                                    <Link
+                                                        href={`/admin/carreras?comercio_id=${comercio.id}`}
+                                                        style={{ textDecoration: 'none' }}
+                                                    >
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="inherit"
+                                                            startIcon={<SchoolIcon />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                                                        >
+                                                            Administrar Carreras
+                                                        </Button>
+                                                    </Link>
+                                                </Box>
                                             }
                                         />
                                         <Divider />
@@ -1656,8 +1919,8 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                         )}
                                                                     </Box>
 
-                                                                    {/* Badges de documentos de carrera */}
-                                                                    <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                                                                    {/* Badges de documentos y acciones de carrera */}
+                                                                    <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center', flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
                                                                         {carrera.url_malla_curricular && (
                                                                             <Button
                                                                                 href={carrera.url_malla_curricular}
@@ -1691,23 +1954,56 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                 Certificado
                                                                             </Button>
                                                                         )}
+                                                                        <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20 }} />
+                                                                        <Tooltip title="Editar carrera" arrow>
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                color="primary"
+                                                                                onClick={() => handleOpenEditCarrera(carrera)}
+                                                                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 0.5 }}
+                                                                            >
+                                                                                <EditIcon sx={{ fontSize: 16 }} />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Eliminar carrera" arrow>
+                                                                            <IconButton
+                                                                                size="small"
+                                                                                color="error"
+                                                                                onClick={() => handleDeleteCarrera(carrera)}
+                                                                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 0.5 }}
+                                                                            >
+                                                                                <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                            </IconButton>
+                                                                        </Tooltip>
                                                                     </Box>
                                                                 </Box>
                                                             </AccordionSummary>
 
                                                             <AccordionDetails sx={{ p: 2.5, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#152844' : '#ffffff' }}>
                                                                 {/* Diplomados de la Carrera */}
-                                                                <Box sx={{ mb: 2.5 }}>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                <Box sx={{ mb: 3 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem' }}>
                                                                             <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
                                                                             DIPLOMADOS DE LA CARRERA ({carrera.diplomados?.length || 0})
                                                                         </Typography>
-                                                                        <Link href={`/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
-                                                                            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
-                                                                                + Administrar Diplomados
-                                                                            </Typography>
-                                                                        </Link>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Button
+                                                                                size="small"
+                                                                                variant="outlined"
+                                                                                color="primary"
+                                                                                startIcon={<AddIcon sx={{ fontSize: 15 }} />}
+                                                                                onClick={() => handleOpenCreateDiplomado(carrera.id)}
+                                                                                sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.72rem', py: 0.2, px: 1, borderRadius: 1.5 }}
+                                                                            >
+                                                                                Nuevo Diplomado
+                                                                            </Button>
+                                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: 'primary.main', textDecoration: 'underline' } }}>
+                                                                                    Ver todos
+                                                                                </Typography>
+                                                                            </Link>
+                                                                        </Box>
                                                                     </Box>
 
                                                                     {carrera.diplomados && carrera.diplomados.length > 0 ? (
@@ -1716,47 +2012,70 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                 <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                                                     <TableRow>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Flyer</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Brochure</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>YouTube</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85 }}>Precio</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Drive</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85, textAlign: 'center' }}>Precio</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Drive</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 80, textAlign: 'center' }}>Acciones</TableCell>
                                                                                     </TableRow>
                                                                                 </TableHead>
                                                                                 <TableBody>
                                                                                     {carrera.diplomados.map((dip) => (
                                                                                         <TableRow key={dip.id} hover>
                                                                                             <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{dip.nombre}</TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.flyer ? (
-                                                                                                    <IconButton href={dip.flyer} target="_blank" size="small" color="primary">
-                                                                                                        <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver flyer" arrow>
+                                                                                                        <IconButton href={dip.flyer} target="_blank" size="small">
+                                                                                                            <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.brochure ? (
-                                                                                                    <IconButton href={dip.brochure} target="_blank" size="small" color="primary">
-                                                                                                        <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver brochure" arrow>
+                                                                                                        <IconButton href={dip.brochure} target="_blank" size="small">
+                                                                                                            <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.youtube ? (
-                                                                                                    <IconButton href={dip.youtube} target="_blank" size="small">
-                                                                                                        <YouTubeIcon fontSize="small" color="error" />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver video" arrow>
+                                                                                                        <IconButton href={dip.youtube} target="_blank" size="small">
+                                                                                                            <YouTubeIcon fontSize="small" color="error" />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.precio ? <Chip label={dip.precio} size="small" variant="outlined" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /> : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.actualizado_drive ? (
-                                                                                                    <IconButton href={dip.actualizado_drive} target="_blank" size="small">
-                                                                                                        <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver en Drive" arrow>
+                                                                                                        <IconButton href={dip.actualizado_drive} target="_blank" size="small">
+                                                                                                            <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                                                                    <Tooltip title="Editar diplomado" arrow>
+                                                                                                        <IconButton size="small" color="primary" onClick={() => handleOpenEditDiplomado(dip)}>
+                                                                                                            <EditIcon sx={{ fontSize: 16 }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
+                                                                                                    <Tooltip title="Eliminar diplomado" arrow>
+                                                                                                        <IconButton size="small" color="error" onClick={() => handleDeleteDiplomado(dip)}>
+                                                                                                            <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
+                                                                                                </Box>
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     ))}
@@ -1764,24 +2083,182 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                             </Table>
                                                                         </TableContainer>
                                                                     ) : (
-                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', py: 0.5 }}>
                                                                             Sin diplomados asociados.
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+
+                                                                {/* Especialidades de la Carrera */}
+                                                                <Box sx={{ mb: 3 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#7c3aed', display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem' }}>
+                                                                            <CategoryIcon sx={{ fontSize: 16 }} />
+                                                                            ESPECIALIDADES DE LA CARRERA ({carrera.especialidades?.length || 0})
+                                                                        </Typography>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Button
+                                                                                size="small"
+                                                                                variant="outlined"
+                                                                                color="secondary"
+                                                                                startIcon={<AddIcon sx={{ fontSize: 15 }} />}
+                                                                                onClick={() => handleOpenCreateEspecialidad(carrera.id)}
+                                                                                sx={{
+                                                                                    textTransform: 'none',
+                                                                                    fontWeight: 700,
+                                                                                    fontSize: '0.72rem',
+                                                                                    py: 0.2,
+                                                                                    px: 1,
+                                                                                    borderRadius: 1.5,
+                                                                                    color: '#7c3aed',
+                                                                                    borderColor: '#7c3aed80',
+                                                                                    '&:hover': { borderColor: '#7c3aed', bgcolor: '#7c3aed0a' }
+                                                                                }}
+                                                                            >
+                                                                                Nueva Especialidad
+                                                                            </Button>
+                                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: '#7c3aed', textDecoration: 'underline' } }}>
+                                                                                    Ver todas
+                                                                                </Typography>
+                                                                            </Link>
+                                                                        </Box>
+                                                                    </Box>
+
+                                                                    {carrera.especialidades && carrera.especialidades.length > 0 ? (
+                                                                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1.5 }}>
+                                                                            <Table size="small">
+                                                                                <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
+                                                                                    <TableRow>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre de la Especialidad</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', minWidth: 140 }}>Rubro Asignado</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85, textAlign: 'center' }}>Precio</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Drive</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 80, textAlign: 'center' }}>Acciones</TableCell>
+                                                                                    </TableRow>
+                                                                                </TableHead>
+                                                                                <TableBody>
+                                                                                    {carrera.especialidades.map((esp) => {
+                                                                                        const rubroColor = esp.rubro?.color_hex || '#7c3aed';
+                                                                                        return (
+                                                                                            <TableRow key={esp.id} hover>
+                                                                                                <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>
+                                                                                                    {esp.nombre}
+                                                                                                </TableCell>
+                                                                                                <TableCell>
+                                                                                                    {esp.rubro ? (
+                                                                                                        <Chip
+                                                                                                            icon={<LabelIcon sx={{ fontSize: '13px !important', color: `${rubroColor} !important` }} />}
+                                                                                                            label={esp.rubro.nombre}
+                                                                                                            size="small"
+                                                                                                            sx={{
+                                                                                                                bgcolor: `${rubroColor}14`,
+                                                                                                                color: rubroColor,
+                                                                                                                border: `1px solid ${rubroColor}40`,
+                                                                                                                fontWeight: 700,
+                                                                                                                fontSize: '0.72rem',
+                                                                                                                height: 22,
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    ) : (
+                                                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                                                                            Sin rubro
+                                                                                                        </Typography>
+                                                                                                    )}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.flyer ? (
+                                                                                                        <Tooltip title="Ver flyer" arrow>
+                                                                                                            <IconButton href={esp.flyer} target="_blank" size="small">
+                                                                                                                <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                    ) : '-'}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.brochure ? (
+                                                                                                        <Tooltip title="Ver brochure" arrow>
+                                                                                                            <IconButton href={esp.brochure} target="_blank" size="small">
+                                                                                                                <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                    ) : '-'}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.youtube ? (
+                                                                                                        <Tooltip title="Ver video" arrow>
+                                                                                                            <IconButton href={esp.youtube} target="_blank" size="small">
+                                                                                                                <YouTubeIcon fontSize="small" color="error" />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                    ) : '-'}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.precio ? <Chip label={esp.precio} size="small" variant="outlined" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /> : '-'}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.actualizado_drive ? (
+                                                                                                        <Tooltip title="Ver en Drive" arrow>
+                                                                                                            <IconButton href={esp.actualizado_drive} target="_blank" size="small">
+                                                                                                                <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                    ) : '-'}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                                                                        <Tooltip title="Editar especialidad" arrow>
+                                                                                                            <IconButton size="small" color="primary" onClick={() => handleOpenEditEspecialidad(esp)}>
+                                                                                                                <EditIcon sx={{ fontSize: 16 }} />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                        <Tooltip title="Eliminar especialidad" arrow>
+                                                                                                            <IconButton size="small" color="error" onClick={() => handleDeleteEspecialidad(esp)}>
+                                                                                                                <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                                                            </IconButton>
+                                                                                                        </Tooltip>
+                                                                                                    </Box>
+                                                                                                </TableCell>
+                                                                                            </TableRow>
+                                                                                        );
+                                                                                    })}
+                                                                                </TableBody>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    ) : (
+                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', py: 0.5 }}>
+                                                                            Sin especialidades asociadas a esta carrera.
                                                                         </Typography>
                                                                     )}
                                                                 </Box>
 
                                                                 {/* Cursos de la Carrera */}
                                                                 <Box>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                                                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem' }}>
                                                                             <MenuBookIcon sx={{ fontSize: 16 }} />
                                                                             CURSOS DE LA CARRERA ({carrera.cursos?.length || 0})
                                                                         </Typography>
-                                                                        <Link href={`/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
-                                                                            <Typography variant="caption" sx={{ color: '#0f766e', fontWeight: 700, '&:hover': { textDecoration: 'underline' } }}>
-                                                                                + Administrar Cursos
-                                                                            </Typography>
-                                                                        </Link>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Button
+                                                                                size="small"
+                                                                                variant="outlined"
+                                                                                color="secondary"
+                                                                                startIcon={<AddIcon sx={{ fontSize: 15 }} />}
+                                                                                onClick={() => handleOpenCreateCurso(carrera.id)}
+                                                                                sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.72rem', py: 0.2, px: 1, borderRadius: 1.5 }}
+                                                                            >
+                                                                                Nuevo Curso
+                                                                            </Button>
+                                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: '#0f766e', textDecoration: 'underline' } }}>
+                                                                                    Ver todos
+                                                                                </Typography>
+                                                                            </Link>
+                                                                        </Box>
                                                                     </Box>
 
                                                                     {carrera.cursos && carrera.cursos.length > 0 ? (
@@ -1790,47 +2267,70 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                 <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                                                     <TableRow>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Flyer</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Brochure</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>YouTube</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85 }}>Precio</TableCell>
-                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 90 }}>Drive</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 85, textAlign: 'center' }}>Precio</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Drive</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 80, textAlign: 'center' }}>Acciones</TableCell>
                                                                                     </TableRow>
                                                                                 </TableHead>
                                                                                 <TableBody>
                                                                                     {carrera.cursos.map((cur) => (
                                                                                         <TableRow key={cur.id} hover>
                                                                                             <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{cur.nombre}</TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.flyer ? (
-                                                                                                    <IconButton href={cur.flyer} target="_blank" size="small">
-                                                                                                        <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver flyer" arrow>
+                                                                                                        <IconButton href={cur.flyer} target="_blank" size="small">
+                                                                                                            <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.brochure ? (
-                                                                                                    <IconButton href={cur.brochure} target="_blank" size="small">
-                                                                                                        <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver brochure" arrow>
+                                                                                                        <IconButton href={cur.brochure} target="_blank" size="small">
+                                                                                                            <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.youtube ? (
-                                                                                                    <IconButton href={cur.youtube} target="_blank" size="small">
-                                                                                                        <YouTubeIcon fontSize="small" color="error" />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver video" arrow>
+                                                                                                        <IconButton href={cur.youtube} target="_blank" size="small">
+                                                                                                            <YouTubeIcon fontSize="small" color="error" />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.precio ? <Chip label={cur.precio} size="small" variant="outlined" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /> : '-'}
                                                                                             </TableCell>
-                                                                                            <TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.actualizado_drive ? (
-                                                                                                    <IconButton href={cur.actualizado_drive} target="_blank" size="small">
-                                                                                                        <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
-                                                                                                    </IconButton>
+                                                                                                    <Tooltip title="Ver en Drive" arrow>
+                                                                                                        <IconButton href={cur.actualizado_drive} target="_blank" size="small">
+                                                                                                            <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
                                                                                                 ) : '-'}
+                                                                                            </TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                                                                    <Tooltip title="Editar curso" arrow>
+                                                                                                        <IconButton size="small" color="primary" onClick={() => handleOpenEditCurso(cur)}>
+                                                                                                            <EditIcon sx={{ fontSize: 16 }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
+                                                                                                    <Tooltip title="Eliminar curso" arrow>
+                                                                                                        <IconButton size="small" color="error" onClick={() => handleDeleteCurso(cur)}>
+                                                                                                            <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                                                        </IconButton>
+                                                                                                    </Tooltip>
+                                                                                                </Box>
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     ))}
@@ -1838,7 +2338,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                             </Table>
                                                                         </TableContainer>
                                                                     ) : (
-                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', py: 0.5 }}>
                                                                             Sin cursos asociados.
                                                                         </Typography>
                                                                     )}
@@ -1848,41 +2348,65 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                     ))}
                                                 </Box>
                                             ) : (
-                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
-                                                    <SchoolIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        {searchCarrera ? 'No se encontraron carreras con ese criterio de búsqueda.' : 'No hay carreras registradas para este comercio.'}
+                                                <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <SchoolIcon sx={{ fontSize: 44, color: 'primary.main', mb: 1, opacity: 0.8 }} />
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
+                                                        {searchCarrera ? 'No se encontraron carreras con ese criterio de búsqueda' : `No hay carreras registradas para ${comercio.nombre}`}
                                                     </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 480, mx: 'auto', mb: 2 }}>
+                                                        {searchCarrera ? 'Prueba con otro término de búsqueda.' : 'Registra la primera carrera profesional o técnica. Una vez creada la carrera, podrás añadir sus especialidades por rubro y diplomados correspondientes.'}
+                                                    </Typography>
+                                                    {!searchCarrera && (
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            startIcon={<AddIcon />}
+                                                            onClick={handleOpenCreateCarrera}
+                                                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, px: 2.5 }}
+                                                        >
+                                                            Registrar Primera Carrera
+                                                        </Button>
+                                                    )}
                                                 </Paper>
                                             )}
                                         </CardContent>
                                     </Card>
-                                )}
 
-                                {/* 2. DIPLOMADOS INDEPENDIENTES / POR RUBRO */}
-                                {showStandaloneDiplomados && (
-                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
-                                        <CardHeader
-                                            avatar={<WorkspacePremiumIcon color="primary" />}
-                                            title={isDiplomadoLibre ? "2. Diplomados Registrados (Libres / Sin Categoría)" : "2. Diplomados y Especializaciones por Rubro"}
-                                            subheader={`Oferta de diplomados registrados para ${comercio.nombre}`}
-                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                {/* 2. DIPLOMADOS Y ESPECIALIZACIONES */}
+                                <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                    <CardHeader
+                                        avatar={<WorkspacePremiumIcon color="primary" />}
+                                        title="2. Diplomados y Especializaciones"
+                                        subheader={`Oferta de diplomados y especializaciones de ${comercio.nombre}`}
+                                        titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             action={
-                                                <Link
-                                                    href={`/admin/diplomados?comercio_id=${comercio.id}`}
-                                                    style={{ textDecoration: 'none' }}
-                                                >
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
                                                     <Button
                                                         size="small"
-                                                        variant="outlined"
+                                                        variant="contained"
                                                         color="primary"
-                                                        startIcon={<WorkspacePremiumIcon />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        startIcon={<AddIcon />}
+                                                        onClick={() => handleOpenCreateDiplomado()}
                                                         sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
                                                     >
-                                                        Administrar Diplomados
+                                                        Nuevo Diplomado
                                                     </Button>
-                                                </Link>
+                                                    <Link
+                                                        href={`/admin/diplomados?comercio_id=${comercio.id}`}
+                                                        style={{ textDecoration: 'none' }}
+                                                    >
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="inherit"
+                                                            startIcon={<WorkspacePremiumIcon />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                                                        >
+                                                            Administrar Diplomados
+                                                        </Button>
+                                                    </Link>
+                                                </Box>
                                             }
                                         />
                                         <Divider />
@@ -1951,11 +2475,12 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 130 }}>Rubro / Tipo</TableCell>
                                                                 )}
                                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 220 }}>Nombre del Diplomado</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Flyer</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Brochure</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>YouTube</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Precio</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Drive</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 85, textAlign: 'center' }}>Precio</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Drive</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 80, textAlign: 'center' }}>Acciones</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -1965,36 +2490,58 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                         <TableCell>{getDiplomadoChip(dip.tipo)}</TableCell>
                                                                     )}
                                                                     <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{dip.nombre}</TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                                         {dip.flyer ? (
-                                                                            <IconButton href={dip.flyer} target="_blank" size="small">
-                                                                                <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
-                                                                            </IconButton>
+                                                                            <Tooltip title="Ver flyer" arrow>
+                                                                                <IconButton href={dip.flyer} target="_blank" size="small">
+                                                                                    <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
                                                                         ) : '-'}
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                                         {dip.brochure ? (
-                                                                            <IconButton href={dip.brochure} target="_blank" size="small">
-                                                                                <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
-                                                                            </IconButton>
+                                                                            <Tooltip title="Ver brochure" arrow>
+                                                                                <IconButton href={dip.brochure} target="_blank" size="small">
+                                                                                    <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
                                                                         ) : '-'}
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                                         {dip.youtube ? (
-                                                                            <IconButton href={dip.youtube} target="_blank" size="small">
-                                                                                <YouTubeIcon fontSize="small" color="error" />
-                                                                            </IconButton>
+                                                                            <Tooltip title="Ver video" arrow>
+                                                                                <IconButton href={dip.youtube} target="_blank" size="small">
+                                                                                    <YouTubeIcon fontSize="small" color="error" />
+                                                                                </IconButton>
+                                                                            </Tooltip>
                                                                         ) : '-'}
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                                         {dip.precio ? <Chip label={dip.precio} size="small" variant="outlined" color="primary" sx={{ height: 22, fontWeight: 700 }} /> : '-'}
                                                                     </TableCell>
-                                                                    <TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                                         {dip.actualizado_drive ? (
-                                                                            <IconButton href={dip.actualizado_drive} target="_blank" size="small">
-                                                                                <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
-                                                                            </IconButton>
+                                                                            <Tooltip title="Ver en Drive" arrow>
+                                                                                <IconButton href={dip.actualizado_drive} target="_blank" size="small">
+                                                                                    <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
                                                                         ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                                            <Tooltip title="Editar diplomado" arrow>
+                                                                                <IconButton size="small" color="primary" onClick={() => handleOpenEditDiplomado(dip)}>
+                                                                                    <EditIcon sx={{ fontSize: 16 }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                            <Tooltip title="Eliminar diplomado" arrow>
+                                                                                <IconButton size="small" color="error" onClick={() => handleDeleteDiplomado(dip)}>
+                                                                                    <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                        </Box>
                                                                     </TableCell>
                                                                 </TableRow>
                                                             ))}
@@ -2002,41 +2549,64 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                     </Table>
                                                 </TableContainer>
                                             ) : (
-                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
-                                                    <WorkspacePremiumIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        No se encontraron diplomados registrados.
+                                                <Paper variant="outlined" sx={{ p: 3.5, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <WorkspacePremiumIcon sx={{ fontSize: 40, color: '#1e40af', mb: 1, opacity: 0.8 }} />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+                                                        {searchDiplomado || filterDiplomadoTipo !== 'all' ? 'No se encontraron diplomados con los filtros aplicados' : `No hay diplomados registrados para ${comercio.nombre}`}
                                                     </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 460, mx: 'auto', mb: 2 }}>
+                                                        {searchDiplomado || filterDiplomadoTipo !== 'all' ? 'Intenta restablecer los filtros de búsqueda.' : 'Crea diplomados de actualización profesional o especializaciones directas para este comercio.'}
+                                                    </Typography>
+                                                    {!searchDiplomado && filterDiplomadoTipo === 'all' && (
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            startIcon={<AddIcon />}
+                                                            onClick={() => handleOpenCreateDiplomado()}
+                                                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                                        >
+                                                            Registrar Diplomado
+                                                        </Button>
+                                                    )}
                                                 </Paper>
                                             )}
                                         </CardContent>
                                     </Card>
-                                )}
 
-                                {/* 3. CURSOS INDEPENDIENTES */}
-                                {showStandaloneCursos && (
-                                    <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
-                                        <CardHeader
-                                            avatar={<MenuBookIcon color="primary" />}
-                                            title="3. Cursos y Talleres Registrados"
-                                            subheader={`Oferta de cursos independientes para ${comercio.nombre}`}
-                                            titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+                                {/* 3. CURSOS Y TALLERES */}
+                                <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                    <CardHeader
+                                        avatar={<MenuBookIcon color="primary" />}
+                                        title="3. Cursos y Talleres Registrados"
+                                        subheader={`Oferta de cursos independientes y talleres para ${comercio.nombre}`}
                                             action={
-                                                <Link
-                                                    href={`/admin/cursos?comercio_id=${comercio.id}`}
-                                                    style={{ textDecoration: 'none' }}
-                                                >
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
                                                     <Button
                                                         size="small"
-                                                        variant="outlined"
+                                                        variant="contained"
                                                         color="primary"
-                                                        startIcon={<MenuBookIcon />}
-                                                        endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                        startIcon={<AddIcon />}
+                                                        onClick={() => handleOpenCreateCurso()}
                                                         sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
                                                     >
-                                                        Administrar Cursos
+                                                        Nuevo Curso
                                                     </Button>
-                                                </Link>
+                                                    <Link
+                                                        href={`/admin/cursos?comercio_id=${comercio.id}`}
+                                                        style={{ textDecoration: 'none' }}
+                                                    >
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="inherit"
+                                                            startIcon={<MenuBookIcon />}
+                                                            endIcon={<LaunchIcon sx={{ fontSize: '11px !important' }} />}
+                                                            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                                                        >
+                                                            Administrar Cursos
+                                                        </Button>
+                                                    </Link>
+                                                </Box>
                                             }
                                         />
                                         <Divider />
@@ -2111,11 +2681,12 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 130 }}>Rubro / Tipo</TableCell>
                                                                 )}
                                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', minWidth: 220 }}>Nombre del Curso</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Flyer</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Brochure</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>YouTube</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Precio</TableCell>
-                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 90 }}>Drive</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 85, textAlign: 'center' }}>Precio</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 70, textAlign: 'center' }}>Drive</TableCell>
+                                                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', width: 80, textAlign: 'center' }}>Acciones</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -2127,66 +2698,88 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                         </TableCell>
                                                                     )}
                                                                     <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem' }}>{curso.nombre}</TableCell>
-                                                                        <TableCell>
-                                                                            {curso.flyer ? (
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        {curso.flyer ? (
+                                                                            <Tooltip title="Ver flyer" arrow>
                                                                                 <IconButton href={curso.flyer} target="_blank" size="small">
                                                                                     <ImageIcon fontSize="small" sx={{ color: '#ea580c' }} />
                                                                                 </IconButton>
-                                                                            ) : '-'}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {curso.brochure ? (
+                                                                            </Tooltip>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        {curso.brochure ? (
+                                                                            <Tooltip title="Ver brochure" arrow>
                                                                                 <IconButton href={curso.brochure} target="_blank" size="small">
                                                                                     <DescriptionIcon fontSize="small" sx={{ color: '#2563eb' }} />
                                                                                 </IconButton>
-                                                                            ) : '-'}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {curso.youtube ? (
+                                                                            </Tooltip>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        {curso.youtube ? (
+                                                                            <Tooltip title="Ver video" arrow>
                                                                                 <IconButton href={curso.youtube} target="_blank" size="small">
                                                                                     <YouTubeIcon fontSize="small" color="error" />
                                                                                 </IconButton>
-                                                                            ) : '-'}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {curso.precio ? <Chip label={curso.precio} size="small" variant="outlined" color="primary" sx={{ height: 22, fontWeight: 700 }} /> : '-'}
-                                                                        </TableCell>
-                                                                        <TableCell>
-                                                                            {curso.actualizado_drive ? (
+                                                                            </Tooltip>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        {curso.precio ? <Chip label={curso.precio} size="small" variant="outlined" color="primary" sx={{ height: 22, fontWeight: 700 }} /> : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        {curso.actualizado_drive ? (
+                                                                            <Tooltip title="Ver en Drive" arrow>
                                                                                 <IconButton href={curso.actualizado_drive} target="_blank" size="small">
                                                                                     <CloudDoneIcon fontSize="small" sx={{ color: '#059669' }} />
                                                                                 </IconButton>
-                                                                            ) : '-'}
-                                                                        </TableCell>
-                                                                    </TableRow>
+                                                                            </Tooltip>
+                                                                        ) : '-'}
+                                                                    </TableCell>
+                                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                                            <Tooltip title="Editar curso" arrow>
+                                                                                <IconButton size="small" color="primary" onClick={() => handleOpenEditCurso(curso)}>
+                                                                                    <EditIcon sx={{ fontSize: 16 }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                            <Tooltip title="Eliminar curso" arrow>
+                                                                                <IconButton size="small" color="error" onClick={() => handleDeleteCurso(curso)}>
+                                                                                    <DeleteIcon sx={{ fontSize: 16 }} />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                        </Box>
+                                                                    </TableCell>
+                                                                </TableRow>
                                                             ))}
                                                         </TableBody>
                                                     </Table>
                                                 </TableContainer>
                                             ) : (
-                                                <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
-                                                    <MenuBookIcon sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }} />
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        No se encontraron cursos registrados.
+                                                <Paper variant="outlined" sx={{ p: 3.5, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                                    <MenuBookIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1, opacity: 0.8 }} />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+                                                        {searchCurso || filterCursoTipo !== 'all' ? 'No se encontraron cursos con los filtros aplicados' : `No hay cursos registrados para ${comercio.nombre}`}
                                                     </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 460, mx: 'auto', mb: 2 }}>
+                                                        {searchCurso || filterCursoTipo !== 'all' ? 'Intenta restablecer los filtros de búsqueda.' : 'Crea cursos cortos, certificaciones técnicas y talleres prácticos para este comercio.'}
+                                                    </Typography>
+                                                    {!searchCurso && filterCursoTipo === 'all' && (
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            startIcon={<AddIcon />}
+                                                            onClick={() => handleOpenCreateCurso()}
+                                                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                                                        >
+                                                            Registrar Curso
+                                                        </Button>
+                                                    )}
                                                 </Paper>
                                             )}
                                         </CardContent>
                                     </Card>
-                                )}
-
-                                {/* 4. SIN OFERTA EDUCATIVA/CURSOS (COMERCIOS CORPORATIVOS DIRECTOS) */}
-                                {!isAcademic && !hasDiplomados && !hasCursos && (
-                                    <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2.5 }}>
-                                        <CheckCircleIcon color="action" sx={{ fontSize: 44, mb: 1, color: '#94a3b8' }} />
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
-                                            Comercio de Rubro Corporativo / Comercial Directo
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto' }}>
-                                            Este comercio no cuenta con programas académicos, carreras ni cursos técnicos registrados en el sistema.
-                                        </Typography>
-                                    </Paper>
-                                )}
                             </Box>
                         )}
                     </Box>
@@ -2278,6 +2871,46 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* DIALOGOS CRUD IN-SITU */}
+            <CarreraDialog
+                open={carreraDialogOpen}
+                onOpenChange={setCarreraDialogOpen}
+                carrera={selectedCarrera}
+                comercios={[comercio]}
+                defaultComercioId={comercio.id}
+            />
+
+            <EspecialidadDialog
+                open={especialidadDialogOpen}
+                onOpenChange={setEspecialidadDialogOpen}
+                especialidad={selectedEspecialidad}
+                carreras={(comercio.carreras || []).map((c) => ({ ...c, comercio }))}
+                rubros={rubros}
+                defaultCarreraId={defaultCarreraIdForEspecialidad}
+            />
+
+            <DiplomadoDialog
+                open={diplomadoDialogOpen}
+                onOpenChange={setDiplomadoDialogOpen}
+                diplomado={selectedDiplomado}
+                comercios={[comercio]}
+                carreras={comercio.carreras || []}
+                rubros={rubros}
+                defaultComercioId={comercio.id}
+                defaultCarreraId={defaultCarreraIdForDiplomado}
+            />
+
+            <CursoDialog
+                open={cursoDialogOpen}
+                onOpenChange={setCursoDialogOpen}
+                curso={selectedCurso}
+                comercios={[comercio]}
+                carreras={comercio.carreras || []}
+                rubros={rubros}
+                defaultComercioId={comercio.id}
+                defaultCarreraId={defaultCarreraIdForCurso}
+            />
         </>
     );
 }

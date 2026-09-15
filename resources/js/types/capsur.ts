@@ -52,6 +52,8 @@ export interface Comercio {
     diplomados?: Diplomado[];
     cursos_count?: number;
     cursos?: Curso[];
+    especialidades_count?: number;
+    especialidades?: Especialidad[];
     created_at?: string;
     updated_at?: string;
 }
@@ -79,6 +81,8 @@ export interface Carrera {
     diplomados?: Diplomado[];
     cursos_count?: number;
     cursos?: Curso[];
+    especialidades_count?: number;
+    especialidades?: Especialidad[];
     created_at?: string;
     updated_at?: string;
 }
@@ -149,12 +153,30 @@ export interface Curso {
     updated_at?: string;
 }
 
+export interface Especialidad {
+    id: number;
+    carrera_id: number;
+    rubro_id: number;
+    nombre: string;
+    slug: string;
+    flyer?: string | null;
+    brochure?: string | null;
+    youtube?: string | null;
+    precio?: string | null;
+    actualizado_drive?: string | null;
+    carrera?: Carrera;
+    rubro?: Rubro;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface CapsurStats {
     totalGrupos: number;
     totalComercios: number;
     totalCarreras: number;
     carrerasActivas: number;
     carrerasEnConvocatoria: number;
+    totalEspecialidades?: number;
 }
 
 export interface Rubro {
@@ -168,7 +190,10 @@ export interface Rubro {
     orden: number;
     diplomados_count?: number;
     cursos_count?: number;
+    especialidades_count?: number;
+    especialidades?: Especialidad[];
     created_at?: string;
     updated_at?: string;
 }
+
 

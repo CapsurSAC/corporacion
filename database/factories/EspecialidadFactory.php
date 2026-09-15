@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Carrera;
 use App\Models\Especialidad;
+use App\Models\Rubro;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -25,6 +26,7 @@ class EspecialidadFactory extends Factory
 
         return [
             'carrera_id' => Carrera::factory(),
+            'rubro_id' => Rubro::factory(),
             'nombre' => $nombre,
             'slug' => Str::slug($nombre),
             'flyer' => fake()->url(),

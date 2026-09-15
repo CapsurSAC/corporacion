@@ -340,10 +340,18 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                             label="Filtrar por Grupo"
                             onChange={(e) => handleFilterChange(e.target.value)}
                         >
-                            <MenuItem value="all">🏢 Todos los grupos</MenuItem>
+                            <MenuItem value="all">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <DomainIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                    <Typography variant="body2">Todos los grupos</Typography>
+                                </Box>
+                            </MenuItem>
                             {grupos.map((g) => (
                                 <MenuItem key={g.id} value={String(g.id)}>
-                                    {g.nombre}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <DomainIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                        <Typography variant="body2">{g.nombre}</Typography>
+                                    </Box>
                                 </MenuItem>
                             ))}
                         </Select>
@@ -389,6 +397,9 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 180 }}>
                                         ACREDITACIÓN & PLATAFORMA
                                     </TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 200 }}>
+                                        OFERTA FORMATIVA
+                                    </TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 150, textAlign: 'right' }}>
                                         ACCIONES
                                     </TableCell>
@@ -397,7 +408,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                             <TableBody>
                                 {comercios.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} sx={{ textAlign: 'center', py: 5 }}>
+                                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
                                             <StorefrontIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                                 No se encontraron comercios registrados
@@ -564,7 +575,80 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Columna 5: Acciones */}
+                                                {/* Columna 5: Oferta Formativa */}
+                                                <TableCell sx={{ minWidth: 200 }}>
+                                                    <Link
+                                                        href={`/admin/comercios/${comercio.id}/edit?tab=3`}
+                                                        style={{ textDecoration: 'none' }}
+                                                    >
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            startIcon={<SchoolIcon sx={{ fontSize: '15px !important' }} />}
+                                                            sx={{
+                                                                textTransform: 'none',
+                                                                fontWeight: 800,
+                                                                fontSize: '0.74rem',
+                                                                borderRadius: 1.5,
+                                                                bgcolor: `${brandColor}15`,
+                                                                color: brandColor,
+                                                                border: `1px solid ${brandColor}40`,
+                                                                boxShadow: 'none',
+                                                                '&:hover': {
+                                                                    bgcolor: brandColor,
+                                                                    color: '#ffffff',
+                                                                    boxShadow: `0 2px 8px ${brandColor}40`,
+                                                                },
+                                                                py: 0.5,
+                                                                px: 1.2,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 0.5,
+                                                            }}
+                                                        >
+                                                            Oferta Formativa
+                                                            <Box
+                                                                component="span"
+                                                                sx={{
+                                                                    ml: 0.5,
+                                                                    px: 0.6,
+                                                                    py: 0.1,
+                                                                    borderRadius: 1,
+                                                                    bgcolor: `${brandColor}25`,
+                                                                    color: 'inherit',
+                                                                    fontSize: '0.68rem',
+                                                                    fontWeight: 900,
+                                                                }}
+                                                            >
+                                                                {(comercio.carreras_count || 0) + (comercio.diplomados_count || 0) + (comercio.cursos_count || 0) + (comercio.especialidades_count || 0)}
+                                                            </Box>
+                                                        </Button>
+                                                    </Link>
+                                                    <Box sx={{ display: 'flex', gap: 0.6, mt: 0.5, flexWrap: 'wrap' }}>
+                                                        {Boolean(comercio.carreras_count) && (
+                                                            <Typography variant="caption" sx={{ fontSize: '0.66rem', color: 'text.secondary' }}>
+                                                                {comercio.carreras_count} carr.
+                                                            </Typography>
+                                                        )}
+                                                        {Boolean(comercio.especialidades_count) && (
+                                                            <Typography variant="caption" sx={{ fontSize: '0.66rem', color: 'text.secondary' }}>
+                                                                • {comercio.especialidades_count} esp.
+                                                            </Typography>
+                                                        )}
+                                                        {Boolean(comercio.diplomados_count) && (
+                                                            <Typography variant="caption" sx={{ fontSize: '0.66rem', color: 'text.secondary' }}>
+                                                                • {comercio.diplomados_count} dip.
+                                                            </Typography>
+                                                        )}
+                                                        {Boolean(comercio.cursos_count) && (
+                                                            <Typography variant="caption" sx={{ fontSize: '0.66rem', color: 'text.secondary' }}>
+                                                                • {comercio.cursos_count} cur.
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+
+                                                {/* Columna 6: Acciones */}
                                                 <TableCell sx={{ textAlign: 'right' }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
                                                         <Tooltip title="Ficha Técnica Completa" arrow>
@@ -712,14 +796,26 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                 {comercio.descripcion || 'Sin descripción corporativa registrada.'}
                                             </Typography>
 
-                                            <Box sx={{ pt: 1.2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <Chip
-                                                    icon={<SchoolIcon sx={{ fontSize: '12px !important' }} />}
-                                                    label={`${comercio.carreras_count || 0} carreras`}
-                                                    size="small"
-                                                    variant="outlined"
-                                                    sx={{ height: 20, fontSize: '0.68rem', borderRadius: 0.8 }}
-                                                />
+                                            <Box sx={{ pt: 1.2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                                <Link href={`/admin/comercios/${comercio.id}/edit?tab=3`} style={{ textDecoration: 'none' }}>
+                                                    <Button
+                                                        size="small"
+                                                        variant="contained"
+                                                        startIcon={<SchoolIcon sx={{ fontSize: '14px !important' }} />}
+                                                        sx={{
+                                                            textTransform: 'none',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.72rem',
+                                                            bgcolor: brandColor,
+                                                            color: '#ffffff',
+                                                            borderRadius: 1,
+                                                            boxShadow: `0 2px 6px ${brandColor}30`,
+                                                            '&:hover': { bgcolor: brandColor, filter: 'brightness(0.95)' },
+                                                        }}
+                                                    >
+                                                        Oferta Formativa ({(comercio.carreras_count || 0) + (comercio.diplomados_count || 0) + (comercio.cursos_count || 0) + (comercio.especialidades_count || 0)})
+                                                    </Button>
+                                                </Link>
 
                                                 <Button
                                                     size="small"

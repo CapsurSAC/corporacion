@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Carrera;
 use App\Models\Especialidad;
+use App\Models\Rubro;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -19,6 +20,7 @@ class EspecialidadSeeder extends Seeder
             'SIS-DSI' => [
                 [
                     'nombre' => 'Especialidad en Desarrollo Web Full Stack & Cloud Computing',
+                    'rubro_clave' => 'especializado',
                     'flyer' => 'https://istpsis.edu.pe/img/flyers/especialidad-fullstack.jpg',
                     'brochure' => 'https://istpsis.edu.pe/docs/brochures/esp-fullstack.pdf',
                     'youtube' => 'https://youtube.com/watch?v=sis-esp-fullstack',
@@ -27,6 +29,7 @@ class EspecialidadSeeder extends Seeder
                 ],
                 [
                     'nombre' => 'Especialidad en Inteligencia Artificial y Machine Learning Aplicado',
+                    'rubro_clave' => 'especializado',
                     'flyer' => 'https://istpsis.edu.pe/img/flyers/especialidad-ia.jpg',
                     'brochure' => 'https://istpsis.edu.pe/docs/brochures/esp-ia.pdf',
                     'youtube' => 'https://youtube.com/watch?v=sis-esp-ia',
@@ -39,6 +42,7 @@ class EspecialidadSeeder extends Seeder
             'SIS-ARC' => [
                 [
                     'nombre' => 'Especialidad en Seguridad Ofensiva y Auditoría de Redes',
+                    'rubro_clave' => 'especializado',
                     'flyer' => 'https://istpsis.edu.pe/img/flyers/especialidad-sec-redes.jpg',
                     'brochure' => 'https://istpsis.edu.pe/docs/brochures/esp-sec-redes.pdf',
                     'youtube' => 'https://youtube.com/watch?v=sis-esp-redes',
@@ -51,6 +55,7 @@ class EspecialidadSeeder extends Seeder
             'AVA-GOT' => [
                 [
                     'nombre' => 'Especialidad en Ecoturismo y Gestión de Rutas de Alta Montaña',
+                    'rubro_clave' => 'ambientales',
                     'flyer' => 'https://avanti.edu.pe/img/flyers/esp-ecoturismo.jpg',
                     'brochure' => 'https://avanti.edu.pe/docs/brochures/esp-ecoturismo.pdf',
                     'youtube' => 'https://youtube.com/watch?v=avanti-esp-ecoturismo',
@@ -63,6 +68,7 @@ class EspecialidadSeeder extends Seeder
             'AVA-ASH' => [
                 [
                     'nombre' => 'Especialidad en Gestión y Gerencia Hotelera Internacional',
+                    'rubro_clave' => 'administracion',
                     'flyer' => 'https://avanti.edu.pe/img/flyers/esp-gerencia-hotelera.jpg',
                     'brochure' => 'https://avanti.edu.pe/docs/brochures/esp-gerencia-hotelera.pdf',
                     'youtube' => 'https://youtube.com/watch?v=avanti-esp-hoteles',
@@ -76,17 +82,30 @@ class EspecialidadSeeder extends Seeder
             $carrera = Carrera::where('codigo', $codigoCarrera)->first();
 
             if (! $carrera) {
-                // Si no se encuentra por código, intentar buscar por similitud
                 continue;
             }
 
             foreach ($especialidades as $item) {
+                $rubroClave = $item['rubro_clave'] ?? 'especializado';
+                $rubro = Rubro::where('clave', $rubroClave)->first() ?? Rubro::first();
+
+                if (! $rubro) {
+                    $rubro = Rubro::create([
+                        'nombre' => 'Especialidades Técnicas',
+                        'clave' => 'especialidades_tecnicas',
+                        'color_hex' => '#7c3aed',
+                        'categoria' => 'Modalidad de Formación',
+                        'activo' => true,
+                    ]);
+                }
+
                 Especialidad::updateOrCreate(
                     [
                         'carrera_id' => $carrera->id,
                         'slug' => Str::slug($item['nombre']),
                     ],
                     [
+                        'rubro_id' => $rubro->id,
                         'nombre' => $item['nombre'],
                         'flyer' => $item['flyer'] ?? null,
                         'brochure' => $item['brochure'] ?? null,

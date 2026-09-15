@@ -24,7 +24,7 @@ class ComercioController extends Controller
 
         $comerciosQuery = Comercio::query()
             ->with('grupo')
-            ->withCount('carreras')
+            ->withCount(['carreras', 'diplomados', 'cursos', 'especialidades'])
             ->when($grupoId, fn ($query) => $query->where('grupo_id', $grupoId))
             ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
@@ -61,9 +61,10 @@ class ComercioController extends Controller
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
         $comercioModel->load([
             'grupo',
-            'carreras' => fn ($q) => $q->with(['diplomados', 'cursos'])->orderBy('nombre', 'asc'),
+            'carreras' => fn ($q) => $q->with(['diplomados', 'cursos', 'especialidades.rubro'])->orderBy('nombre', 'asc'),
             'cursos' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
             'diplomados' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
+            'especialidades' => fn ($q) => $q->with(['carrera', 'rubro'])->latest('id'),
         ]);
 
         $grupos = Grupo::query()

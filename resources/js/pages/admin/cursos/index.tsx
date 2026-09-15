@@ -1,17 +1,20 @@
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage, router, Link } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CategoryIcon from '@mui/icons-material/Category';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
 import ImageIcon from '@mui/icons-material/Image';
+import LabelIcon from '@mui/icons-material/Label';
 import LaunchIcon from '@mui/icons-material/Launch';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
-import StorefrontIcon from '@mui/icons-material/Storefront';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import { ComercioBadge, ComercioAllBadge } from '@/components/admin/comercio-badge';
 import {
     Avatar,
     Box,
@@ -220,6 +223,78 @@ export default function CursosIndex({
                     boxSizing: 'border-box',
                 }}
             >
+                {/* BANNER RETORNO A OFERTA FORMATIVA DE COMERCIO */}
+                {(() => {
+                    const activeComercio = filters.comercio_id ? comercios.find((c) => String(c.id) === String(filters.comercio_id)) : null;
+                    if (!activeComercio) return null;
+                    return (
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: { xs: 1.5, sm: 2 },
+                                borderRadius: 2,
+                                bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
+                                border: '1px solid',
+                                borderColor: (theme) =>
+                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#bfdbfe',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Avatar
+                                    src={activeComercio.logo_modo_claro || undefined}
+                                    alt={activeComercio.nombre}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        bgcolor: activeComercio.color_hex || 'primary.main',
+                                        fontWeight: 700,
+                                        fontSize: '0.85rem',
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                    }}
+                                >
+                                    {activeComercio.sigla || activeComercio.nombre.substring(0, 2).toUpperCase()}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                                        Gestionando Cursos de {activeComercio.nombre}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        Filtro aplicado desde la Oferta Formativa de la institución.
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Link
+                                href={`/admin/comercios/${activeComercio.id}/edit?tab=3`}
+                                style={{ textDecoration: 'none' }}
+                            >
+                                <Button
+                                    size="small"
+                                    variant="contained"
+                                    startIcon={<ArrowBackIcon />}
+                                    sx={{
+                                        bgcolor: activeComercio.color_hex || '#2563eb',
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        borderRadius: 1.5,
+                                        px: 2,
+                                        boxShadow: 'none',
+                                        '&:hover': { bgcolor: activeComercio.color_hex || '#1d4ed8', filter: 'brightness(0.92)' },
+                                    }}
+                                >
+                                    Volver a Oferta Formativa
+                                </Button>
+                            </Link>
+                        </Paper>
+                    );
+                })()}
+
                 {/* CABECERA PRINCIPAL UNIFICADA */}
                 <Paper
                     elevation={0}
@@ -374,10 +449,15 @@ export default function CursosIndex({
                                     applyFilters({ comercio_id: e.target.value });
                                 }}
                             >
-                                <MenuItem value="all">🏬 Todos los comercios</MenuItem>
+                                <MenuItem value="all">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <ComercioAllBadge size={22} label="ALL" />
+                                        <Typography variant="body2">Todos los comercios</Typography>
+                                    </Box>
+                                </MenuItem>
                                 {comercios.map((c) => (
                                     <MenuItem key={c.id} value={String(c.id)}>
-                                        {c.nombre}
+                                        <ComercioBadge comercio={c} size={22} showName />
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -394,33 +474,110 @@ export default function CursosIndex({
                                     applyFilters({ tipo: e.target.value });
                                 }}
                             >
-                                <MenuItem value="all">🎓 Todos los rubros y tipos</MenuItem>
-                                <MenuItem value="sin_categoria">Libre / Sin Categoría</MenuItem>
+                                <MenuItem value="all">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CategoryIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">Todos los rubros y tipos</Typography>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="sin_categoria">
+                                    <Typography variant="body2" color="text.secondary">Libre / Sin Categoría</Typography>
+                                </MenuItem>
                                 {rubros && rubros.length > 0 ? (
                                     rubros.map((r) => (
                                         <MenuItem key={r.clave} value={r.clave}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#0284c7', flexShrink: 0 }} />
-                                                {r.nombre}
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#0284c7', flexShrink: 0 }} />
+                                                <Typography variant="body2">{r.nombre}</Typography>
                                             </Box>
                                         </MenuItem>
                                     ))
                                 ) : (
                                     <>
-                                        <MenuItem value="tradicional">📘 Tradicional</MenuItem>
-                                        <MenuItem value="especializado">⭐ Especializado</MenuItem>
-                                        <MenuItem value="ambientales">🌿 Ambientales</MenuItem>
-                                        <MenuItem value="calidad_isos">🏆 Calidad e ISOs</MenuItem>
-                                        <MenuItem value="mineros">⛏️ Mineros</MenuItem>
-                                        <MenuItem value="administracion">💼 Administración</MenuItem>
-                                        <MenuItem value="arquitectura_ingenieria">📐 Arq. e Ingeniería</MenuItem>
-                                        <MenuItem value="osha">🦺 OSHA</MenuItem>
-                                        <MenuItem value="comercio_exterior">🚢 Comercio Exterior</MenuItem>
-                                        <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
-                                        <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
-                                        <MenuItem value="nombramiento">📝 Nombramiento</MenuItem>
-                                        <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
-                                        <MenuItem value="generico">🎓 Genérico</MenuItem>
+                                        <MenuItem value="tradicional">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                <Typography variant="body2">Tradicional</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="especializado">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+                                                <Typography variant="body2">Especializado</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="ambientales">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
+                                                <Typography variant="body2">Ambientales</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="calidad_isos">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                <Typography variant="body2">Calidad e ISOs</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="mineros">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#d97706' }} />
+                                                <Typography variant="body2">Mineros</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="administracion">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0d9488' }} />
+                                                <Typography variant="body2">Administración</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="arquitectura_ingenieria">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#6366f1' }} />
+                                                <Typography variant="body2">Arq. e Ingeniería</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="osha">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#dc2626' }} />
+                                                <Typography variant="body2">OSHA</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="comercio_exterior">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0891b2' }} />
+                                                <Typography variant="body2">Comercio Exterior</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="rubro_legal">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+                                                <Typography variant="body2">Rubro Legal</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="no_actualizados">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#64748b' }} />
+                                                <Typography variant="body2">No Actualizados</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="nombramiento">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+                                                <Typography variant="body2">Nombramiento</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="secundaria">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
+                                                <Typography variant="body2">Secundaria</Typography>
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="generico">
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                <Typography variant="body2">Genérico</Typography>
+                                            </Box>
+                                        </MenuItem>
                                     </>
                                 )}
                             </Select>
@@ -557,8 +714,8 @@ export default function CursosIndex({
                                             <TableCell>
                                                 {curso.comercio ? (
                                                     <Chip
-                                                        icon={<StorefrontIcon sx={{ fontSize: '13px !important' }} />}
-                                                        label={curso.comercio.nombre}
+                                                        avatar={<ComercioBadge comercio={curso.comercio} size={18} />}
+                                                        label={curso.comercio.sigla || curso.comercio.codigo || curso.comercio.nombre}
                                                         size="small"
                                                         sx={{
                                                             bgcolor: `${brandColor}18`,

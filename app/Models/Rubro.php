@@ -50,4 +50,12 @@ class Rubro extends Model
     {
         return $this->hasMany(Curso::class, 'tipo', 'clave');
     }
+
+    /**
+     * Especialidades vinculadas a este rubro mediante su ID.
+     */
+    public function especialidades(): HasMany
+    {
+        return $this->hasMany(Especialidad::class, 'rubro_id');
+    }
 }

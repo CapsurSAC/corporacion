@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import SchoolIcon from '@mui/icons-material/School';
+import { ComercioBadge } from '@/components/admin/comercio-badge';
 import {
     Dialog,
     DialogTitle,
@@ -169,17 +170,7 @@ export function CarreraDialog({
                                     return (
                                         <MenuItem key={c.id} value={String(c.id)}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1.5 }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Box
-                                                        sx={{
-                                                             width: 10,
-                                                             height: 10,
-                                                             borderRadius: '50%',
-                                                             bgcolor: c.color_hex || '#3b82f6',
-                                                         }}
-                                                     />
-                                                     <span>{c.nombre}</span>
-                                                 </Box>
+                                                <ComercioBadge comercio={c} size={22} showName />
                                                  {isAcademic && (
                                                      <Box
                                                          component="span"

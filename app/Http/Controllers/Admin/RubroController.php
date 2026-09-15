@@ -22,7 +22,7 @@ class RubroController extends Controller
         $activo = $request->query('activo');
 
         $rubrosQuery = Rubro::query()
-            ->withCount(['diplomados', 'cursos'])
+            ->withCount(['diplomados', 'cursos', 'especialidades'])
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nombre', 'like', "%{$search}%")
@@ -167,11 +167,19 @@ class RubroController extends Controller
 
         $diplomadosCount = $rubroModel->diplomados()->count();
         $cursosCount = $rubroModel->cursos()->count();
+        $especialidadesCount = $rubroModel->especialidades()->count();
 
-        if ($diplomadosCount > 0 || $cursosCount > 0) {
+        if ($diplomadosCount > 0 || $cursosCount > 0 || $especialidadesCount > 0) {
+            $detalles = [];
+            if ($diplomadosCount > 0) $detalles[] = "{$diplomadosCount} diplomados";
+            if ($cursosCount > 0) $detalles[] = "{$cursosCount} cursos";
+            if ($especialidadesCount > 0) $detalles[] = "{$especialidadesCount} especialidades";
+
+            $detallesTexto = implode(', ', $detalles);
+
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$diplomadosCount} diplomados y {$cursosCount} cursos asociados. Puedes desactivarlo.",
+                'message' => "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} asociados. Puedes desactivarlo.",
             ]);
 
             return back();

@@ -1,6 +1,5 @@
 import { Link } from '@inertiajs/react';
 import {
-    Award,
     BookOpen,
     Building2,
     HardDrive,
@@ -34,24 +33,14 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Grupos Comerciales',
-            href: '/admin/grupos',
-            icon: Building2,
-        },
-        {
             title: 'Comercios',
             href: '/admin/comercios',
             icon: Store,
         },
         {
-            title: 'Diplomados',
-            href: '/admin/diplomados',
-            icon: Award,
-        },
-        {
-            title: 'Cursos',
-            href: '/admin/cursos',
-            icon: BookOpen,
+            title: 'Grupos Comerciales',
+            href: '/admin/grupos',
+            icon: Building2,
         },
         {
             title: 'Rubros',

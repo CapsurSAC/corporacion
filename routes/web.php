@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ComercioController;
 use App\Http\Controllers\Admin\CursoController;
 use App\Http\Controllers\Admin\DiplomadoController;
 use App\Http\Controllers\Admin\DriveCapacitacionController;
+use App\Http\Controllers\Admin\EspecialidadController;
 use App\Http\Controllers\Admin\GrupoController;
 use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\RubroController;
@@ -39,6 +40,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('carreras', [CarreraController::class, 'store'])->name('carreras.store');
         Route::put('carreras/{carrera}', [CarreraController::class, 'update'])->name('carreras.update');
         Route::delete('carreras/{carrera}', [CarreraController::class, 'destroy'])->name('carreras.destroy');
+
+        // Especialidades
+        Route::get('especialidades', [EspecialidadController::class, 'index'])->name('especialidades.index');
+        Route::post('especialidades', [EspecialidadController::class, 'store'])->name('especialidades.store');
+        Route::put('especialidades/{especialidad}', [EspecialidadController::class, 'update'])->name('especialidades.update');
+        Route::delete('especialidades/{especialidad}', [EspecialidadController::class, 'destroy'])->name('especialidades.destroy');
 
         // Diplomados
         Route::get('diplomados', [DiplomadoController::class, 'index'])->name('diplomados.index');

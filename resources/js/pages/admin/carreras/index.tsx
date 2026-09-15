@@ -9,8 +9,8 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
-import StorefrontIcon from '@mui/icons-material/Storefront';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import { ComercioBadge, ComercioAllBadge } from '@/components/admin/comercio-badge';
 import {
     Avatar,
     Box,
@@ -141,6 +141,78 @@ export default function CarrerasIndex({
                     boxSizing: 'border-box',
                 }}
             >
+                {/* BANNER RETORNO A OFERTA FORMATIVA DE COMERCIO */}
+                {(() => {
+                    const activeComercio = filters.comercio_id ? comercios.find((c) => String(c.id) === String(filters.comercio_id)) : null;
+                    if (!activeComercio) return null;
+                    return (
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: { xs: 1.5, sm: 2 },
+                                borderRadius: 2,
+                                bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
+                                border: '1px solid',
+                                borderColor: (theme) =>
+                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#bfdbfe',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Avatar
+                                    src={activeComercio.logo_modo_claro || undefined}
+                                    alt={activeComercio.nombre}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        bgcolor: activeComercio.color_hex || 'primary.main',
+                                        fontWeight: 700,
+                                        fontSize: '0.85rem',
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                    }}
+                                >
+                                    {activeComercio.sigla || activeComercio.nombre.substring(0, 2).toUpperCase()}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                                        Gestionando Carreras de {activeComercio.nombre}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        Filtro aplicado desde la Oferta Formativa de la institución.
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Link
+                                href={`/admin/comercios/${activeComercio.id}/edit?tab=3`}
+                                style={{ textDecoration: 'none' }}
+                            >
+                                <Button
+                                    size="small"
+                                    variant="contained"
+                                    startIcon={<ArrowBackIcon />}
+                                    sx={{
+                                        bgcolor: activeComercio.color_hex || '#2563eb',
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        borderRadius: 1.5,
+                                        px: 2,
+                                        boxShadow: 'none',
+                                        '&:hover': { bgcolor: activeComercio.color_hex || '#1d4ed8', filter: 'brightness(0.92)' },
+                                    }}
+                                >
+                                    Volver a Oferta Formativa
+                                </Button>
+                            </Link>
+                        </Paper>
+                    );
+                })()}
+
                 {/* CABECERA PRINCIPAL UNIFICADA */}
                 <Paper
                     elevation={0}
@@ -314,10 +386,15 @@ export default function CarrerasIndex({
                                 applyFilters({ comercio_id: e.target.value });
                             }}
                         >
-                            <MenuItem value="all">🏬 Todos los comercios</MenuItem>
+                            <MenuItem value="all">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <ComercioAllBadge size={22} label="ALL" />
+                                    <Typography variant="body2">Todos los comercios</Typography>
+                                </Box>
+                            </MenuItem>
                             {comercios.map((c) => (
                                 <MenuItem key={c.id} value={String(c.id)}>
-                                    {c.nombre}
+                                    <ComercioBadge comercio={c} size={22} showName />
                                 </MenuItem>
                             ))}
                         </Select>
@@ -443,8 +520,8 @@ export default function CarrerasIndex({
                                             <TableCell>
                                                 {carrera.comercio ? (
                                                     <Chip
-                                                        icon={<StorefrontIcon sx={{ fontSize: '13px !important' }} />}
-                                                        label={carrera.comercio.nombre}
+                                                        avatar={<ComercioBadge comercio={carrera.comercio} size={18} />}
+                                                        label={carrera.comercio.sigla || carrera.comercio.codigo || carrera.comercio.nombre}
                                                         size="small"
                                                         sx={{
                                                             bgcolor: `${brandColor}18`,

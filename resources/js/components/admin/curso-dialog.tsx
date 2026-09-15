@@ -1,5 +1,8 @@
 import { useForm } from '@inertiajs/react';
+import LabelIcon from '@mui/icons-material/Label';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import SchoolIcon from '@mui/icons-material/School';
+import { ComercioBadge } from '@/components/admin/comercio-badge';
 import {
     Dialog,
     DialogTitle,
@@ -215,17 +218,7 @@ export function CursoDialog({
                                     >
                                         {comercios.map((c) => (
                                             <MenuItem key={c.id} value={String(c.id)}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Box
-                                                        sx={{
-                                                            width: 10,
-                                                            height: 10,
-                                                            borderRadius: '50%',
-                                                            bgcolor: c.color_hex || '#3b82f6',
-                                                        }}
-                                                    />
-                                                    <span>{c.nombre}</span>
-                                                </Box>
+                                                <ComercioBadge comercio={c} size={22} showName />
                                             </MenuItem>
                                         ))}
                                     </Select>
@@ -246,7 +239,9 @@ export function CursoDialog({
                                         label="Rubro / Categoría"
                                         onChange={(e) => setData('tipo', e.target.value)}
                                     >
-                                        <MenuItem value="">🎓 Sin Categoría / Curso Libre</MenuItem>
+                                        <MenuItem value="">
+                                            <Typography variant="body2" color="text.secondary">Sin Categoría / Curso Libre</Typography>
+                                        </MenuItem>
 
                                         {groupedRubros ? (
                                             groupedRubros.map(([catName, items]) => [
@@ -256,8 +251,8 @@ export function CursoDialog({
                                                 ...items.map((r) => (
                                                     <MenuItem key={r.clave} value={r.clave}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: r.color_hex || '#0284c7', flexShrink: 0 }} />
-                                                            {r.nombre}
+                                                            <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#0284c7', flexShrink: 0 }} />
+                                                            <Typography variant="body2">{r.nombre}</Typography>
                                                         </Box>
                                                     </MenuItem>
                                                 )),
@@ -267,28 +262,98 @@ export function CursoDialog({
                                                 <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
                                                     Modalidad de Formación
                                                 </ListSubheader>
-                                                <MenuItem value="tradicional">📘 Curso Tradicional</MenuItem>
-                                                <MenuItem value="especializado">⭐ Curso Especializado</MenuItem>
+                                                <MenuItem value="tradicional">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                        <Typography variant="body2">Curso Tradicional</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="especializado">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#f59e0b' }} />
+                                                        <Typography variant="body2">Curso Especializado</Typography>
+                                                    </Box>
+                                                </MenuItem>
 
                                                 <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
                                                     CECAVA (Rubros Técnicos)
                                                 </ListSubheader>
-                                                <MenuItem value="ambientales">🌿 Rubro Ambiental</MenuItem>
-                                                <MenuItem value="calidad_isos">🏆 Rubro Calidad e ISOs</MenuItem>
-                                                <MenuItem value="mineros">⛏️ Rubro Minero</MenuItem>
-                                                <MenuItem value="administracion">💼 Rubro Administración</MenuItem>
-                                                <MenuItem value="arquitectura_ingenieria">📐 Rubro Arquitectura e Ingeniería</MenuItem>
-                                                <MenuItem value="osha">🦺 Rubro OSHA</MenuItem>
-                                                <MenuItem value="comercio_exterior">🚢 Rubro Comercio Exterior</MenuItem>
-                                                <MenuItem value="rubro_legal">⚖️ Rubro Legal</MenuItem>
-                                                <MenuItem value="no_actualizados">📁 No Actualizados</MenuItem>
+                                                <MenuItem value="ambientales">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
+                                                        <Typography variant="body2">Rubro Ambiental</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="calidad_isos">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                        <Typography variant="body2">Rubro Calidad e ISOs</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="mineros">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#d97706' }} />
+                                                        <Typography variant="body2">Rubro Minero</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="administracion">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#0d9488' }} />
+                                                        <Typography variant="body2">Rubro Administración</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="arquitectura_ingenieria">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#6366f1' }} />
+                                                        <Typography variant="body2">Rubro Arquitectura e Ingeniería</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="osha">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#dc2626' }} />
+                                                        <Typography variant="body2">Rubro OSHA</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="comercio_exterior">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#0891b2' }} />
+                                                        <Typography variant="body2">Rubro Comercio Exterior</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="rubro_legal">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+                                                        <Typography variant="body2">Rubro Legal</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="no_actualizados">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#64748b' }} />
+                                                        <Typography variant="body2">No Actualizados</Typography>
+                                                    </Box>
+                                                </MenuItem>
 
                                                 <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', bgcolor: 'action.hover' }}>
                                                     MAGISTER (Educación)
                                                 </ListSubheader>
-                                                <MenuItem value="nombramiento">📝 Nombramiento Docente</MenuItem>
-                                                <MenuItem value="secundaria">🏫 Secundaria</MenuItem>
-                                                <MenuItem value="generico">🎓 Genérico / Otros</MenuItem>
+                                                <MenuItem value="nombramiento">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+                                                        <Typography variant="body2">Nombramiento Docente</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="secundaria">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
+                                                        <Typography variant="body2">Secundaria</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                                <MenuItem value="generico">
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
+                                                        <Typography variant="body2">Genérico / Otros</Typography>
+                                                    </Box>
+                                                </MenuItem>
                                             </>
                                         )}
                                     </Select>
@@ -311,12 +376,22 @@ export function CursoDialog({
                                             label="Carrera Perteneciente (Opcional)"
                                             onChange={(e) => setData('carrera_id', e.target.value)}
                                         >
-                                            <MenuItem value="">📖 General / Sin Carrera Específica</MenuItem>
+                                            <MenuItem value="">
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                                    <Typography variant="body2">General / Sin Carrera Específica</Typography>
+                                                </Box>
+                                            </MenuItem>
                                             {carreras
                                                 .filter(c => String(c.comercio_id) === String(data.comercio_id))
                                                 .map((c) => (
                                                     <MenuItem key={c.id} value={String(c.id)}>
-                                                        📚 {c.nombre} {c.codigo ? `(${c.codigo})` : ''}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <SchoolIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                                            <Typography variant="body2">
+                                                                {c.nombre} {c.codigo ? `(${c.codigo})` : ''}
+                                                            </Typography>
+                                                        </Box>
                                                     </MenuItem>
                                                 ))}
                                         </Select>

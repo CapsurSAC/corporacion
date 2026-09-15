@@ -40,7 +40,7 @@ class DiplomadoController extends Controller
 
         $comercios = Comercio::query()
             ->with('grupo:id,nombre')
-            ->select('id', 'grupo_id', 'nombre', 'codigo', 'color_hex', 'activo')
+            ->select('id', 'grupo_id', 'nombre', 'codigo', 'sigla', 'color_hex', 'logo_modo_claro', 'logo_modo_oscuro', 'activo')
             ->orderBy('grupo_id')
             ->orderBy('nombre')
             ->get();
