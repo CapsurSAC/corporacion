@@ -388,9 +388,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 220, py: 1.5 }}>
                                         COMERCIO / INSTITUTO
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 150 }}>
-                                        GRUPO CORPORATIVO
-                                    </TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', width: 110, textAlign: 'center' }}>
                                         SIGLA
                                     </TableCell>
@@ -408,7 +405,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                             <TableBody>
                                 {comercios.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
+                                        <TableCell colSpan={5} sx={{ textAlign: 'center', py: 5 }}>
                                             <StorefrontIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                                 No se encontraron comercios registrados
@@ -488,22 +485,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Columna 2: Grupo */}
-                                                <TableCell>
-                                                    {comercio.grupo ? (
-                                                        <Chip
-                                                            icon={<DomainIcon sx={{ fontSize: '13px !important' }} />}
-                                                            label={comercio.grupo.nombre}
-                                                            size="small"
-                                                            variant="outlined"
-                                                            sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24, borderRadius: 0.8 }}
-                                                        />
-                                                    ) : (
-                                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
-
-                                                {/* Columna 3: Sigla */}
+                                                {/* Columna 2: Sigla */}
                                                 <TableCell sx={{ textAlign: 'center' }}>
                                                     <Typography
                                                         variant="caption"
@@ -524,7 +506,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Typography>
                                                 </TableCell>
 
-                                                {/* Columna 4: Acreditación & Plataformas */}
+                                                {/* Columna 3: Acreditación & Plataformas */}
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, alignItems: 'center' }}>
                                                         {comercio.pagina_web && (
@@ -575,7 +557,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Columna 5: Oferta Formativa */}
+                                                {/* Columna 4: Oferta Formativa */}
                                                 <TableCell sx={{ minWidth: 200 }}>
                                                     <Link
                                                         href={`/admin/comercios/${comercio.id}/edit?tab=3`}
@@ -648,7 +630,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Columna 6: Acciones */}
+                                                {/* Columna 5: Acciones */}
                                                 <TableCell sx={{ textAlign: 'right' }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
                                                         <Tooltip title="Ficha Técnica Completa" arrow>
