@@ -213,39 +213,6 @@ export function RubroDialog({
 
                 <DialogContent dividers sx={{ p: 3 }}>
                     <Grid container spacing={2.5}>
-                        {/* Vista previa en vivo del Badge */}
-                        <Grid size={{ xs: 12 }}>
-                            <Box
-                                sx={{
-                                    p: 2,
-                                    borderRadius: 2,
-                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
-                                    border: '1px dashed',
-                                    borderColor: 'divider',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                }}
-                            >
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-                                    VISTA PREVIA EN TABLAS Y SELECTS:
-                                </Typography>
-                                <Chip
-                                    label={data.nombre.trim() || 'Nombre del Rubro'}
-                                    size="small"
-                                    sx={{
-                                        bgcolor: `${data.color_hex}18`,
-                                        color: data.color_hex,
-                                        border: `1px solid ${data.color_hex}45`,
-                                        fontWeight: 800,
-                                        fontSize: '0.78rem',
-                                        height: 24,
-                                        borderRadius: 1,
-                                    }}
-                                />
-                            </Box>
-                        </Grid>
-
                         {/* Nombre del Rubro */}
                         <Grid size={{ xs: 12 }}>
                             <TextField
