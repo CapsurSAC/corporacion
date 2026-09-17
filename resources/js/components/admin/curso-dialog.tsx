@@ -24,7 +24,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength } from '@/lib/validation';
-import type { Curso, Comercio, Rubro } from '@/types';
+import type { Curso, Comercio, Rubro, Estado } from '@/types';
 
 interface CursoDialogProps {
     open: boolean;
@@ -33,6 +33,7 @@ interface CursoDialogProps {
     comercios: Comercio[];
     carreras?: { id: number; comercio_id: number; nombre: string; codigo?: string | null }[];
     rubros?: Rubro[];
+    estados?: Estado[];
     defaultComercioId?: number | null;
     defaultCarreraId?: number | null;
 }
@@ -44,6 +45,7 @@ export function CursoDialog({
     comercios,
     carreras = [],
     rubros = [],
+    estados = [],
     defaultComercioId,
     defaultCarreraId,
     
@@ -56,6 +58,7 @@ export function CursoDialog({
         useForm<{
             comercio_id: string;
             carrera_id: string;
+            estado_id: string;
             tipo: string;
             nombre: string;
             flyer: string;
@@ -66,6 +69,7 @@ export function CursoDialog({
         }>({
             comercio_id: defaultComercioId ? String(defaultComercioId) : (comercios[0]?.id ? String(comercios[0].id) : ''),
             carrera_id: defaultCarreraId ? String(defaultCarreraId) : '',
+            estado_id: '',
             tipo: 'tradicional',
             nombre: '',
             flyer: '',
@@ -80,6 +84,7 @@ export function CursoDialog({
             setData({
                 comercio_id: String(curso.comercio_id),
                 carrera_id: curso.carrera_id ? String(curso.carrera_id) : '',
+                estado_id: curso.estado_id ? String(curso.estado_id) : '',
                 tipo: curso.tipo || '',
                 nombre: curso.nombre,
                 flyer: curso.flyer || '',
@@ -459,24 +464,62 @@ export function CursoDialog({
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
+                                    label="Actualizado Drive (Link de Google Drive)"
+                                    value={data.actualizado_drive}
+                                    onChange={(e) => setData('actualizado_drive', e.target.value)}
+                                    placeholder="https://drive.google.com/drive/folders/..."
+                                    error={!!errors.actualizado_drive}
+                                    helperText={errors.actualizado_drive || 'Carpeta o archivo actualizado en Drive'}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth size="small" error={!!errors.estado_id}>
+                                    <InputLabel id="select-estado-curso-label">Estado</InputLabel>
+                                    <Select
+                                        labelId="select-estado-curso-label"
+                                        value={data.estado_id}
+                                        label="Estado"
+                                        onChange={(e) => setData('estado_id', e.target.value)}
+                                    >
+                                        <MenuItem value="">
+                                            <Typography variant="body2" color="text.secondary">
+                                                Sin estado asignado
+                                            </Typography>
+                                        </MenuItem>
+                                        {estados.map((est) => (
+                                            <MenuItem key={est.id} value={String(est.id)}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 10,
+                                                            height: 10,
+                                                            borderRadius: '50%',
+                                                            bgcolor: est.color_hex || '#94a3b8',
+                                                            flexShrink: 0,
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                        {est.nombre}
+                                                    </Typography>
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {errors.estado_id && (
+                                        <FormHelperText>{errors.estado_id}</FormHelperText>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
                                     label="Precio (Monto o Inversión)"
                                     value={data.precio}
                                     onChange={(e) => setData('precio', e.target.value)}
                                     placeholder="Ej. S/ 220, S/ 280"
                                     error={!!errors.precio}
                                     helperText={errors.precio}
-                                    fullWidth
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField
-                                    label="Actualizado Drive (Link de Google Drive / Carpeta de Materiales)"
-                                    value={data.actualizado_drive}
-                                    onChange={(e) => setData('actualizado_drive', e.target.value)}
-                                    placeholder="https://drive.google.com/drive/folders/..."
-                                    error={!!errors.actualizado_drive}
-                                    helperText={errors.actualizado_drive || 'Enlace a la carpeta o archivo actualizado en Google Drive'}
                                     fullWidth
                                     size="small"
                                 />

@@ -87,10 +87,23 @@ export interface Carrera {
     updated_at?: string;
 }
 
+export interface Estado {
+    id: number;
+    nombre: string;
+    clave: string;
+    color_hex?: string | null;
+    descripcion?: string | null;
+    activo: boolean;
+    orden: number;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface Diplomado {
     id: number;
     comercio_id: number;
     carrera_id?: number | null;
+    estado_id?: number | null;
     nombre: string;
     slug: string;
     tipo?:
@@ -115,6 +128,7 @@ export interface Diplomado {
     actualizado_drive?: string | null;
     comercio?: Comercio;
     carrera?: Carrera | null;
+    estado?: Estado | null;
     created_at?: string;
     updated_at?: string;
 }
@@ -123,6 +137,7 @@ export interface Curso {
     id: number;
     comercio_id: number;
     carrera_id?: number | null;
+    estado_id?: number | null;
     nombre: string;
     slug: string;
     tipo?:
@@ -149,6 +164,7 @@ export interface Curso {
     actualizado_drive?: string | null;
     comercio?: Comercio;
     carrera?: Carrera | null;
+    estado?: Estado | null;
     created_at?: string;
     updated_at?: string;
 }
@@ -157,6 +173,7 @@ export interface Especialidad {
     id: number;
     carrera_id: number;
     rubro_id: number;
+    estado_id?: number | null;
     nombre: string;
     slug: string;
     flyer?: string | null;
@@ -166,6 +183,7 @@ export interface Especialidad {
     actualizado_drive?: string | null;
     carrera?: Carrera;
     rubro?: Rubro;
+    estado?: Estado | null;
     created_at?: string;
     updated_at?: string;
 }

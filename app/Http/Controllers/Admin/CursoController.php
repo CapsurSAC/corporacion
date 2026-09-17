@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Carrera;
 use App\Models\Comercio;
 use App\Models\Curso;
+use App\Models\Estado;
 use App\Models\Grupo;
 use App\Models\Rubro;
 use Illuminate\Http\RedirectResponse;
@@ -23,13 +24,15 @@ class CursoController extends Controller
     {
         $comercioId = $request->query('comercio_id');
         $carreraId = $request->query('carrera_id');
+        $estadoId = $request->query('estado_id');
         $tipo = $request->query('tipo') ?? $request->query('rubros') ?? $request->query('rubro');
         $search = $request->query('search');
 
         $cursosQuery = Curso::query()
-            ->with(['comercio.grupo', 'carrera'])
+            ->with(['comercio.grupo', 'carrera', 'estado'])
             ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
             ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
+            ->when($estadoId, fn ($query) => $query->where('estado_id', $estadoId))
             ->when($tipo, fn ($query) => $query->where('tipo', $tipo))
             ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
@@ -55,15 +58,22 @@ class CursoController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        $estados = Estado::query()
+            ->where('activo', true)
+            ->orderBy('orden')
+            ->get();
+
         return Inertia::render('admin/cursos/index', [
             'cursos' => $cursosQuery->get(),
             'comercios' => $comercios,
             'carreras' => $carreras,
             'grupos' => $grupos,
+            'estados' => $estados,
             'rubros' => Rubro::where('activo', true)->orderBy('orden')->orderBy('nombre')->get(),
             'filters' => [
                 'comercio_id' => $comercioId,
                 'carrera_id' => $carreraId,
+                'estado_id' => $estadoId,
                 'tipo' => $tipo,
                 'search' => $search,
             ],
@@ -79,9 +89,14 @@ class CursoController extends Controller
             $request->merge(['tipo' => $request->input('rubros')]);
         }
 
+        if ($request->filled('estado') && ! $request->filled('estado_id')) {
+            $request->merge(['estado_id' => $request->input('estado')]);
+        }
+
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
+            'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
             'flyer' => ['nullable', 'string', 'max:500'],
@@ -93,6 +108,7 @@ class CursoController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre del curso es obligatorio.',
             'nombre.min' => 'El nombre del curso debe tener al menos 3 caracteres.',
             'nombre.max' => 'El nombre del curso no puede superar los 255 caracteres.',
@@ -109,6 +125,7 @@ class CursoController extends Controller
         Curso::create([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
+            'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,
             'tipo' => !empty($validated['tipo']) ? trim($validated['tipo']) : null,
@@ -138,9 +155,14 @@ class CursoController extends Controller
             $request->merge(['tipo' => $request->input('rubros')]);
         }
 
+        if ($request->filled('estado') && ! $request->filled('estado_id')) {
+            $request->merge(['estado_id' => $request->input('estado')]);
+        }
+
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
+            'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
             'flyer' => ['nullable', 'string', 'max:500'],
@@ -152,6 +174,7 @@ class CursoController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre del curso es obligatorio.',
             'nombre.min' => 'El nombre del curso debe tener al menos 3 caracteres.',
             'nombre.max' => 'El nombre del curso no puede superar los 255 caracteres.',
@@ -171,6 +194,7 @@ class CursoController extends Controller
         $cursoModel->update([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
+            'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,
             'tipo' => !empty($validated['tipo']) ? trim($validated['tipo']) : null,

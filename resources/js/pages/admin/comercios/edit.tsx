@@ -79,21 +79,22 @@ import {
     Typography,
 } from '@mui/material';
 import { useState, useMemo } from 'react';
-import type { Carrera, Comercio, Curso, Diplomado, Especialidad, Grupo, Rubro } from '@/types';
+import type { Carrera, Comercio, Curso, Diplomado, Especialidad, Estado, Grupo, Rubro } from '@/types';
 
 interface EditComercioPageProps {
     comercio: Comercio & {
         carreras?: (Carrera & {
             diplomados?: Diplomado[];
             cursos?: Curso[];
-            especialidades?: (Especialidad & { rubro?: Rubro })[];
+            especialidades?: (Especialidad & { rubro?: Rubro; estado?: Estado })[];
         })[];
         cursos?: Curso[];
         diplomados?: Diplomado[];
-        especialidades?: (Especialidad & { carrera?: Carrera; rubro?: Rubro })[];
+        especialidades?: (Especialidad & { carrera?: Carrera; rubro?: Rubro; estado?: Estado })[];
     };
     grupos: Grupo[];
     rubros?: Rubro[];
+    estados?: Estado[];
 }
 
 const COLOR_PRESETS = [
@@ -109,7 +110,7 @@ const COLOR_PRESETS = [
     { name: 'Gris Grafito', hex: '#4b5563' },
 ];
 
-export default function EditComercioPage({ comercio, grupos, rubros = [] }: EditComercioPageProps) {
+export default function EditComercioPage({ comercio, grupos, rubros = [], estados = [] }: EditComercioPageProps) {
     
     
     const { notify } = useNotification();
@@ -1867,6 +1868,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                 <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                                                     <TableRow>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 95, textAlign: 'center' }}>Estado</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
@@ -1879,6 +1881,22 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                     {carrera.diplomados.map((dip) => (
                                                                                         <TableRow key={dip.id} hover>
                                                                                             <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{dip.nombre}</TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                {dip.estado ? (
+                                                                                                    <Chip
+                                                                                                        label={dip.estado.nombre}
+                                                                                                        size="small"
+                                                                                                        sx={{
+                                                                                                            height: 20,
+                                                                                                            fontSize: '0.68rem',
+                                                                                                            fontWeight: 700,
+                                                                                                            bgcolor: dip.estado.color_hex ? `${dip.estado.color_hex}18` : 'grey.100',
+                                                                                                            color: dip.estado.color_hex || 'text.primary',
+                                                                                                            border: `1px solid ${dip.estado.color_hex ? `${dip.estado.color_hex}35` : 'divider'}`,
+                                                                                                        }}
+                                                                                                    />
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
                                                                                             <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {dip.flyer ? (
                                                                                                     <Tooltip title="Ver flyer" arrow>
@@ -1987,6 +2005,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                     <TableRow>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre de la Especialidad</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', minWidth: 140 }}>Rubro Asignado</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 95, textAlign: 'center' }}>Estado</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
@@ -2023,6 +2042,22 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                                             Sin rubro
                                                                                                         </Typography>
                                                                                                     )}
+                                                                                                </TableCell>
+                                                                                                <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                    {esp.estado ? (
+                                                                                                        <Chip
+                                                                                                            label={esp.estado.nombre}
+                                                                                                            size="small"
+                                                                                                            sx={{
+                                                                                                                height: 20,
+                                                                                                                fontSize: '0.68rem',
+                                                                                                                fontWeight: 700,
+                                                                                                                bgcolor: esp.estado.color_hex ? `${esp.estado.color_hex}18` : 'grey.100',
+                                                                                                                color: esp.estado.color_hex || 'text.primary',
+                                                                                                                border: `1px solid ${esp.estado.color_hex ? `${esp.estado.color_hex}35` : 'divider'}`,
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    ) : '-'}
                                                                                                 </TableCell>
                                                                                                 <TableCell sx={{ textAlign: 'center' }}>
                                                                                                     {esp.flyer ? (
@@ -2122,6 +2157,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                 <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                                                     <TableRow>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Nombre</TableCell>
+                                                                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 95, textAlign: 'center' }}>Estado</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Flyer</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>Brochure</TableCell>
                                                                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', width: 70, textAlign: 'center' }}>YouTube</TableCell>
@@ -2134,6 +2170,22 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                                                                                     {carrera.cursos.map((cur) => (
                                                                                         <TableRow key={cur.id} hover>
                                                                                             <TableCell sx={{ fontWeight: 600, fontSize: '0.78rem' }}>{cur.nombre}</TableCell>
+                                                                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                                                                {cur.estado ? (
+                                                                                                    <Chip
+                                                                                                        label={cur.estado.nombre}
+                                                                                                        size="small"
+                                                                                                        sx={{
+                                                                                                            height: 20,
+                                                                                                            fontSize: '0.68rem',
+                                                                                                            fontWeight: 700,
+                                                                                                            bgcolor: cur.estado.color_hex ? `${cur.estado.color_hex}18` : 'grey.100',
+                                                                                                            color: cur.estado.color_hex || 'text.primary',
+                                                                                                            border: `1px solid ${cur.estado.color_hex ? `${cur.estado.color_hex}35` : 'divider'}`,
+                                                                                                        }}
+                                                                                                    />
+                                                                                                ) : '-'}
+                                                                                            </TableCell>
                                                                                             <TableCell sx={{ textAlign: 'center' }}>
                                                                                                 {cur.flyer ? (
                                                                                                     <Tooltip title="Ver flyer" arrow>
@@ -2335,6 +2387,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                 especialidad={selectedEspecialidad}
                 carreras={(comercio.carreras || []).map((c) => ({ ...c, comercio }))}
                 rubros={rubros}
+                estados={estados}
                 defaultCarreraId={defaultCarreraIdForEspecialidad}
             />
 
@@ -2345,6 +2398,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                 comercios={[comercio]}
                 carreras={comercio.carreras || []}
                 rubros={rubros}
+                estados={estados}
                 defaultComercioId={comercio.id}
                 defaultCarreraId={defaultCarreraIdForDiplomado}
             />
@@ -2356,6 +2410,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [] }: Edit
                 comercios={[comercio]}
                 carreras={comercio.carreras || []}
                 rubros={rubros}
+                estados={estados}
                 defaultComercioId={comercio.id}
                 defaultCarreraId={defaultCarreraIdForCurso}
             />

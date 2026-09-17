@@ -43,7 +43,7 @@ import { CursoDialog } from '@/components/admin/curso-dialog';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
-import type { Carrera, Comercio, Curso, Grupo, Rubro } from '@/types';
+import type { Carrera, Comercio, Curso, Grupo, Rubro, Estado } from '@/types';
 
 interface Props {
     cursos: Curso[];
@@ -51,8 +51,11 @@ interface Props {
     carreras?: Carrera[];
     grupos?: Grupo[];
     rubros?: Rubro[];
+    estados?: Estado[];
     filters: {
         comercio_id?: string;
+        carrera_id?: string;
+        estado_id?: string;
         tipo?: string;
         search?: string;
     };
@@ -63,16 +66,17 @@ export default function CursosIndex({
     comercios = [],
     carreras = [],
     rubros = [],
+    estados = [],
     filters,
 }: Props) {
     const page = usePage();
-    
     
     const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
     const [selectedComercio, setSelectedComercio] = useState<string>(filters.comercio_id || 'all');
     const [selectedTipo, setSelectedTipo] = useState<string>(filters.tipo || 'all');
+    const [selectedEstado, setSelectedEstado] = useState<string>(filters.estado_id || 'all');
 
     // Dialog state
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -80,6 +84,7 @@ export default function CursosIndex({
 
     const applyFilters = (newFilters: {
         comercio_id?: string;
+        estado_id?: string;
         tipo?: string;
         search?: string;
     }) => {
@@ -87,6 +92,7 @@ export default function CursosIndex({
             `/admin/cursos`,
             {
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
+                estado_id: newFilters.estado_id !== undefined ? (newFilters.estado_id === 'all' ? undefined : newFilters.estado_id) : (selectedEstado === 'all' ? undefined : selectedEstado),
                 tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
                 search: newFilters.search !== undefined ? (newFilters.search || undefined) : (search || undefined),
             },
@@ -112,6 +118,11 @@ export default function CursosIndex({
     const handleTipoChange = (val: string) => {
         setSelectedTipo(val);
         applyFilters({ tipo: val });
+    };
+
+    const handleEstadoChange = (val: string) => {
+        setSelectedEstado(val);
+        applyFilters({ estado_id: val });
     };
 
     const handleCreate = () => {
@@ -582,6 +593,35 @@ export default function CursosIndex({
                                 )}
                             </Select>
                         </FormControl>
+                        {/* Filtro por Estado */}
+                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 160 } }}>
+                            <InputLabel id="filter-estado-label">Estado</InputLabel>
+                            <Select
+                                labelId="filter-estado-label"
+                                value={selectedEstado}
+                                label="Estado"
+                                onChange={(e) => handleEstadoChange(e.target.value)}
+                            >
+                                <MenuItem value="all">
+                                    <Typography variant="body2">Todos los estados</Typography>
+                                </MenuItem>
+                                {estados.map((est) => (
+                                    <MenuItem key={est.id} value={String(est.id)}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box
+                                                sx={{
+                                                    width: 8,
+                                                    height: 8,
+                                                    borderRadius: '50%',
+                                                    bgcolor: est.color_hex || '#94a3b8',
+                                                }}
+                                            />
+                                            <Typography variant="body2">{est.nombre}</Typography>
+                                        </Box>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Box>
                 </Paper>
 
@@ -620,6 +660,9 @@ export default function CursosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140 }}>
                                     RUBRO / TIPO
                                 </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
+                                    ESTADO
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -634,17 +677,17 @@ export default function CursosIndex({
                         <TableBody>
                             {cursos.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 5 }}>
                                         <MenuBookIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron cursos registrados
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
-                                            {search || selectedComercio !== 'all' || selectedTipo !== 'all'
+                                            {search || selectedComercio !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all'
                                                 ? 'No hay registros que coincidan con los filtros aplicados.'
                                                 : 'Aún no se han registrado cursos.'}
                                         </Typography>
-                                        {search || selectedComercio !== 'all' || selectedTipo !== 'all' ? (
+                                        {search || selectedComercio !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all' ? (
                                             <Button
                                                 variant="outlined"
                                                 size="small"
@@ -653,7 +696,8 @@ export default function CursosIndex({
                                                     setSearch('');
                                                     setSelectedComercio('all');
                                                     setSelectedTipo('all');
-                                                    applyFilters({ comercio_id: 'all', tipo: 'all', search: '' });
+                                                    setSelectedEstado('all');
+                                                    applyFilters({ comercio_id: 'all', tipo: 'all', estado_id: 'all', search: '' });
                                                 }}
                                                 sx={{ borderRadius: 1 }}
                                             >
@@ -735,6 +779,27 @@ export default function CursosIndex({
                                             {/* Columna 3: Rubro / Tipo */}
                                             <TableCell>
                                                 {getTipoChip(curso.tipo)}
+                                            </TableCell>
+
+                                            {/* Columna Estado */}
+                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                {curso.estado ? (
+                                                    <Chip
+                                                        label={curso.estado.nombre}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: curso.estado.color_hex ? `${curso.estado.color_hex}18` : 'grey.100',
+                                                            color: curso.estado.color_hex || 'text.primary',
+                                                            border: `1px solid ${curso.estado.color_hex ? `${curso.estado.color_hex}40` : 'divider'}`,
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem',
+                                                            height: 24,
+                                                            borderRadius: 1,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Typography variant="caption" color="text.disabled">—</Typography>
+                                                )}
                                             </TableCell>
 
                                             {/* Columna 4: Recursos */}
@@ -898,7 +963,7 @@ export default function CursosIndex({
                 comercios={comercios}
                 carreras={carreras}
                 rubros={rubros}
-                
+                estados={estados}
             />
         </>
     );

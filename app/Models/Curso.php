@@ -15,6 +15,7 @@ class Curso extends Model
     protected $fillable = [
         'comercio_id',
         'carrera_id',
+        'estado_id',
         'nombre',
         'slug',
         'tipo',
@@ -73,5 +74,13 @@ class Curso extends Model
     public function carrera(): BelongsTo
     {
         return $this->belongsTo(Carrera::class, 'carrera_id');
+    }
+
+    /**
+     * Estado al que pertenece el curso.
+     */
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 }

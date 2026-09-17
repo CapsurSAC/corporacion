@@ -17,6 +17,7 @@ class Especialidad extends Model
     protected $fillable = [
         'carrera_id',
         'rubro_id',
+        'estado_id',
         'nombre',
         'slug',
         'flyer',
@@ -40,5 +41,13 @@ class Especialidad extends Model
     public function rubro(): BelongsTo
     {
         return $this->belongsTo(Rubro::class, 'rubro_id');
+    }
+
+    /**
+     * Estado al que pertenece esta especialidad.
+     */
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 }

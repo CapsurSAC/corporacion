@@ -23,7 +23,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength } from '@/lib/validation';
-import type { Especialidad, Carrera, Rubro } from '@/types';
+import type { Especialidad, Carrera, Rubro, Estado } from '@/types';
 
 interface EspecialidadDialogProps {
     open: boolean;
@@ -31,6 +31,7 @@ interface EspecialidadDialogProps {
     especialidad?: Especialidad | null;
     carreras: (Carrera & { comercio?: { id: number; nombre: string; codigo?: string | null; color_hex?: string | null } })[];
     rubros: Rubro[];
+    estados?: Estado[];
     defaultCarreraId?: number | null;
     defaultRubroId?: number | null;
 }
@@ -41,6 +42,7 @@ export function EspecialidadDialog({
     especialidad,
     carreras = [],
     rubros = [],
+    estados = [],
     defaultCarreraId,
     defaultRubroId,
 }: EspecialidadDialogProps) {
@@ -52,6 +54,7 @@ export function EspecialidadDialog({
         useForm<{
             carrera_id: string;
             rubro_id: string;
+            estado_id: string;
             nombre: string;
             flyer: string;
             brochure: string;
@@ -61,6 +64,7 @@ export function EspecialidadDialog({
         }>({
             carrera_id: defaultCarreraId ? String(defaultCarreraId) : (carreras[0]?.id ? String(carreras[0].id) : ''),
             rubro_id: defaultRubroId ? String(defaultRubroId) : (rubros[0]?.id ? String(rubros[0].id) : ''),
+            estado_id: '',
             nombre: '',
             flyer: '',
             brochure: '',
@@ -74,6 +78,7 @@ export function EspecialidadDialog({
             setData({
                 carrera_id: String(especialidad.carrera_id),
                 rubro_id: String(especialidad.rubro_id),
+                estado_id: especialidad.estado_id ? String(especialidad.estado_id) : '',
                 nombre: especialidad.nombre || '',
                 flyer: especialidad.flyer || '',
                 brochure: especialidad.brochure || '',
@@ -275,20 +280,59 @@ export function EspecialidadDialog({
                             </FormControl>
                         </Box>
 
-                        {/* Fila 2: Nombre de Especialidad y Precio */}
-                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '2fr 1fr' }, gap: 2 }}>
-                            <TextField
-                                label="Nombre de la Especialidad"
-                                value={data.nombre}
-                                onChange={(e) => setData('nombre', e.target.value)}
-                                fullWidth
-                                size="small"
-                                required
-                                disabled={processing}
-                                error={!!clientErrors.nombre || !!errors.nombre}
-                                helperText={clientErrors.nombre || errors.nombre || 'Ej: Especialidad en Full Stack Cloud & DevOps'}
-                                placeholder="Especialidad en ..."
-                            />
+                        {/* Fila 2: Nombre de Especialidad */}
+                        <TextField
+                            label="Nombre de la Especialidad"
+                            value={data.nombre}
+                            onChange={(e) => setData('nombre', e.target.value)}
+                            fullWidth
+                            size="small"
+                            required
+                            disabled={processing}
+                            error={!!clientErrors.nombre || !!errors.nombre}
+                            helperText={clientErrors.nombre || errors.nombre || 'Ej: Especialidad en Full Stack Cloud & DevOps'}
+                            placeholder="Especialidad en ..."
+                        />
+
+                        {/* Fila 3: Estado y Precio */}
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                            <FormControl fullWidth size="small" error={!!errors.estado_id}>
+                                <InputLabel id="estado-select-label">Estado</InputLabel>
+                                <Select
+                                    labelId="estado-select-label"
+                                    value={data.estado_id}
+                                    label="Estado"
+                                    onChange={(e) => setData('estado_id', e.target.value)}
+                                    disabled={processing}
+                                >
+                                    <MenuItem value="">
+                                        <Typography variant="body2" color="text.secondary">
+                                            Sin estado asignado
+                                        </Typography>
+                                    </MenuItem>
+                                    {estados.map((est) => (
+                                        <MenuItem key={est.id} value={String(est.id)}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box
+                                                    sx={{
+                                                        width: 10,
+                                                        height: 10,
+                                                        borderRadius: '50%',
+                                                        bgcolor: est.color_hex || '#94a3b8',
+                                                        flexShrink: 0,
+                                                    }}
+                                                />
+                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                    {est.nombre}
+                                                </Typography>
+                                            </Box>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                {errors.estado_id && (
+                                    <FormHelperText>{errors.estado_id}</FormHelperText>
+                                )}
+                            </FormControl>
 
                             <TextField
                                 label="Precio / Inversión"

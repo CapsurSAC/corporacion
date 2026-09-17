@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comercio;
+use App\Models\Estado;
 use App\Models\Grupo;
 use App\Models\Rubro;
 use Illuminate\Http\RedirectResponse;
@@ -61,10 +62,10 @@ class ComercioController extends Controller
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
         $comercioModel->load([
             'grupo',
-            'carreras' => fn ($q) => $q->with(['diplomados', 'cursos', 'especialidades.rubro'])->orderBy('nombre', 'asc'),
-            'cursos' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
-            'diplomados' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
-            'especialidades' => fn ($q) => $q->with(['carrera', 'rubro'])->latest('id'),
+            'carreras' => fn ($q) => $q->with(['diplomados.estado', 'cursos.estado', 'especialidades.rubro', 'especialidades.estado'])->orderBy('nombre', 'asc'),
+            'cursos' => fn ($q) => $q->with('estado')->orderBy('tipo', 'asc')->latest('id'),
+            'diplomados' => fn ($q) => $q->with('estado')->orderBy('tipo', 'asc')->latest('id'),
+            'especialidades' => fn ($q) => $q->with(['carrera', 'rubro', 'estado'])->latest('id'),
         ]);
 
         $grupos = Grupo::query()
@@ -72,9 +73,15 @@ class ComercioController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        $estados = Estado::query()
+            ->where('activo', true)
+            ->orderBy('orden')
+            ->get();
+
         return Inertia::render('admin/comercios/edit', [
             'comercio' => $comercioModel,
             'grupos' => $grupos,
+            'estados' => $estados,
             'rubros' => Rubro::where('activo', true)->orderBy('orden')->orderBy('nombre')->get(),
         ]);
     }

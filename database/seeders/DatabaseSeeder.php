@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             GrupoYComercioSeeder::class,
             RubroSeeder::class,
+            EstadoSeeder::class,
             CarreraSeeder::class,
             DiplomadoSeeder::class,
             CursoSeeder::class,
