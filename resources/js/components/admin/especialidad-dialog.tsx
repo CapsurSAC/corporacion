@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import CategoryIcon from '@mui/icons-material/Category';
 import LabelIcon from '@mui/icons-material/Label';
 import SchoolIcon from '@mui/icons-material/School';
+import StoreIcon from '@mui/icons-material/Store';
 import { ComercioBadge } from '@/components/admin/comercio-badge';
 import {
     Dialog,
@@ -23,15 +24,17 @@ import {
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import { isMinLength } from '@/lib/validation';
-import type { Especialidad, Carrera, Rubro, Estado } from '@/types';
+import type { Especialidad, Carrera, Comercio, Rubro, Estado } from '@/types';
 
 interface EspecialidadDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     especialidad?: Especialidad | null;
-    carreras: (Carrera & { comercio?: { id: number; nombre: string; codigo?: string | null; color_hex?: string | null } })[];
+    comercios: Comercio[];
+    carreras?: (Carrera & { comercio?: { id: number; nombre: string; codigo?: string | null; color_hex?: string | null } })[];
     rubros: Rubro[];
     estados?: Estado[];
+    defaultComercioId?: number | null;
     defaultCarreraId?: number | null;
     defaultRubroId?: number | null;
 }
@@ -40,18 +43,21 @@ export function EspecialidadDialog({
     open,
     onOpenChange,
     especialidad,
+    comercios = [],
     carreras = [],
     rubros = [],
     estados = [],
+    defaultComercioId,
     defaultCarreraId,
     defaultRubroId,
 }: EspecialidadDialogProps) {
     const isEditing = !!especialidad;
     const { notify } = useNotification();
-    const [clientErrors, setClientErrors] = useState<{ carrera_id?: string; rubro_id?: string; nombre?: string }>({});
+    const [clientErrors, setClientErrors] = useState<{ comercio_id?: string; rubro_id?: string; nombre?: string }>({});
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm<{
+            comercio_id: string;
             carrera_id: string;
             rubro_id: string;
             estado_id: string;
@@ -62,7 +68,8 @@ export function EspecialidadDialog({
             precio: string;
             actualizado_drive: string;
         }>({
-            carrera_id: defaultCarreraId ? String(defaultCarreraId) : (carreras[0]?.id ? String(carreras[0].id) : ''),
+            comercio_id: defaultComercioId ? String(defaultComercioId) : (comercios[0]?.id ? String(comercios[0].id) : ''),
+            carrera_id: defaultCarreraId ? String(defaultCarreraId) : '',
             rubro_id: defaultRubroId ? String(defaultRubroId) : (rubros[0]?.id ? String(rubros[0].id) : ''),
             estado_id: '',
             nombre: '',
@@ -76,8 +83,9 @@ export function EspecialidadDialog({
     useEffect(() => {
         if (especialidad) {
             setData({
-                carrera_id: String(especialidad.carrera_id),
-                rubro_id: String(especialidad.rubro_id),
+                comercio_id: String(especialidad.comercio_id || especialidad.carrera?.comercio_id || comercios[0]?.id || ''),
+                carrera_id: especialidad.carrera_id ? String(especialidad.carrera_id) : '',
+                rubro_id: String(especialidad.rubro_id || ''),
                 estado_id: especialidad.estado_id ? String(especialidad.estado_id) : '',
                 nombre: especialidad.nombre || '',
                 flyer: especialidad.flyer || '',
@@ -89,29 +97,33 @@ export function EspecialidadDialog({
         } else {
             reset();
 
-            const targetCarreraId = defaultCarreraId || carreras[0]?.id;
+            const targetComercioId = defaultComercioId || comercios[0]?.id;
+            const targetCarreraId = defaultCarreraId || '';
             const targetRubroId = defaultRubroId || rubros[0]?.id;
 
-            if (targetCarreraId) {
-                setData((prev) => ({ ...prev, carrera_id: String(targetCarreraId) }));
-            }
-            if (targetRubroId) {
-                setData((prev) => ({ ...prev, rubro_id: String(targetRubroId) }));
-            }
+            setData((prev) => ({
+                ...prev,
+                comercio_id: targetComercioId ? String(targetComercioId) : '',
+                carrera_id: targetCarreraId ? String(targetCarreraId) : '',
+                rubro_id: targetRubroId ? String(targetRubroId) : '',
+            }));
         }
 
         setClientErrors({});
         clearErrors();
-    }, [especialidad, open, defaultCarreraId, defaultRubroId, carreras, rubros]);
+    }, [especialidad, open, defaultComercioId, defaultCarreraId, defaultRubroId, comercios, carreras, rubros]);
+
+    // Filtrar carreras que pertenezcan al comercio seleccionado actualmente
+    const availableCarreras = carreras.filter((c) => String(c.comercio_id) === String(data.comercio_id));
 
     const validate = (): boolean => {
-        const newErrors: { carrera_id?: string; rubro_id?: string; nombre?: string } = {};
+        const newErrors: { comercio_id?: string; rubro_id?: string; nombre?: string } = {};
 
-        if (!data.carrera_id) {
-            newErrors.carrera_id = 'Debes seleccionar la carrera a la que pertenece esta especialidad.';
+        if (!data.comercio_id) {
+            newErrors.comercio_id = 'Debes seleccionar el comercio o sede responsable.';
         }
         if (!data.rubro_id) {
-            newErrors.rubro_id = 'Debes seleccionar exactamente un rubro para esta especialidad.';
+            newErrors.rubro_id = 'Debes seleccionar obligatoriamente un rubro para esta especialidad.';
         }
         if (!isMinLength(data.nombre, 3)) {
             newErrors.nombre = 'El nombre de la especialidad debe tener al menos 3 caracteres.';
@@ -195,8 +207,8 @@ export function EspecialidadDialog({
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
                         {isEditing
-                            ? 'Actualiza los datos, carrera matriz y rubro de la especialidad.'
-                            : 'Asocia una nueva especialidad académica a una carrera y a su rubro.'}
+                            ? 'Actualiza los datos, comercio responsable, carrera y rubro de la especialidad.'
+                            : 'Registra una especialidad para un comercio, vinculada opcionalmente a una carrera técnica.'}
                     </Typography>
                 </Box>
             </DialogTitle>
@@ -204,42 +216,105 @@ export function EspecialidadDialog({
             <form onSubmit={handleSubmit} noValidate>
                 <DialogContent sx={{ pt: 3, pb: 2 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                        {/* Fila 1: Carrera y Rubro */}
+                        {/* Fila 1: Comercio Responsable y Carrera Matriz (Opcional) */}
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                            {/* Carrera Técnica Asociada */}
+                            {/* Comercio / Instituto Responsable */}
                             <FormControl
                                 fullWidth
                                 size="small"
                                 required
-                                error={!!clientErrors.carrera_id || !!errors.carrera_id}
+                                error={!!clientErrors.comercio_id || !!errors.comercio_id}
                             >
-                                <InputLabel id="carrera-select-label">Carrera Profesional Matriz</InputLabel>
+                                <InputLabel id="comercio-select-label">Comercio / Sede Responsable *</InputLabel>
+                                <Select
+                                    labelId="comercio-select-label"
+                                    value={data.comercio_id}
+                                    label="Comercio / Sede Responsable *"
+                                    onChange={(e) => {
+                                        const newComercioId = e.target.value;
+                                        setData((prev) => ({
+                                            ...prev,
+                                            comercio_id: newComercioId,
+                                            carrera_id: '',
+                                        }));
+                                        if (clientErrors.comercio_id) {
+                                            setClientErrors((prev) => ({ ...prev, comercio_id: undefined }));
+                                        }
+                                    }}
+                                    disabled={processing}
+                                >
+                                    {comercios.map((comercio) => (
+                                        <MenuItem key={comercio.id} value={String(comercio.id)}>
+                                            <ComercioBadge comercio={comercio} size={22} showName />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                {(clientErrors.comercio_id || errors.comercio_id) && (
+                                    <FormHelperText>
+                                        {clientErrors.comercio_id || errors.comercio_id}
+                                    </FormHelperText>
+                                )}
+                            </FormControl>
+
+                            {/* Carrera Técnica Asociada (Opcional) */}
+                            <FormControl
+                                fullWidth
+                                size="small"
+                                error={!!errors.carrera_id}
+                            >
+                                <InputLabel id="carrera-select-label">Carrera Perteneciente (Opcional)</InputLabel>
                                 <Select
                                     labelId="carrera-select-label"
                                     value={data.carrera_id}
-                                    label="Carrera Profesional Matriz"
+                                    label="Carrera Perteneciente (Opcional)"
                                     onChange={(e) => setData('carrera_id', e.target.value)}
-                                    disabled={processing}
+                                    disabled={processing || availableCarreras.length === 0}
                                 >
-                                    {carreras.map((carrera) => (
+                                    <MenuItem value="">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <StoreIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                            <Typography variant="body2" color="text.secondary">
+                                                {availableCarreras.length === 0
+                                                    ? 'Sin carreras disponibles (Directo al comercio)'
+                                                    : 'General / Sin Carrera Específica'}
+                                            </Typography>
+                                        </Box>
+                                    </MenuItem>
+                                    {availableCarreras.map((carrera) => (
                                         <MenuItem key={carrera.id} value={String(carrera.id)}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                {carrera.comercio && (
-                                                    <ComercioBadge comercio={carrera.comercio} size={20} />
-                                                )}
+                                                <SchoolIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
                                                 <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                                                    {carrera.nombre}
+                                                    {carrera.nombre} {carrera.codigo ? `(${carrera.codigo})` : ''}
                                                 </Typography>
                                             </Box>
                                         </MenuItem>
                                     ))}
                                 </Select>
-                                {(clientErrors.carrera_id || errors.carrera_id) && (
-                                    <FormHelperText>
-                                        {clientErrors.carrera_id || errors.carrera_id}
+                                {availableCarreras.length === 0 ? (
+                                    <FormHelperText sx={{ color: 'text.secondary' }}>
+                                        Este comercio no tiene carreras registradas (se asignará directo al comercio).
                                     </FormHelperText>
-                                )}
+                                ) : errors.carrera_id ? (
+                                    <FormHelperText>{errors.carrera_id}</FormHelperText>
+                                ) : null}
                             </FormControl>
+                        </Box>
+
+                        {/* Fila 2: Nombre de Especialidad y Rubro Asignado */}
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1.2fr 0.8fr' }, gap: 2 }}>
+                            <TextField
+                                label="Nombre de la Especialidad *"
+                                value={data.nombre}
+                                onChange={(e) => setData('nombre', e.target.value)}
+                                fullWidth
+                                size="small"
+                                required
+                                disabled={processing}
+                                error={!!clientErrors.nombre || !!errors.nombre}
+                                helperText={clientErrors.nombre || errors.nombre || 'Ej: Especialidad en Full Stack Cloud & DevOps'}
+                                placeholder="Especialidad en ..."
+                            />
 
                             {/* Rubro (Mínimo 1 y Máximo 1) */}
                             <FormControl
@@ -248,11 +323,11 @@ export function EspecialidadDialog({
                                 required
                                 error={!!clientErrors.rubro_id || !!errors.rubro_id}
                             >
-                                <InputLabel id="rubro-select-label">Rubro Asignado</InputLabel>
+                                <InputLabel id="rubro-select-label">Rubro Asignado *</InputLabel>
                                 <Select
                                     labelId="rubro-select-label"
                                     value={data.rubro_id}
-                                    label="Rubro Asignado"
+                                    label="Rubro Asignado *"
                                     onChange={(e) => setData('rubro_id', e.target.value)}
                                     disabled={processing}
                                 >
@@ -279,20 +354,6 @@ export function EspecialidadDialog({
                                 )}
                             </FormControl>
                         </Box>
-
-                        {/* Fila 2: Nombre de Especialidad */}
-                        <TextField
-                            label="Nombre de la Especialidad"
-                            value={data.nombre}
-                            onChange={(e) => setData('nombre', e.target.value)}
-                            fullWidth
-                            size="small"
-                            required
-                            disabled={processing}
-                            error={!!clientErrors.nombre || !!errors.nombre}
-                            helperText={clientErrors.nombre || errors.nombre || 'Ej: Especialidad en Full Stack Cloud & DevOps'}
-                            placeholder="Especialidad en ..."
-                        />
 
                         {/* Fila 3: Estado y Precio */}
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>

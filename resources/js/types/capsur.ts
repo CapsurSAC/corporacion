@@ -171,7 +171,8 @@ export interface Curso {
 
 export interface Especialidad {
     id: number;
-    carrera_id: number;
+    comercio_id: number;
+    carrera_id?: number | null;
     rubro_id: number;
     estado_id?: number | null;
     nombre: string;
@@ -181,7 +182,8 @@ export interface Especialidad {
     youtube?: string | null;
     precio?: string | null;
     actualizado_drive?: string | null;
-    carrera?: Carrera;
+    comercio?: Comercio;
+    carrera?: Carrera | null;
     rubro?: Rubro;
     estado?: Estado | null;
     created_at?: string;

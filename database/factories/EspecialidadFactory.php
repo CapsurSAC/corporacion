@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Carrera;
+use App\Models\Comercio;
 use App\Models\Especialidad;
 use App\Models\Rubro;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class EspecialidadFactory extends Factory
         $nombre = 'Especialidad en ' . fake()->unique()->jobTitle();
 
         return [
+            'comercio_id' => Comercio::factory(),
             'carrera_id' => Carrera::factory(),
             'rubro_id' => Rubro::factory(),
             'nombre' => $nombre,

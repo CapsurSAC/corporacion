@@ -15,6 +15,7 @@ class Especialidad extends Model
     protected $table = 'especialidades';
 
     protected $fillable = [
+        'comercio_id',
         'carrera_id',
         'rubro_id',
         'estado_id',
@@ -28,7 +29,15 @@ class Especialidad extends Model
     ];
 
     /**
-     * Carrera a la que pertenece esta especialidad.
+     * Comercio al que pertenece esta especialidad.
+     */
+    public function comercio(): BelongsTo
+    {
+        return $this->belongsTo(Comercio::class, 'comercio_id');
+    }
+
+    /**
+     * Carrera a la que pertenece esta especialidad (opcional).
      */
     public function carrera(): BelongsTo
     {

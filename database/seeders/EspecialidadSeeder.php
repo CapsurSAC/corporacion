@@ -101,6 +101,7 @@ class EspecialidadSeeder extends Seeder
 
                 Especialidad::updateOrCreate(
                     [
+                        'comercio_id' => $carrera->comercio_id,
                         'carrera_id' => $carrera->id,
                         'slug' => Str::slug($item['nombre']),
                     ],

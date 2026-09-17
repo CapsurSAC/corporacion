@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Comercio extends Model
 {
@@ -88,10 +87,10 @@ class Comercio extends Model
     }
 
     /**
-     * Especialidades ofrecidas a través de las carreras de este comercio.
+     * Especialidades ofrecidas por este comercio.
      */
-    public function especialidades(): HasManyThrough
+    public function especialidades(): HasMany
     {
-        return $this->hasManyThrough(Especialidad::class, Carrera::class, 'comercio_id', 'carrera_id');
+        return $this->hasMany(Especialidad::class, 'comercio_id');
     }
 }

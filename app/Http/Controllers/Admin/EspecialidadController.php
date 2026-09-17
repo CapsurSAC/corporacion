@@ -28,10 +28,10 @@ class EspecialidadController extends Controller
         $search = $request->query('search');
 
         $especialidadesQuery = Especialidad::query()
-            ->with(['carrera.comercio.grupo', 'rubro', 'estado'])
+            ->with(['comercio.grupo', 'carrera', 'rubro', 'estado'])
             ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
             ->when($rubroId, fn ($query) => $query->where('rubro_id', $rubroId))
-            ->when($comercioId, fn ($query) => $query->whereHas('carrera', fn ($q) => $q->where('comercio_id', $comercioId)))
+            ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
             ->when($estadoId, fn ($query) => $query->where('estado_id', $estadoId))
             ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
@@ -89,7 +89,8 @@ class EspecialidadController extends Controller
         }
 
         $validated = $request->validate([
-            'carrera_id' => ['required', 'exists:carreras,id'],
+            'comercio_id' => ['required', 'exists:comercios,id'],
+            'carrera_id' => ['nullable', 'exists:carreras,id'],
             'rubro_id' => ['required', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
@@ -99,7 +100,8 @@ class EspecialidadController extends Controller
             'precio' => ['nullable', 'string', 'max:100'],
             'actualizado_drive' => ['nullable', 'string', 'max:500'],
         ], [
-            'carrera_id.required' => 'Debes seleccionar la carrera a la que pertenece esta especialidad.',
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera seleccionada no es válida.',
             'rubro_id.required' => 'Debes seleccionar obligatoriamente un rubro para esta especialidad.',
             'rubro_id.exists' => 'El rubro seleccionado no es válido.',
@@ -118,7 +120,8 @@ class EspecialidadController extends Controller
         }
 
         Especialidad::create([
-            'carrera_id' => $validated['carrera_id'],
+            'comercio_id' => $validated['comercio_id'],
+            'carrera_id' => $validated['carrera_id'] ?? null,
             'rubro_id' => $validated['rubro_id'],
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
@@ -150,7 +153,8 @@ class EspecialidadController extends Controller
         }
 
         $validated = $request->validate([
-            'carrera_id' => ['required', 'exists:carreras,id'],
+            'comercio_id' => ['required', 'exists:comercios,id'],
+            'carrera_id' => ['nullable', 'exists:carreras,id'],
             'rubro_id' => ['required', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
@@ -160,7 +164,8 @@ class EspecialidadController extends Controller
             'precio' => ['nullable', 'string', 'max:100'],
             'actualizado_drive' => ['nullable', 'string', 'max:500'],
         ], [
-            'carrera_id.required' => 'Debes seleccionar la carrera a la que pertenece esta especialidad.',
+            'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
+            'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera seleccionada no es válida.',
             'rubro_id.required' => 'Debes seleccionar obligatoriamente un rubro para esta especialidad.',
             'rubro_id.exists' => 'El rubro seleccionado no es válido.',
@@ -182,7 +187,8 @@ class EspecialidadController extends Controller
         }
 
         $especialidadModel->update([
-            'carrera_id' => $validated['carrera_id'],
+            'comercio_id' => $validated['comercio_id'],
+            'carrera_id' => $validated['carrera_id'] ?? null,
             'rubro_id' => $validated['rubro_id'],
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),

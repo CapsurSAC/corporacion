@@ -2385,9 +2385,11 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                 open={especialidadDialogOpen}
                 onOpenChange={setEspecialidadDialogOpen}
                 especialidad={selectedEspecialidad}
+                comercios={[comercio]}
                 carreras={(comercio.carreras || []).map((c) => ({ ...c, comercio }))}
                 rubros={rubros}
                 estados={estados}
+                defaultComercioId={comercio.id}
                 defaultCarreraId={defaultCarreraIdForEspecialidad}
             />
 

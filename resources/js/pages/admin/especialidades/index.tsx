@@ -612,35 +612,35 @@ export default function EspecialidadesIndex({
 
                                         {/* Carrera Matriz */}
                                         <TableCell>
-                                            {esp.carrera ? (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                {esp.carrera ? (
                                                     <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
                                                         {esp.carrera.nombre}
                                                     </Typography>
-                                                    {esp.carrera.comercio && (
-                                                        <Chip
-                                                            avatar={<ComercioBadge comercio={esp.carrera.comercio} size={16} />}
-                                                            label={esp.carrera.comercio.sigla || esp.carrera.comercio.codigo || esp.carrera.comercio.nombre}
-                                                            size="small"
-                                                            sx={{
-                                                                width: 'fit-content',
-                                                                height: 22,
-                                                                fontSize: '0.68rem',
-                                                                bgcolor: esp.carrera.comercio.color_hex
-                                                                    ? `${esp.carrera.comercio.color_hex}15`
-                                                                    : 'grey.100',
-                                                                color: esp.carrera.comercio.color_hex || 'text.primary',
-                                                                fontWeight: 700,
-                                                                borderRadius: 0.8,
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Box>
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">
-                                                    Sin carrera
-                                                </Typography>
-                                            )}
+                                                ) : (
+                                                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary', fontSize: '0.82rem' }}>
+                                                        Directo del comercio
+                                                    </Typography>
+                                                )}
+                                                {(esp.comercio || esp.carrera?.comercio) && (
+                                                    <Chip
+                                                        avatar={<ComercioBadge comercio={(esp.comercio || esp.carrera?.comercio)!} size={16} />}
+                                                        label={(esp.comercio || esp.carrera?.comercio)!.sigla || (esp.comercio || esp.carrera?.comercio)!.codigo || (esp.comercio || esp.carrera?.comercio)!.nombre}
+                                                        size="small"
+                                                        sx={{
+                                                            width: 'fit-content',
+                                                            height: 22,
+                                                            fontSize: '0.68rem',
+                                                            bgcolor: (esp.comercio || esp.carrera?.comercio)!.color_hex
+                                                                ? `${(esp.comercio || esp.carrera?.comercio)!.color_hex}15`
+                                                                : 'grey.100',
+                                                            color: (esp.comercio || esp.carrera?.comercio)!.color_hex || 'text.primary',
+                                                            fontWeight: 700,
+                                                            borderRadius: 0.8,
+                                                        }}
+                                                    />
+                                                )}
+                                            </Box>
                                         </TableCell>
 
                                         {/* Rubro (1 Obligatorio) */}
@@ -826,9 +826,11 @@ export default function EspecialidadesIndex({
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 especialidad={editingEspecialidad}
+                comercios={comercios}
                 carreras={carreras}
                 rubros={rubros}
                 estados={estados}
+                defaultComercioId={selectedComercio !== 'all' ? Number(selectedComercio) : null}
                 defaultCarreraId={selectedCarrera !== 'all' ? Number(selectedCarrera) : null}
                 defaultRubroId={selectedRubro !== 'all' ? Number(selectedRubro) : null}
             />
