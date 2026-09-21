@@ -150,7 +150,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
 
     return (
         <>
-            <Head title="Comercios e Institutos - Grupo Capsur" />
+            <Head title="Comercios" />
 
             <Box
                 sx={{
@@ -211,7 +211,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                             letterSpacing: '-0.02em',
                                         }}
                                     >
-                                        Comercios e Institutos
+                                        Comercios
                                     </Typography>
                                     <Chip
                                         label={`${comercios.length} MARCAS`}
@@ -751,7 +751,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                             }}
                         >
                             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                Mostrando <strong>{comercios.length}</strong> comercios e institutos
+                                Mostrando <strong>{comercios.length}</strong> comercios
                             </Typography>
                         </Box>
                     </TableContainer>
@@ -878,7 +878,7 @@ ComerciosIndex.layout = () => ({
             href: '/dashboard',
         },
         {
-            title: 'Comercios e Institutos',
+            title: 'Comercios',
             href: '/admin/comercios',
         },
     ],
