@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Update cPanel repository
+      - name: Update repository on cPanel
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
@@ -23,7 +23,7 @@ jobs:
 
           echo "$response" | grep -q '"status":1' || exit 1
 
-      - name: Deploy cPanel repository
+      - name: Deploy application
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
