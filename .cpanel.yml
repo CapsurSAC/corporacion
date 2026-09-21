@@ -1,5 +1,4 @@
 ---
 deployment:
   tasks:
-    - command -v composer > /home/corporacioncapsu/app_corporacion/composer_check.txt 2>&1
-    - composer --version >> /home/corporacioncapsu/app_corporacion/composer_check.txt 2>&1
+    - /bin/sh -c 'echo DEPLOYMENT_OK > /home/corporacioncapsu/deployment_proof.txt'
