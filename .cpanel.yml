@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - /bin/sh -c 'find /opt /usr /home -type f \( -name node -o -name npm \) -executable 2>/dev/null > /home/corporacioncapsu/app_corporacion/node_paths.txt || true'
+    - /bin/sh -c 'ls -la /opt/cpanel/ | grep -i node > /home/corporacioncapsu/app_corporacion/node_check.txt 2>&1 || true'
