@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - /bin/sh -c 'find /usr /opt -type f -name composer -executable 2>/dev/null > /home/corporacioncapsu/app_corporacion/composer_paths.txt || true'
+    - /bin/sh -c 'find /usr /opt /home -type f \( -name composer -o -name composer.phar \) 2>/dev/null > /home/corporacioncapsu/app_corporacion/composer_paths.txt || true'
