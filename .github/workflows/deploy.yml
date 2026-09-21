@@ -1,51 +1,15 @@
-name: Build and Deploy
+name: Deploy to cPanel
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - "public/build/**"
-
-permissions:
-  contents: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-
-      - name: Commit compiled frontend
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add -f public/build
-
-          if git diff --cached --quiet; then
-            echo "No hay cambios en public/build."
-          else
-            git commit -m "build: actualizar frontend compilado"
-            git push origin HEAD:main
-          fi
-
       - name: Update cPanel repository
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
