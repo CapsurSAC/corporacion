@@ -1,4 +1,5 @@
 ---
 deployment:
   tasks:
-    - cd /home/corporacioncapsu/app_corporacion && composer install --no-dev --optimize-autoloader
+    - command -v composer > /home/corporacioncapsu/app_corporacion/composer_check.txt 2>&1
+    - composer --version >> /home/corporacioncapsu/app_corporacion/composer_check.txt 2>&1
