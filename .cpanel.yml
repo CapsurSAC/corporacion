@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - touch /home/corporacioncapsu/app_corporacion/deployment_test.txt
+    - cd /home/corporacioncapsu/app_corporacion && composer install --no-dev --optimize-autoloader
