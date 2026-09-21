@@ -1,10 +1,73 @@
-- uses: actions/checkout@v4
+name: Build and Deploy
 
-- uses: actions/setup-node@v4
-  with:
-    node-version: 22
-    cache: npm
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "public/build/**"
 
-- run: npm ci
+permissions:
+  contents: write
 
-- run: npm run build
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Commit compiled frontend
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -f public/build
+
+          if git diff --cached --quiet; then
+            echo "No hay cambios en public/build."
+          else
+            git commit -m "build: actualizar frontend compilado"
+            git push origin HEAD:main
+          fi
+
+      - name: Update cPanel repository
+        env:
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
+        run: |
+          response=$(curl -sS \
+            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
+            "https://corporacioncapsur.com:2083/execute/VersionControl/update?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion&branch=main")
+
+          echo "$response"
+
+          echo "$response" | grep -q '"status":1' || exit 1
+
+      - name: Deploy cPanel repository
+        env:
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
+        run: |
+          response=$(curl -sS \
+            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
+            "https://corporacioncapsur.com:2083/execute/VersionControlDeployment/create?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion")
+
+          echo "$response"
+
+          echo "$response" | grep -q '"status":1' || exit 1
