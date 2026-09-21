@@ -1,19 +1,17 @@
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
-import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DomainIcon from '@mui/icons-material/Domain';
 import EditIcon from '@mui/icons-material/Edit';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaunchIcon from '@mui/icons-material/Launch';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import {
     Avatar,
     Box,
@@ -26,7 +24,6 @@ import {
     InputLabel,
     MenuItem,
     Paper,
-    Popover,
     Select,
     Table,
     TableBody,
@@ -47,6 +44,13 @@ import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert, showSuccessToast } from '@/lib/swal';
 import { dashboard } from '@/routes';
 import type { Comercio, Grupo } from '@/types';
+
+const ensureHttp = (url?: string | null): string => {
+    if (!url) return '';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    return `https://${trimmed}`;
+};
 
 interface Props {
     comercios: Comercio[];
@@ -77,21 +81,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
     const [carreraDialogOpen, setCarreraDialogOpen] = useState(false);
     const [quickComercioId, setQuickComercioId] = useState<number | null>(null);
 
-    // Popover state for Detail View
-    const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
-    const [popoverComercio, setPopoverComercio] = useState<Comercio | null>(null);
 
-    const handleOpenPopover = (event: React.MouseEvent<HTMLElement>, comercio: Comercio) => {
-        setPopoverAnchor(event.currentTarget);
-        setPopoverComercio(comercio);
-    };
-
-    const handleClosePopover = () => {
-        setPopoverAnchor(null);
-        setPopoverComercio(null);
-    };
-
-    const isPopoverOpen = Boolean(popoverAnchor);
 
     const handleFilterChange = (grupoId: string) => {
         setSelectedGrupoFilter(grupoId);
@@ -506,56 +496,124 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                     </Typography>
                                                 </TableCell>
 
-                                                {/* Columna 3: Acreditación & Plataformas */}
+                                                {/* Columna 3: Acreditación & Plataforma (Máximo 3 botones vivos y llamativos) */}
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, alignItems: 'center' }}>
+                                                        {/* Botón 1: Web (Planeta) */}
                                                         {comercio.pagina_web && (
-                                                            <Button
-                                                                href={comercio.pagina_web}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                variant="outlined"
-                                                                startIcon={<LanguageIcon sx={{ fontSize: 13 }} />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
-                                                            >
-                                                                Web
-                                                            </Button>
+                                                            <Tooltip title={`Visitar Sitio Web: ${comercio.pagina_web}`} arrow>
+                                                                <Button
+                                                                    href={ensureHttp(comercio.pagina_web)}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    size="small"
+                                                                    startIcon={<LanguageIcon sx={{ fontSize: '15px !important', color: '#0284c7' }} />}
+                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important', color: '#0284c7', opacity: 0.9 }} />}
+                                                                    sx={{
+                                                                        textTransform: 'none',
+                                                                        fontSize: '0.74rem',
+                                                                        fontWeight: 750,
+                                                                        py: 0.3,
+                                                                        px: 1,
+                                                                        height: 25,
+                                                                        borderRadius: 1.2,
+                                                                        border: '1.5px solid #0284c7',
+                                                                        color: (theme) => theme.palette.mode === 'dark' ? '#38bdf8' : '#0369a1',
+                                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.08)' : 'rgba(2, 132, 199, 0.06)',
+                                                                        transition: 'all 0.2s ease',
+                                                                        '&:hover': {
+                                                                            border: '1.5px solid #0369a1',
+                                                                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(2, 132, 199, 0.14)',
+                                                                            boxShadow: '0 2px 10px rgba(2, 132, 199, 0.32)',
+                                                                            transform: 'translateY(-1px)',
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    Web
+                                                                </Button>
+                                                            </Tooltip>
                                                         )}
-                                                        {comercio.certificado_url && (
-                                                            <Button
-                                                                href={comercio.certificado_url}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                size="small"
-                                                                variant="outlined"
-                                                                color="error"
-                                                                startIcon={<PictureAsPdfIcon sx={{ fontSize: 13 }} />}
-                                                                endIcon={<LaunchIcon sx={{ fontSize: '10px !important' }} />}
-                                                                sx={{ textTransform: 'none', fontSize: '0.72rem', py: 0.2, px: 0.8, height: 22, borderRadius: 0.8 }}
-                                                            >
-                                                                Certificado
-                                                            </Button>
+
+                                                        {/* Botón 2: Plataforma (Sombrero) */}
+                                                        {comercio.plataforma_carrera && (
+                                                            <Tooltip title={`Ir a la Plataforma / Aula Virtual: ${comercio.plataforma_carrera}`} arrow>
+                                                                <Button
+                                                                    href={ensureHttp(comercio.plataforma_carrera)}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    size="small"
+                                                                    startIcon={<SchoolIcon sx={{ fontSize: '16px !important', color: '#6366f1' }} />}
+                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important', color: '#6366f1', opacity: 0.9 }} />}
+                                                                    sx={{
+                                                                        textTransform: 'none',
+                                                                        fontSize: '0.74rem',
+                                                                        fontWeight: 750,
+                                                                        py: 0.3,
+                                                                        px: 1,
+                                                                        height: 25,
+                                                                        borderRadius: 1.2,
+                                                                        border: '1.5px solid #6366f1',
+                                                                        color: (theme) => theme.palette.mode === 'dark' ? '#a5b4fc' : '#4338ca',
+                                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(129, 140, 248, 0.08)' : 'rgba(99, 102, 241, 0.06)',
+                                                                        transition: 'all 0.2s ease',
+                                                                        '&:hover': {
+                                                                            border: '1.5px solid #4f46e5',
+                                                                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(129, 140, 248, 0.18)' : 'rgba(99, 102, 241, 0.14)',
+                                                                            boxShadow: '0 2px 10px rgba(99, 102, 241, 0.32)',
+                                                                            transform: 'translateY(-1px)',
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    Plataforma
+                                                                </Button>
+                                                            </Tooltip>
                                                         )}
-                                                        {comercio.resolucion_revalidacion && (
-                                                            <Chip
-                                                                label={comercio.resolucion_revalidacion}
-                                                                size="small"
-                                                                sx={{
-                                                                    bgcolor: (theme) =>
-                                                                        theme.palette.mode === 'dark'
-                                                                            ? 'rgba(255, 255, 255, 0.06)'
-                                                                            : 'rgba(0, 0, 0, 0.04)',
-                                                                    fontSize: '0.68rem',
-                                                                    height: 20,
-                                                                    borderRadius: 0.8,
-                                                                    fontWeight: 600,
-                                                                }}
-                                                            />
+
+                                                        {/* Botón 3: Tutorial (YouTube) */}
+                                                        {comercio.como_ingresar_plataforma && (
+                                                            <Tooltip title={`Tutorial de acceso (YouTube): ${comercio.como_ingresar_plataforma}`} arrow>
+                                                                <Button
+                                                                    href={ensureHttp(comercio.como_ingresar_plataforma)}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    size="small"
+                                                                    startIcon={<YouTubeIcon sx={{ fontSize: '18px !important', color: '#dc2626' }} />}
+                                                                    endIcon={<LaunchIcon sx={{ fontSize: '10px !important', color: '#dc2626', opacity: 0.9 }} />}
+                                                                    sx={{
+                                                                        textTransform: 'none',
+                                                                        fontSize: '0.74rem',
+                                                                        fontWeight: 750,
+                                                                        py: 0.3,
+                                                                        px: 1,
+                                                                        height: 25,
+                                                                        borderRadius: 1.2,
+                                                                        border: '1.5px solid #dc2626',
+                                                                        color: (theme) => theme.palette.mode === 'dark' ? '#f87171' : '#b91c1c',
+                                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(248, 113, 113, 0.08)' : 'rgba(220, 38, 38, 0.06)',
+                                                                        transition: 'all 0.2s ease',
+                                                                        '&:hover': {
+                                                                            border: '1.5px solid #b91c1c',
+                                                                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(248, 113, 113, 0.18)' : 'rgba(220, 38, 38, 0.14)',
+                                                                            boxShadow: '0 2px 10px rgba(220, 38, 38, 0.32)',
+                                                                            transform: 'translateY(-1px)',
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    Tutorial
+                                                                </Button>
+                                                            </Tooltip>
+                                                        )}
+
+                                                        {/* Fallback si no tiene ninguno de los 3 enlaces */}
+                                                        {!comercio.pagina_web && !comercio.plataforma_carrera && !comercio.como_ingresar_plataforma && (
+                                                            <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic', fontSize: '0.72rem' }}>
+                                                                Sin enlaces registrados
+                                                            </Typography>
                                                         )}
                                                     </Box>
                                                 </TableCell>
+
+
 
                                                 {/* Columna 4: Oferta Formativa */}
                                                 <TableCell sx={{ minWidth: 200 }}>
@@ -633,21 +691,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                 {/* Columna 5: Acciones */}
                                                 <TableCell sx={{ textAlign: 'right' }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.8 }}>
-                                                        <Tooltip title="Ficha Técnica Completa" arrow>
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={(e) => handleOpenPopover(e, comercio)}
-                                                                sx={{
-                                                                    border: '1px solid',
-                                                                    borderColor: 'divider',
-                                                                    borderRadius: 1,
-                                                                    '&:hover': { bgcolor: 'action.hover' },
-                                                                }}
-                                                            >
-                                                                <InfoOutlinedIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-
                                                         <Tooltip title="Editar Ficha de Comercio" arrow>
                                                             <Link
                                                                 href={`/admin/comercios/${comercio.id}/edit`}
@@ -798,16 +841,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                                         Oferta Formativa ({(comercio.carreras_count || 0) + (comercio.diplomados_count || 0) + (comercio.cursos_count || 0) + (comercio.especialidades_count || 0)})
                                                     </Button>
                                                 </Link>
-
-                                                <Button
-                                                    size="small"
-                                                    variant="text"
-                                                    startIcon={<InfoOutlinedIcon fontSize="small" />}
-                                                    onClick={(e) => handleOpenPopover(e, comercio)}
-                                                    sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.74rem', borderRadius: 0.8 }}
-                                                >
-                                                    Ficha Técnica
-                                                </Button>
                                             </Box>
                                         </Box>
                                     </Paper>
@@ -817,79 +850,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                     </Grid>
                 )}
             </Box>
-
-            {/* POPOVER DE FICHA TÉCNICA */}
-            <Popover
-                open={isPopoverOpen}
-                anchorEl={popoverAnchor}
-                onClose={handleClosePopover}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                slotProps={{
-                    paper: {
-                        sx: {
-                            p: 2.2,
-                            width: { xs: 340, sm: 500 },
-                            maxWidth: '95vw',
-                            borderRadius: 1.5,
-                            boxShadow: '0 8px 25px rgba(0,0,0,0.18)',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            bgcolor: 'background.paper',
-                        },
-                    },
-                }}
-            >
-                {popoverComercio && (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-                                <Avatar sx={{ bgcolor: popoverComercio.color_hex || '#0c43a3', color: '#fff', width: 30, height: 30, fontWeight: 800, fontSize: '0.72rem', borderRadius: 0.8 }}>
-                                    {(popoverComercio.sigla || popoverComercio.nombre.substring(0, 3)).substring(0, 3).toUpperCase()}
-                                </Avatar>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.92rem' }}>
-                                    {popoverComercio.nombre}
-                                </Typography>
-                            </Box>
-                            <IconButton size="small" onClick={handleClosePopover} sx={{ borderRadius: 0.8 }}>
-                                <CloseIcon fontSize="small" />
-                            </IconButton>
-                        </Box>
-
-                        <Grid container spacing={1.5}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-                                    PÁGINA WEB:
-                                </Typography>
-                                <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-all', fontSize: '0.82rem' }}>
-                                    {popoverComercio.pagina_web ? (
-                                        <a href={popoverComercio.pagina_web} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
-                                            {popoverComercio.pagina_web}
-                                        </a>
-                                    ) : 'No registrada'}
-                                </Typography>
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-                                    RESOLUCIÓN / ESCALE:
-                                </Typography>
-                                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
-                                    {popoverComercio.resolucion_revalidacion || popoverComercio.escale_minedu || 'No especificada'}
-                                </Typography>
-                            </Grid>
-                        </Grid>
-
-                        <Box sx={{ pt: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Link href={`/admin/comercios/${popoverComercio.id}/edit`} style={{ textDecoration: 'none' }}>
-                                <Button variant="contained" size="small" startIcon={<EditIcon />} sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 1 }}>
-                                    Abrir Edición Completa
-                                </Button>
-                            </Link>
-                        </Box>
-                    </Box>
-                )}
-            </Popover>
 
             {/* MODALES Y DIÁLOGOS CRUD */}
             <ComercioDialog

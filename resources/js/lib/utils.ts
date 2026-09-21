@@ -42,3 +42,12 @@ export function isGoogleDriveUrl(url: string | null | undefined): boolean {
     return url.includes('drive.google.com') || url.includes('docs.google.com') || url.includes('googleusercontent.com');
 }
 
+/**
+ * Determina si un valor de texto corresponde a una URL válida o enlace web
+ */
+export function isHttpUrl(url: string | null | undefined): boolean {
+    if (!url) return false;
+    const trimmed = url.trim();
+    return trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com');
+}
+

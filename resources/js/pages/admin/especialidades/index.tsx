@@ -35,7 +35,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { EspecialidadDialog } from '@/components/admin/especialidad-dialog';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
@@ -72,9 +72,38 @@ export default function EspecialidadesIndex({
     const [selectedComercio, setSelectedComercio] = useState<string>(filters.comercio_id || 'all');
     const [selectedEstado, setSelectedEstado] = useState<string>(filters.estado_id || 'all');
 
+    useEffect(() => {
+        setSelectedCarrera(filters.carrera_id || 'all');
+        setSelectedRubro(filters.rubro_id || 'all');
+        setSelectedComercio(filters.comercio_id || 'all');
+        setSelectedEstado(filters.estado_id || 'all');
+        setSearch(filters.search || '');
+    }, [filters]);
+
+    const filteredCarreras = useMemo(() => {
+        if (!selectedComercio || selectedComercio === 'all') return carreras;
+        return carreras.filter((c) => String(c.comercio_id) === String(selectedComercio));
+    }, [carreras, selectedComercio]);
+
     // Dialog state
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingEspecialidad, setEditingEspecialidad] = useState<Especialidad | null>(null);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('create') === '1' || params.get('create') === 'true') {
+            setEditingEspecialidad(null);
+            setDialogOpen(true);
+        } else if (params.get('edit_id')) {
+            const id = Number(params.get('edit_id'));
+            const found = especialidades.find((e) => e.id === id);
+            if (found) {
+                setEditingEspecialidad(found);
+                setDialogOpen(true);
+            }
+        }
+    }, [especialidades]);
 
     const applyFilters = (newFilters: {
         carrera_id?: string;
@@ -150,77 +179,6 @@ export default function EspecialidadesIndex({
                     boxSizing: 'border-box',
                 }}
             >
-                {/* BANNER RETORNO A OFERTA FORMATIVA DE COMERCIO */}
-                {(() => {
-                    const activeComercio = filters.comercio_id ? comercios.find((c) => String(c.id) === String(filters.comercio_id)) : null;
-                    if (!activeComercio) return null;
-                    return (
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: { xs: 1.5, sm: 2 },
-                                borderRadius: 2,
-                                bgcolor: (theme) =>
-                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
-                                border: '1px solid',
-                                borderColor: (theme) =>
-                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#bfdbfe',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexWrap: 'wrap',
-                                gap: 2,
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Avatar
-                                    src={activeComercio.logo_modo_claro || undefined}
-                                    alt={activeComercio.nombre}
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        bgcolor: activeComercio.color_hex || 'primary.main',
-                                        fontWeight: 700,
-                                        fontSize: '0.85rem',
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                    }}
-                                >
-                                    {activeComercio.sigla || activeComercio.nombre.substring(0, 2).toUpperCase()}
-                                </Avatar>
-                                <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
-                                        Gestionando Especialidades de {activeComercio.nombre}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        Filtro aplicado desde la Oferta Formativa de la institución.
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            <Link
-                                href={`/admin/comercios/${activeComercio.id}/edit?tab=3`}
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <Button
-                                    size="small"
-                                    variant="contained"
-                                    startIcon={<ArrowBackIcon />}
-                                    sx={{
-                                        bgcolor: activeComercio.color_hex || '#2563eb',
-                                        textTransform: 'none',
-                                        fontWeight: 700,
-                                        borderRadius: 1.5,
-                                        px: 2,
-                                        boxShadow: 'none',
-                                        '&:hover': { bgcolor: activeComercio.color_hex || '#1d4ed8', filter: 'brightness(0.92)' },
-                                    }}
-                                >
-                                    Volver a Oferta Formativa
-                                </Button>
-                            </Link>
-                        </Paper>
-                    );
-                })()}
 
                 {/* CABECERA PRINCIPAL UNIFICADA (Estilo Cursos y Talleres) */}
                 <Paper
@@ -365,6 +323,40 @@ export default function EspecialidadesIndex({
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap', alignItems: 'center' }}>
+                        {/* Filtro por Comercio */}
+                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
+                            <InputLabel id="filter-comercio-label">Comercio / Sede</InputLabel>
+                            <Select
+                                labelId="filter-comercio-label"
+                                value={selectedComercio}
+                                label="Comercio / Sede"
+                                onChange={(e) => {
+                                    const nextComercio = e.target.value;
+                                    setSelectedComercio(nextComercio);
+                                    const carreraValida =
+                                        nextComercio === 'all' ||
+                                        carreras.some((c) => String(c.id) === selectedCarrera && String(c.comercio_id) === String(nextComercio));
+                                    const nextCarrera = carreraValida ? selectedCarrera : 'all';
+                                    if (!carreraValida) {
+                                        setSelectedCarrera('all');
+                                    }
+                                    applyFilters({ comercio_id: nextComercio, carrera_id: nextCarrera });
+                                }}
+                            >
+                                <MenuItem value="all">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <ComercioAllBadge size={22} label="ALL" />
+                                        <Typography variant="body2">Todos los comercios</Typography>
+                                    </Box>
+                                </MenuItem>
+                                {comercios.map((c) => (
+                                    <MenuItem key={c.id} value={String(c.id)}>
+                                        <ComercioBadge comercio={c} size={22} showName />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
                         {/* Filtro por Carrera */}
                         <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
                             <InputLabel id="filter-carrera-label">Carrera Matriz</InputLabel>
@@ -383,12 +375,11 @@ export default function EspecialidadesIndex({
                                         <Typography variant="body2">Todas las carreras</Typography>
                                     </Box>
                                 </MenuItem>
-                                {carreras.map((c) => (
+                                {filteredCarreras.map((c) => (
                                     <MenuItem key={c.id} value={String(c.id)}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <SchoolIcon sx={{ fontSize: '1rem', color: c.comercio?.color_hex || 'primary.main' }} />
                                             <Typography variant="body2">
-                                                {c.comercio ? `[${c.comercio.codigo || c.comercio.nombre}] ` : ''}
                                                 {c.nombre}
                                             </Typography>
                                         </Box>
@@ -421,32 +412,6 @@ export default function EspecialidadesIndex({
                                             <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#0284c7', flexShrink: 0 }} />
                                             <Typography variant="body2">{r.nombre}</Typography>
                                         </Box>
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        {/* Filtro por Comercio */}
-                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 170 } }}>
-                            <InputLabel id="filter-comercio-label">Comercio / Sede</InputLabel>
-                            <Select
-                                labelId="filter-comercio-label"
-                                value={selectedComercio}
-                                label="Comercio / Sede"
-                                onChange={(e) => {
-                                    setSelectedComercio(e.target.value);
-                                    applyFilters({ comercio_id: e.target.value });
-                                }}
-                            >
-                                <MenuItem value="all">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <ComercioAllBadge size={22} label="ALL" />
-                                        <Typography variant="body2">Todos los comercios</Typography>
-                                    </Box>
-                                </MenuItem>
-                                {comercios.map((c) => (
-                                    <MenuItem key={c.id} value={String(c.id)}>
-                                        <ComercioBadge comercio={c} size={22} showName />
                                     </MenuItem>
                                 ))}
                             </Select>

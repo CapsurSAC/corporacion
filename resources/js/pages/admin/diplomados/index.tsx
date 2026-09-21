@@ -39,7 +39,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DiplomadoDialog } from '@/components/admin/diplomado-dialog';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
@@ -71,20 +71,51 @@ export default function DiplomadosIndex({
     filters,
 }: Props) {
     const page = usePage();
-    
+
     const { notify } = useNotification();
 
     const [search, setSearch] = useState<string>(filters.search || '');
     const [selectedComercio, setSelectedComercio] = useState<string>(filters.comercio_id || 'all');
+    const [selectedCarrera, setSelectedCarrera] = useState<string>(filters.carrera_id || 'all');
     const [selectedTipo, setSelectedTipo] = useState<string>(filters.tipo || 'all');
     const [selectedEstado, setSelectedEstado] = useState<string>(filters.estado_id || 'all');
+
+    useEffect(() => {
+        setSelectedComercio(filters.comercio_id || 'all');
+        setSelectedCarrera(filters.carrera_id || 'all');
+        setSelectedTipo(filters.tipo || 'all');
+        setSelectedEstado(filters.estado_id || 'all');
+        setSearch(filters.search || '');
+    }, [filters]);
+
+    const filteredCarreras = useMemo(() => {
+        if (!selectedComercio || selectedComercio === 'all') return carreras;
+        return carreras.filter((c) => String(c.comercio_id) === String(selectedComercio));
+    }, [carreras, selectedComercio]);
 
     // Dialog state
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedDiplomado, setSelectedDiplomado] = useState<Diplomado | null>(null);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('create') === '1' || params.get('create') === 'true') {
+            setSelectedDiplomado(null);
+            setDialogOpen(true);
+        } else if (params.get('edit_id')) {
+            const id = Number(params.get('edit_id'));
+            const found = diplomados.find((d) => d.id === id);
+            if (found) {
+                setSelectedDiplomado(found);
+                setDialogOpen(true);
+            }
+        }
+    }, [diplomados]);
+
     const applyFilters = (newFilters: {
         comercio_id?: string;
+        carrera_id?: string;
         estado_id?: string;
         tipo?: string;
         search?: string;
@@ -93,6 +124,7 @@ export default function DiplomadosIndex({
             `/admin/diplomados`,
             {
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
+                carrera_id: newFilters.carrera_id !== undefined ? (newFilters.carrera_id === 'all' ? undefined : newFilters.carrera_id) : (selectedCarrera === 'all' ? undefined : selectedCarrera),
                 estado_id: newFilters.estado_id !== undefined ? (newFilters.estado_id === 'all' ? undefined : newFilters.estado_id) : (selectedEstado === 'all' ? undefined : selectedEstado),
                 tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
                 search: newFilters.search !== undefined ? (newFilters.search || undefined) : (search || undefined),
@@ -113,7 +145,19 @@ export default function DiplomadosIndex({
 
     const handleComercioChange = (val: string) => {
         setSelectedComercio(val);
-        applyFilters({ comercio_id: val });
+        const carreraValida =
+            val === 'all' ||
+            carreras.some((c) => String(c.id) === selectedCarrera && String(c.comercio_id) === String(val));
+        const nextCarrera = carreraValida ? selectedCarrera : 'all';
+        if (!carreraValida) {
+            setSelectedCarrera('all');
+        }
+        applyFilters({ comercio_id: val, carrera_id: nextCarrera });
+    };
+
+    const handleCarreraChange = (val: string) => {
+        setSelectedCarrera(val);
+        applyFilters({ carrera_id: val });
     };
 
     const handleTipoChange = (val: string) => {
@@ -221,7 +265,7 @@ export default function DiplomadosIndex({
 
     return (
         <>
-            <Head title="Diplomados y Especializaciones - Grupo Capsur" />
+            <Head title="Diplomados" />
 
             <Box
                 sx={{
@@ -233,77 +277,7 @@ export default function DiplomadosIndex({
                     boxSizing: 'border-box',
                 }}
             >
-                {/* BANNER RETORNO A OFERTA FORMATIVA DE COMERCIO */}
-                {(() => {
-                    const activeComercio = filters.comercio_id ? comercios.find((c) => String(c.id) === String(filters.comercio_id)) : null;
-                    if (!activeComercio) return null;
-                    return (
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: { xs: 1.5, sm: 2 },
-                                borderRadius: 2,
-                                bgcolor: (theme) =>
-                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
-                                border: '1px solid',
-                                borderColor: (theme) =>
-                                    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#bfdbfe',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexWrap: 'wrap',
-                                gap: 2,
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Avatar
-                                    src={activeComercio.logo_modo_claro || undefined}
-                                    alt={activeComercio.nombre}
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        bgcolor: activeComercio.color_hex || 'primary.main',
-                                        fontWeight: 700,
-                                        fontSize: '0.85rem',
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                    }}
-                                >
-                                    {activeComercio.sigla || activeComercio.nombre.substring(0, 2).toUpperCase()}
-                                </Avatar>
-                                <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
-                                        Gestionando Diplomados de {activeComercio.nombre}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        Filtro aplicado desde la Oferta Formativa de la institución.
-                                    </Typography>
-                                </Box>
-                            </Box>
 
-                            <Link
-                                href={`/admin/comercios/${activeComercio.id}/edit?tab=3`}
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <Button
-                                    size="small"
-                                    variant="contained"
-                                    startIcon={<ArrowBackIcon />}
-                                    sx={{
-                                        bgcolor: activeComercio.color_hex || '#2563eb',
-                                        textTransform: 'none',
-                                        fontWeight: 700,
-                                        borderRadius: 1.5,
-                                        px: 2,
-                                        boxShadow: 'none',
-                                        '&:hover': { bgcolor: activeComercio.color_hex || '#1d4ed8', filter: 'brightness(0.92)' },
-                                    }}
-                                >
-                                    Volver a Oferta Formativa
-                                </Button>
-                            </Link>
-                        </Paper>
-                    );
-                })()}
 
                 {/* CABECERA PRINCIPAL UNIFICADA */}
                 <Paper
@@ -354,7 +328,7 @@ export default function DiplomadosIndex({
                                             letterSpacing: '-0.02em',
                                         }}
                                     >
-                                        Diplomados y Especializaciones
+                                        Diplomados
                                     </Typography>
                                     <Chip
                                         label={`${diplomados.length} PROGRAMAS`}
@@ -454,10 +428,7 @@ export default function DiplomadosIndex({
                                 labelId="filtro-comercio-label"
                                 value={selectedComercio}
                                 label="Filtrar por Comercio"
-                                onChange={(e) => {
-                                    setSelectedComercio(e.target.value);
-                                    applyFilters({ comercio_id: e.target.value });
-                                }}
+                                onChange={(e) => handleComercioChange(e.target.value)}
                             >
                                 <MenuItem value="all">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -468,6 +439,34 @@ export default function DiplomadosIndex({
                                 {comercios.map((c) => (
                                     <MenuItem key={c.id} value={String(c.id)}>
                                         <ComercioBadge comercio={c} size={22} showName />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        {/* Filtro por Carrera Matriz */}
+                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
+                            <InputLabel id="filter-carrera-label">Carrera Matriz</InputLabel>
+                            <Select
+                                labelId="filter-carrera-label"
+                                value={selectedCarrera}
+                                label="Carrera Matriz"
+                                onChange={(e) => handleCarreraChange(e.target.value)}
+                            >
+                                <MenuItem value="all">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">Todas las carreras</Typography>
+                                    </Box>
+                                </MenuItem>
+                                {filteredCarreras.map((c) => (
+                                    <MenuItem key={c.id} value={String(c.id)}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <SchoolIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                            <Typography variant="body2">
+                                                {c.nombre}
+                                            </Typography>
+                                        </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -673,11 +672,11 @@ export default function DiplomadosIndex({
                                             No se encontraron diplomados registrados
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
-                                            {search || selectedComercio !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all'
+                                            {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all'
                                                 ? 'No hay registros que coincidan con los filtros aplicados.'
                                                 : 'Aún no se han registrado diplomados.'}
                                         </Typography>
-                                        {search || selectedComercio !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all' ? (
+                                        {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all' ? (
                                             <Button
                                                 variant="outlined"
                                                 size="small"
@@ -685,9 +684,10 @@ export default function DiplomadosIndex({
                                                 onClick={() => {
                                                     setSearch('');
                                                     setSelectedComercio('all');
+                                                    setSelectedCarrera('all');
                                                     setSelectedTipo('all');
                                                     setSelectedEstado('all');
-                                                    applyFilters({ comercio_id: 'all', tipo: 'all', estado_id: 'all', search: '' });
+                                                    applyFilters({ comercio_id: 'all', carrera_id: 'all', tipo: 'all', estado_id: 'all', search: '' });
                                                 }}
                                                 sx={{ borderRadius: 1 }}
                                             >
@@ -954,6 +954,8 @@ export default function DiplomadosIndex({
                 carreras={carreras}
                 rubros={rubros}
                 estados={estados}
+                defaultComercioId={selectedComercio !== 'all' ? Number(selectedComercio) : undefined}
+                defaultCarreraId={filters.carrera_id ? Number(filters.carrera_id) : undefined}
             />
         </>
     );

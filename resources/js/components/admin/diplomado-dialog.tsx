@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import LabelIcon from '@mui/icons-material/Label';
 import SchoolIcon from '@mui/icons-material/School';
+import StoreIcon from '@mui/icons-material/Store';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { ComercioBadge } from '@/components/admin/comercio-badge';
 import {
@@ -360,16 +361,37 @@ export function DiplomadoDialog({
                             {carreras.filter(c => String(c.comercio_id) === String(data.comercio_id)).length > 0 && (
                                 <Grid size={{ xs: 12 }}>
                                     <FormControl fullWidth size="small">
-                                        <InputLabel id="select-carrera-label">Carrera Perteneciente (Opcional)</InputLabel>
+                                        <InputLabel id="select-carrera-label" shrink>Carrera Perteneciente (Opcional)</InputLabel>
                                         <Select
                                             labelId="select-carrera-label"
                                             value={data.carrera_id}
                                             label="Carrera Perteneciente (Opcional)"
+                                            displayEmpty
+                                            notched
                                             onChange={(e) => setData('carrera_id', e.target.value)}
+                                            renderValue={(selected) => {
+                                                if (!selected) {
+                                                    return (
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <StoreIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                                            <Typography variant="body2" color="text.secondary">General / Sin Carrera Específica</Typography>
+                                                        </Box>
+                                                    );
+                                                }
+                                                const carrera = carreras.find((c) => String(c.id) === String(selected));
+                                                return (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <SchoolIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                                        <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                                                            {carrera ? `${carrera.nombre} ${carrera.codigo ? `(${carrera.codigo})` : ''}` : selected}
+                                                        </Typography>
+                                                    </Box>
+                                                );
+                                            }}
                                         >
                                             <MenuItem value="">
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                                    <StoreIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
                                                     <Typography variant="body2">General / Sin Carrera Específica</Typography>
                                                 </Box>
                                             </MenuItem>

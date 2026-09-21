@@ -353,15 +353,15 @@ export default function ComercioDetailModal({
                                         <Grid size={{ xs: 12, sm: 6 }}>
                                             <Card variant="outlined" sx={{ borderRadius: 2, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Avatar sx={{ bgcolor: 'info.light', color: 'info.dark', width: 38, height: 38 }}>
-                                                        <SchoolIcon fontSize="small" />
+                                                    <Avatar sx={{ bgcolor: isGoogleDriveUrl(comercio.plataforma_carrera) ? 'rgba(38, 132, 252, 0.12)' : 'info.light', color: 'info.dark', width: 38, height: 38 }}>
+                                                        {isGoogleDriveUrl(comercio.plataforma_carrera) ? <GoogleDriveIcon size={20} /> : <SchoolIcon fontSize="small" />}
                                                     </Avatar>
                                                     <Box>
                                                         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                             Plataforma / Aula Virtual
                                                         </Typography>
                                                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                            {comercio.plataforma_carrera}
+                                                            {isGoogleDriveUrl(comercio.plataforma_carrera) ? 'Google Drive' : comercio.plataforma_carrera}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
@@ -373,6 +373,7 @@ export default function ComercioDetailModal({
                                                     href={comercio.plataforma_carrera}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
+                                                    startIcon={isGoogleDriveUrl(comercio.plataforma_carrera) ? <GoogleDriveIcon size={15} /> : undefined}
                                                     endIcon={<LaunchIcon fontSize="small" />}
                                                     sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
                                                 >

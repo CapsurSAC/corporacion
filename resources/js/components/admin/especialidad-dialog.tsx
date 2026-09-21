@@ -262,13 +262,38 @@ export function EspecialidadDialog({
                                 size="small"
                                 error={!!errors.carrera_id}
                             >
-                                <InputLabel id="carrera-select-label">Carrera Perteneciente (Opcional)</InputLabel>
+                                <InputLabel id="carrera-select-label" shrink>Carrera Perteneciente (Opcional)</InputLabel>
                                 <Select
                                     labelId="carrera-select-label"
                                     value={data.carrera_id}
                                     label="Carrera Perteneciente (Opcional)"
+                                    displayEmpty
+                                    notched
                                     onChange={(e) => setData('carrera_id', e.target.value)}
                                     disabled={processing || availableCarreras.length === 0}
+                                    renderValue={(selected) => {
+                                        if (!selected) {
+                                            return (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <StoreIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {availableCarreras.length === 0
+                                                            ? 'Sin carreras disponibles (Directo al comercio)'
+                                                            : 'General / Sin Carrera Específica'}
+                                                    </Typography>
+                                                </Box>
+                                            );
+                                        }
+                                        const found = availableCarreras.find((c) => String(c.id) === String(selected));
+                                        return (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <SchoolIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                                <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                                                    {found ? `${found.nombre} ${found.codigo ? `(${found.codigo})` : ''}` : selected}
+                                                </Typography>
+                                            </Box>
+                                        );
+                                    }}
                                 >
                                     <MenuItem value="">
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
