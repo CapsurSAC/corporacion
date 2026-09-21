@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - /bin/sh -c 'find /usr /opt /home -type f \( -name composer -o -name composer.phar \) 2>/dev/null > /home/corporacioncapsu/app_corporacion/composer_paths.txt || true'
+    - cd /home/corporacioncapsu/app_corporacion && php /opt/cpanel/ea-wappspector/composer.phar install --no-dev --optimize-autoloader
