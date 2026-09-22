@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Build Application
 
 on:
   push:
@@ -6,32 +6,32 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Update repository on cPanel
-        env:
-          CPANEL_USER: ${{ secrets.CPANEL_USER }}
-          CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
-        run: |
-          response=$(curl -sS \
-            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
-            "https://corporacioncapsur.com:2083/execute/VersionControl/update?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion&branch=main")
+      - name: Checkout
+        uses: actions/checkout@v4
 
-          echo "$response"
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, bcmath, curl, zip
+          tools: composer
+          coverage: none
 
-          echo "$response" | grep -q '"status":1' || exit 1
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Deploy application
-        env:
-          CPANEL_USER: ${{ secrets.CPANEL_USER }}
-          CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
-        run: |
-          response=$(curl -sS \
-            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
-            "https://corporacioncapsur.com:2083/execute/VersionControlDeployment/create?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion")
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-          echo "$response"
+      - name: Install frontend dependencies
+        run: npm ci
 
-          echo "$response" | grep -q '"status":1' || exit 1
+      - name: Build frontend
+        run: npm run build
