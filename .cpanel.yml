@@ -1,10 +1,6 @@
 ---
 deployment:
   tasks:
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-php84/root/usr/bin/php /opt/cpanel/ea-wappspector/composer.phar install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-    - mkdir -p /home/corporacioncapsu/app_corporacion/public
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-nodejs22/bin/npm ci --no-audit --no-fund
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-nodejs22/bin/npm run build
     - rm -rf /home/corporacioncapsu/public_html/build
     - mkdir -p /home/corporacioncapsu/public_html/build
     - cp -a /home/corporacioncapsu/app_corporacion/public/build/. /home/corporacioncapsu/public_html/build/
