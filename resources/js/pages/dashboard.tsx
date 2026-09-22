@@ -104,7 +104,7 @@ export default function Dashboard({
                                             lineHeight: 1.2,
                                         }}
                                     >
-                                        Comercios
+                                        Comercios xd
                                     </Typography>
                                     <Chip
                                         label="GRUPO CAPSUR"
