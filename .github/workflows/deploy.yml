@@ -19,20 +19,11 @@ jobs:
             -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
             "https://corporacioncapsur.com:2083/execute/VersionControl/update?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion&branch=main")
 
-          echo "Respuesta de Update:"
           echo "$response"
 
-          echo "$response" | grep -q '"status":1' || {
-            echo "ERROR: cPanel no pudo actualizar el repositorio."
-            exit 1
-          }
+          echo "$response" | grep -q '"status":1' || exit 1
 
-      - name: Wait for cPanel update
-        run: |
-          echo "Esperando a que cPanel termine de actualizar el repositorio..."
-          sleep 10
-
-      - name: Deploy HEAD Commit on cPanel
+      - name: Deploy application
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
@@ -41,10 +32,6 @@ jobs:
             -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
             "https://corporacioncapsur.com:2083/execute/VersionControlDeployment/create?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion")
 
-          echo "Respuesta de Deploy:"
           echo "$response"
 
-          echo "$response" | grep -q '"status":1' || {
-            echo "ERROR: cPanel no pudo iniciar el deployment."
-            exit 1
-          }
+          echo "$response" | grep -q '"status":1' || exit 1

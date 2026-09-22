@@ -1,7 +1,4 @@
 ---
 deployment:
   tasks:
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-php84/root/usr/bin/php /opt/cpanel/ea-wappspector/composer.phar install --no-dev --optimize-autoloader
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-nodejs22/bin/npm ci
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-nodejs22/bin/npm run build
-    - cd /home/corporacioncapsu/app_corporacion && /opt/cpanel/ea-php84/root/usr/bin/php artisan optimize
+    - /bin/sh -c 'ls -la /opt/cpanel/ | grep -i node > /home/corporacioncapsu/app_corporacion/node_check.txt 2>&1 || true'
