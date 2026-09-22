@@ -1,1 +1,0 @@
-import{i as e,n as t,t as n}from"./compiler-runtime-BMwsO_TL.js";var r=n(),i=e(t(),1);function a(){let e=(0,r.c)(1),t;return e[0]===Symbol.for(`react.memo_cache_sentinel`)?(t=[],e[0]=t):t=e[0],(0,i.useEffect)(o,t),null}function o(){window.location.replace(`/?login=1`)}export{a as default};
