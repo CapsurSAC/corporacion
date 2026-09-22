@@ -104,7 +104,7 @@ export default function Dashboard({
                                             lineHeight: 1.2,
                                         }}
                                     >
-                                        Comercios e Institutos
+                                        Comercios
                                     </Typography>
                                     <Chip
                                         label="GRUPO CAPSUR"
