@@ -211,7 +211,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                             letterSpacing: '-0.02em',
                                         }}
                                     >
-                                        Comercios
+                                        Comercios xd
                                     </Typography>
                                     <Chip
                                         label={`${comercios.length} MARCAS`}
