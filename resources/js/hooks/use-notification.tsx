@@ -160,13 +160,23 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     // Escuchar navegación y respuestas globales de Inertia
     useEffect(() => {
-        const unregister = router.on('navigate', (event) => {
-            const pageProps = event.detail.page.props as { flash?: Record<string, unknown> };
-            handleFlash(pageProps?.flash);
+        const checkPageFlash = (page: any) => {
+            if (!page) return;
+            const flash = page.flash || page.props?.flash;
+            handleFlash(flash);
+        };
+
+        const unregisterNavigate = router.on('navigate', (event) => {
+            checkPageFlash(event.detail.page);
+        });
+
+        const unregisterSuccess = router.on('success', (event) => {
+            checkPageFlash(event.detail.page);
         });
 
         return () => {
-            unregister();
+            unregisterNavigate();
+            unregisterSuccess();
         };
     }, [handleFlash]);
 

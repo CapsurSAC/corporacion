@@ -171,27 +171,43 @@ class RubroController extends Controller
 
         if ($diplomadosCount > 0 || $cursosCount > 0 || $especialidadesCount > 0) {
             $detalles = [];
-            if ($diplomadosCount > 0) $detalles[] = "{$diplomadosCount} diplomados";
-            if ($cursosCount > 0) $detalles[] = "{$cursosCount} cursos";
-            if ($especialidadesCount > 0) $detalles[] = "{$especialidadesCount} especialidades";
+            if ($especialidadesCount > 0) {
+                $detalles[] = "{$especialidadesCount} " . ($especialidadesCount === 1 ? 'especialidad' : 'especialidades');
+            }
+            if ($diplomadosCount > 0) {
+                $detalles[] = "{$diplomadosCount} " . ($diplomadosCount === 1 ? 'diplomado' : 'diplomados');
+            }
+            if ($cursosCount > 0) {
+                $detalles[] = "{$cursosCount} " . ($cursosCount === 1 ? 'curso' : 'cursos');
+            }
 
             $detallesTexto = implode(', ', $detalles);
+            $mensajeError = "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} asociados. Puedes desactivarlo.";
 
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} asociados. Puedes desactivarlo.",
+                'message' => $mensajeError,
             ]);
 
-            return back();
+            return back()->with('error', $mensajeError)->with('toast', [
+                'type' => 'error',
+                'message' => $mensajeError,
+            ]);
         }
 
+        $nombre = $rubroModel->nombre;
         $rubroModel->delete();
+
+        $mensajeExito = "Rubro \"{$nombre}\" eliminado con éxito.";
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Rubro eliminado correctamente.',
+            'message' => $mensajeExito,
         ]);
 
-        return back();
+        return back()->with('success', $mensajeExito)->with('toast', [
+            'type' => 'success',
+            'message' => $mensajeExito,
+        ]);
     }
 }

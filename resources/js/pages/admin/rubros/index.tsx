@@ -34,7 +34,7 @@ import {
 import { useState } from 'react';
 import { RubroDialog } from '@/components/admin/rubro-dialog';
 import { useNotification } from '@/hooks/use-notification';
-import { confirmDeleteAlert } from '@/lib/swal';
+import { confirmDeleteAlert, showErrorAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
 import type { Rubro } from '@/types';
 
@@ -108,9 +108,28 @@ export default function RubrosIndex({
     };
 
     const handleDelete = async (rubro: Rubro) => {
-        const totalProgramas = (rubro.diplomados_count || 0) + (rubro.cursos_count || 0);
-        if (totalProgramas > 0) {
-            notify.error(`No se puede eliminar el rubro "${rubro.nombre}" porque tiene ${totalProgramas} programas asociados. Puedes desactivarlo.`);
+        const diplomados = rubro.diplomados_count || 0;
+        const cursos = rubro.cursos_count || 0;
+        const especialidades = rubro.especialidades_count || 0;
+        const totalAsociados = diplomados + cursos + especialidades;
+
+        if (totalAsociados > 0) {
+            const detalles: string[] = [];
+            if (especialidades > 0) {
+                detalles.push(`${especialidades} especialidad${especialidades > 1 ? 'es' : ''}`);
+            }
+            if (diplomados > 0) {
+                detalles.push(`${diplomados} diplomado${diplomados > 1 ? 's' : ''}`);
+            }
+            if (cursos > 0) {
+                detalles.push(`${cursos} curso${cursos > 1 ? 's' : ''}`);
+            }
+
+            const detallesTexto = detalles.join(', ');
+            const mensaje = `No se puede eliminar el rubro "${rubro.nombre}" porque tiene ${detallesTexto} asociado${totalAsociados > 1 ? 's' : ''}. Si deseas ocultarlo del catálogo, puedes desactivarlo desde la opción de editar.`;
+
+            await showErrorAlert('No se puede eliminar el rubro', mensaje);
+            notify.error(mensaje);
             return;
         }
 
@@ -122,8 +141,16 @@ export default function RubrosIndex({
         if (confirmed) {
             router.delete(`/admin/rubros/${rubro.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success(`Rubro "${rubro.nombre}" eliminado con éxito.`);
+                onSuccess: (page) => {
+                    const pageAny = page as any;
+                    const isError =
+                        pageAny?.flash?.toast?.type === 'error' ||
+                        pageAny?.props?.flash?.toast?.type === 'error' ||
+                        pageAny?.props?.flash?.error;
+
+                    if (!isError) {
+                        notify.success(`Rubro "${rubro.nombre}" eliminado con éxito.`);
+                    }
                 },
                 onError: () => {
                     notify.error('No se pudo eliminar el rubro.');
@@ -510,9 +537,17 @@ export default function RubrosIndex({
                                                 </Typography>
                                             </TableCell>
 
-                                            {/* Columna 3: Programas Vinculados */}
+                                            {/* Columna 3: Programas y Especialidades Vinculados */}
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                    <Chip
+                                                        icon={<CategoryIcon sx={{ fontSize: '13px !important' }} />}
+                                                        label={`${rubro.especialidades_count || 0} Especialidades`}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color={(rubro.especialidades_count || 0) > 0 ? 'warning' : 'default'}
+                                                        sx={{ height: 22, fontSize: '0.7rem', fontWeight: 700 }}
+                                                    />
                                                     <Chip
                                                         icon={<AwardIcon sx={{ fontSize: '13px !important' }} />}
                                                         label={`${rubro.diplomados_count || 0} Diplomados`}
@@ -580,21 +615,29 @@ export default function RubrosIndex({
                                                         </IconButton>
                                                     </Tooltip>
 
-                                                    <Tooltip title="Eliminar Rubro">
-                                                        <IconButton
-                                                            size="small"
-                                                            color="error"
-                                                            onClick={() => handleDelete(rubro)}
-                                                            sx={{
-                                                                border: '1px solid',
-                                                                borderColor: 'divider',
-                                                                borderRadius: 1,
-                                                                '&:hover': { bgcolor: 'error.lighter' },
-                                                            }}
-                                                        >
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
+                                                    {(() => {
+                                                        const totalAsociados = (rubro.especialidades_count || 0) + (rubro.diplomados_count || 0) + (rubro.cursos_count || 0);
+                                                        return (
+                                                            <Tooltip title={totalAsociados > 0 ? `No se puede eliminar (${totalAsociados} elementos vinculados)` : "Eliminar Rubro"}>
+                                                                <span>
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        color="error"
+                                                                        onClick={() => handleDelete(rubro)}
+                                                                        sx={{
+                                                                            border: '1px solid',
+                                                                            borderColor: totalAsociados > 0 ? 'action.disabledBackground' : 'divider',
+                                                                            borderRadius: 1,
+                                                                            opacity: totalAsociados > 0 ? 0.6 : 1,
+                                                                            '&:hover': { bgcolor: totalAsociados > 0 ? 'action.hover' : 'error.lighter' },
+                                                                        }}
+                                                                    >
+                                                                        <DeleteIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </span>
+                                                            </Tooltip>
+                                                        );
+                                                    })()}
                                                 </Box>
                                             </TableCell>
                                         </TableRow>
