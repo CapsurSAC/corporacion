@@ -59,6 +59,7 @@ export function CursoDialog({
         useForm<{
             comercio_id: string;
             carrera_id: string;
+            rubro_id: string;
             estado_id: string;
             tipo: string;
             nombre: string;
@@ -70,6 +71,7 @@ export function CursoDialog({
         }>({
             comercio_id: defaultComercioId ? String(defaultComercioId) : (comercios[0]?.id ? String(comercios[0].id) : ''),
             carrera_id: defaultCarreraId ? String(defaultCarreraId) : '',
+            rubro_id: '',
             estado_id: '',
             tipo: 'tradicional',
             nombre: '',
@@ -85,6 +87,7 @@ export function CursoDialog({
             setData({
                 comercio_id: String(curso.comercio_id),
                 carrera_id: curso.carrera_id ? String(curso.carrera_id) : '',
+                rubro_id: curso.rubro_id ? String(curso.rubro_id) : '',
                 estado_id: curso.estado_id ? String(curso.estado_id) : '',
                 tipo: curso.tipo || '',
                 nombre: curso.nombre,
@@ -150,7 +153,6 @@ export function CursoDialog({
             put(`/admin/cursos/${curso.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Curso "${data.nombre}" actualizado con éxito.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -162,7 +164,6 @@ export function CursoDialog({
             post(`/admin/cursos`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Curso "${data.nombre}" registrado exitosamente.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -241,9 +242,9 @@ export function CursoDialog({
                                     <InputLabel id="select-tipo-label">Rubro / Categoría</InputLabel>
                                     <Select
                                         labelId="select-tipo-label"
-                                        value={data.tipo}
+                                        value={data.rubro_id}
                                         label="Rubro / Categoría"
-                                        onChange={(e) => setData('tipo', e.target.value)}
+                                        onChange={(e) => setData('rubro_id', e.target.value)}
                                     >
                                         <MenuItem value="">
                                             <Typography variant="body2" color="text.secondary">Sin Categoría / Curso Libre</Typography>
@@ -255,7 +256,7 @@ export function CursoDialog({
                                                     {catName}
                                                 </ListSubheader>,
                                                 ...items.map((r) => (
-                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                    <MenuItem key={r.id} value={String(r.id)}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#0284c7', flexShrink: 0 }} />
                                                             <Typography variant="body2">{r.nombre}</Typography>

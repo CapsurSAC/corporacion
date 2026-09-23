@@ -14,7 +14,6 @@ class Rubro extends Model
 
     protected $fillable = [
         'nombre',
-        'clave',
         'color_hex',
         'categoria',
         'descripcion',
@@ -36,19 +35,19 @@ class Rubro extends Model
     }
 
     /**
-     * Diplomados vinculados a este rubro mediante su clave.
+     * Diplomados vinculados a este rubro mediante su ID.
      */
     public function diplomados(): HasMany
     {
-        return $this->hasMany(Diplomado::class, 'tipo', 'clave');
+        return $this->hasMany(Diplomado::class, 'rubro_id');
     }
 
     /**
-     * Cursos vinculados a este rubro mediante su clave.
+     * Cursos vinculados a este rubro mediante su ID.
      */
     public function cursos(): HasMany
     {
-        return $this->hasMany(Curso::class, 'tipo', 'clave');
+        return $this->hasMany(Curso::class, 'rubro_id');
     }
 
     /**

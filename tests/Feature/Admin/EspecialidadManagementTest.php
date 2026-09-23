@@ -28,8 +28,8 @@ class EspecialidadManagementTest extends TestCase
         $carrera1 = Carrera::factory()->create(['nombre' => 'Desarrollo de Software']);
         $carrera2 = Carrera::factory()->create(['nombre' => 'Guía Oficial de Turismo']);
 
-        $rubroTech = Rubro::factory()->create(['nombre' => 'Tecnología', 'clave' => 'tecnologia']);
-        $rubroTurismo = Rubro::factory()->create(['nombre' => 'Turismo', 'clave' => 'turismo']);
+        $rubroTech = Rubro::factory()->create(['nombre' => 'Tecnología']);
+        $rubroTurismo = Rubro::factory()->create(['nombre' => 'Turismo']);
 
         Especialidad::factory()->create([
             'carrera_id' => $carrera1->id,

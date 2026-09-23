@@ -138,9 +138,6 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
         if (confirmed) {
             router.delete(`/admin/comercios/${comercio.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success(`Comercio "${comercio.nombre}" eliminado exitosamente.`);
-                },
                 onError: () => {
                     notify.error('No se pudo eliminar el comercio.');
                 },

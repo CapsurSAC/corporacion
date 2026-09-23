@@ -433,9 +433,6 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
 
         put(`/admin/comercios/${comercio.id}`, {
             preserveScroll: true,
-            onSuccess: () => {
-                notify.success('Información institucional actualizada exitosamente.');
-            },
             onError: () => {
                 notify.error('Ocurrió un error al guardar los cambios.');
             },

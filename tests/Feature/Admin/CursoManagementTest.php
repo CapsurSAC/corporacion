@@ -24,21 +24,23 @@ class CursoManagementTest extends TestCase
         $user = User::factory()->create();
 
         $comercio = Comercio::factory()->create();
+        $rubroEspecializado = \App\Models\Rubro::factory()->create(['nombre' => 'Especializado']);
+        $rubroTradicional = \App\Models\Rubro::factory()->create(['nombre' => 'Tradicional']);
 
         Curso::factory()->create([
             'comercio_id' => $comercio->id,
             'nombre' => 'Curso de Materiales Peligrosos MATPEL I',
-            'tipo' => 'especializado',
+            'rubro_id' => $rubroEspecializado->id,
         ]);
         Curso::factory()->create([
             'comercio_id' => $comercio->id,
             'nombre' => 'Taller de Excel Financiero',
-            'tipo' => 'tradicional',
+            'rubro_id' => $rubroTradicional->id,
         ]);
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.cursos.index', ));
+            ->get(route('admin.cursos.index'));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -48,8 +50,7 @@ class CursoManagementTest extends TestCase
 
         $filteredResponse = $this
             ->actingAs($user)
-            ->get(route('admin.cursos.index', ['tipo' => 'especializado',
-            ]));
+            ->get(route('admin.cursos.index', ['rubro_id' => $rubroEspecializado->id]));
 
         $filteredResponse->assertOk();
         $filteredResponse->assertInertia(fn (Assert $page) => $page

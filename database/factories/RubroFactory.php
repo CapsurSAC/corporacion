@@ -24,7 +24,6 @@ class RubroFactory extends Factory
 
         return [
             'nombre' => ucfirst($nombre),
-            'clave' => Str::slug($nombre, '_') . '_' . fake()->unique()->numberBetween(100, 999),
             'color_hex' => fake()->hexColor(),
             'categoria' => fake()->randomElement(['Modalidad de Formación', 'CECAVA (Rubros Técnicos)', 'MAGISTER (Educación)']),
             'descripcion' => fake()->sentence(),

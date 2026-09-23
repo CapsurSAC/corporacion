@@ -275,7 +275,7 @@ class ComercioController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Comercio actualizado correctamente.',
+            'message' => 'Comercio actualizado con éxito.',
         ]);
 
         return back();
@@ -287,12 +287,11 @@ class ComercioController extends Controller
     public function destroy(Request $request, $comercio): RedirectResponse
     {
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
-        $nombre = $comercioModel->nombre;
         $comercioModel->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El comercio \"{$nombre}\" ha sido eliminado correctamente.",
+            'message' => 'Comercio eliminado con éxito.',
         ]);
 
         return back();

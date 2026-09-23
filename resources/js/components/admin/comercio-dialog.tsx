@@ -238,7 +238,6 @@ export function ComercioDialog({
             put(`/admin/comercios/${comercio.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Ficha de "${data.nombre}" actualizada con éxito.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -250,7 +249,6 @@ export function ComercioDialog({
             post(`/admin/comercios`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Comercio "${data.nombre}" creado exitosamente.`);
                     onOpenChange(false);
                     reset();
                 },

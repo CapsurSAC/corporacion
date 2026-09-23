@@ -53,8 +53,8 @@ export default function RubrosIndex({
     categorias = [],
     filters = {},
 }: RubrosIndexProps) {
-    
-    
+
+
     const { notify } = useNotification();
 
     const [search, setSearch] = useState(filters.search || '');
@@ -128,8 +128,6 @@ export default function RubrosIndex({
                         if (errorMsg) {
                             notify.error(errorMsg);
                         }
-                    } else {
-                        notify.success(`Rubro "${rubro.nombre}" eliminado con éxito.`);
                     }
                 },
                 onError: (errors) => {
@@ -649,7 +647,7 @@ export default function RubrosIndex({
                 onOpenChange={setDialogOpen}
                 rubro={selectedRubro}
                 categorias={categorias}
-                
+
             />
         </>
     );

@@ -27,6 +27,7 @@ class CursoFactory extends Factory
         return [
             'comercio_id' => Comercio::factory(),
             'carrera_id' => null,
+            'rubro_id' => null,
             'nombre' => $nombre,
             'slug' => Str::slug($nombre),
             'tipo' => fake()->randomElement(['tradicional', 'especializado']),

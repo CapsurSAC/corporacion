@@ -15,6 +15,7 @@ class Diplomado extends Model
     protected $fillable = [
         'comercio_id',
         'carrera_id',
+        'rubro_id',
         'estado_id',
         'nombre',
         'slug',
@@ -74,6 +75,14 @@ class Diplomado extends Model
     public function carrera(): BelongsTo
     {
         return $this->belongsTo(Carrera::class, 'carrera_id');
+    }
+
+    /**
+     * Rubro al que pertenece el diplomado.
+     */
+    public function rubro(): BelongsTo
+    {
+        return $this->belongsTo(Rubro::class, 'rubro_id');
     }
 
     /**

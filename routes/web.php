@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CursoController;
 use App\Http\Controllers\Admin\DiplomadoController;
 use App\Http\Controllers\Admin\DriveCapacitacionController;
 use App\Http\Controllers\Admin\EspecialidadController;
+use App\Http\Controllers\Admin\EstadoController;
 use App\Http\Controllers\Admin\GrupoController;
 use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\RubroController;
@@ -68,6 +69,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('rubros', [RubroController::class, 'store'])->name('rubros.store');
         Route::put('rubros/{rubro}', [RubroController::class, 'update'])->name('rubros.update');
         Route::delete('rubros/{rubro}', [RubroController::class, 'destroy'])->name('rubros.destroy');
+
+        // Estados
+        Route::get('estados', [EstadoController::class, 'index'])->name('estados.index');
+        Route::post('estados', [EstadoController::class, 'store'])->name('estados.store');
+        Route::put('estados/{estado}', [EstadoController::class, 'update'])->name('estados.update');
+        Route::delete('estados/{estado}', [EstadoController::class, 'destroy'])->name('estados.destroy');
 
         // Logos
         Route::get('logos', [LogoController::class, 'index'])->name('logos.index');

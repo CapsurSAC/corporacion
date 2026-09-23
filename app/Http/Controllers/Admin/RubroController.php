@@ -26,7 +26,6 @@ class RubroController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nombre', 'like', "%{$search}%")
-                        ->orWhere('clave', 'like', "%{$search}%")
                         ->orWhere('categoria', 'like', "%{$search}%")
                         ->orWhere('descripcion', 'like', "%{$search}%");
                 });
@@ -66,7 +65,6 @@ class RubroController extends Controller
     {
         $validated = $request->validate([
             'nombre' => ['required', 'string', 'min:2', 'max:100'],
-            'clave' => ['nullable', 'string', 'max:100', 'unique:rubros,clave'],
             'color_hex' => ['required', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'categoria' => ['nullable', 'string', 'max:100'],
             'descripcion' => ['nullable', 'string', 'max:500'],
@@ -75,26 +73,12 @@ class RubroController extends Controller
         ], [
             'nombre.required' => 'El nombre del rubro es obligatorio.',
             'nombre.min' => 'El nombre debe tener al menos 2 caracteres.',
-            'clave.unique' => 'Ya existe un rubro con esta clave identificadora.',
             'color_hex.required' => 'Debes asignar un color al rubro.',
             'color_hex.regex' => 'El color debe ser un formato hexadecimal válido (ej. #7c3aed).',
         ]);
 
-        $clave = !empty($validated['clave'])
-            ? Str::slug($validated['clave'], '_')
-            : Str::slug($validated['nombre'], '_');
-
-        // Garantizar clave única
-        $baseClave = $clave;
-        $counter = 1;
-        while (Rubro::where('clave', $clave)->exists()) {
-            $clave = "{$baseClave}_{$counter}";
-            $counter++;
-        }
-
         Rubro::create([
             'nombre' => trim($validated['nombre']),
-            'clave' => $clave,
             'color_hex' => $validated['color_hex'],
             'categoria' => !empty($validated['categoria']) ? trim($validated['categoria']) : null,
             'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
@@ -104,7 +88,7 @@ class RubroController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Rubro creado correctamente.',
+            'message' => 'Rubro registrado con éxito.',
         ]);
 
         return back();
@@ -119,7 +103,6 @@ class RubroController extends Controller
 
         $validated = $request->validate([
             'nombre' => ['required', 'string', 'min:2', 'max:100'],
-            'clave' => ['required', 'string', 'max:100', 'unique:rubros,clave,' . $rubroModel->id],
             'color_hex' => ['required', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'categoria' => ['nullable', 'string', 'max:100'],
             'descripcion' => ['nullable', 'string', 'max:500'],
@@ -127,22 +110,12 @@ class RubroController extends Controller
             'orden' => ['nullable', 'integer', 'min:0'],
         ], [
             'nombre.required' => 'El nombre del rubro es obligatorio.',
-            'clave.required' => 'La clave identificadora es obligatoria.',
-            'clave.unique' => 'Ya existe otro rubro con esta clave.',
             'color_hex.required' => 'El color del rubro es obligatorio.',
             'color_hex.regex' => 'El color debe ser un formato hexadecimal válido (ej. #7c3aed).',
         ]);
 
-        $clave = Str::slug($validated['clave'], '_');
-
-        // Si la clave cambió, verificar que no colisione
-        if ($clave !== $rubroModel->clave && Rubro::where('clave', $clave)->where('id', '!=', $rubroModel->id)->exists()) {
-            return back()->withErrors(['clave' => 'La clave ingresada ya está en uso por otro rubro.']);
-        }
-
         $rubroModel->update([
             'nombre' => trim($validated['nombre']),
-            'clave' => $clave,
             'color_hex' => $validated['color_hex'],
             'categoria' => !empty($validated['categoria']) ? trim($validated['categoria']) : null,
             'descripcion' => !empty($validated['descripcion']) ? trim($validated['descripcion']) : null,
@@ -152,7 +125,7 @@ class RubroController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Rubro actualizado correctamente.',
+            'message' => 'Rubro actualizado con éxito.',
         ]);
 
         return back();
@@ -184,7 +157,7 @@ class RubroController extends Controller
             $totalCount = $especialidadesCount + $diplomadosCount + $cursosCount;
             $detallesTexto = implode(', ', $detalles);
             $asociadoTexto = $totalCount === 1 ? ($especialidadesCount === 1 ? 'asociada' : 'asociado') : 'asociados';
-            $mensajeError = "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} {$asociadoTexto}. Puedes desactivarlo.";
+            $mensajeError = "No se puede eliminar el rubro porque tiene {$detallesTexto} {$asociadoTexto}. Puedes desactivarlo.";
 
             Inertia::flash('toast', [
                 'type' => 'error',
@@ -197,10 +170,9 @@ class RubroController extends Controller
             ]);
         }
 
-        $nombre = $rubroModel->nombre;
         $rubroModel->delete();
 
-        $mensajeExito = "Rubro \"{$nombre}\" eliminado con éxito.";
+        $mensajeExito = 'Rubro eliminado con éxito.';
 
         Inertia::flash('toast', [
             'type' => 'success',

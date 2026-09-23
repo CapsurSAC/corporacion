@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
     BookOpen,
     Building2,
+    CheckCircle2,
     HardDrive,
     Image,
     LayoutGrid,
@@ -46,6 +47,11 @@ export function AppSidebar() {
             title: 'Rubros',
             href: '/admin/rubros',
             icon: Tags,
+        },
+        {
+            title: 'Estados',
+            href: '/admin/estados',
+            icon: CheckCircle2,
         },
         {
             title: 'Drive Capacitaciones',

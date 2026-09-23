@@ -90,19 +90,22 @@ export interface Carrera {
 export interface Estado {
     id: number;
     nombre: string;
-    clave: string;
     color_hex?: string | null;
     descripcion?: string | null;
     activo: boolean;
     orden: number;
     created_at?: string;
     updated_at?: string;
+    especialidades_count?: number;
+    diplomados_count?: number;
+    cursos_count?: number;
 }
 
 export interface Diplomado {
     id: number;
     comercio_id: number;
     carrera_id?: number | null;
+    rubro_id?: number | null;
     estado_id?: number | null;
     nombre: string;
     slug: string;
@@ -128,6 +131,7 @@ export interface Diplomado {
     actualizado_drive?: string | null;
     comercio?: Comercio;
     carrera?: Carrera | null;
+    rubro?: Rubro | null;
     estado?: Estado | null;
     created_at?: string;
     updated_at?: string;
@@ -137,6 +141,7 @@ export interface Curso {
     id: number;
     comercio_id: number;
     carrera_id?: number | null;
+    rubro_id?: number | null;
     estado_id?: number | null;
     nombre: string;
     slug: string;
@@ -164,6 +169,7 @@ export interface Curso {
     actualizado_drive?: string | null;
     comercio?: Comercio;
     carrera?: Carrera | null;
+    rubro?: Rubro | null;
     estado?: Estado | null;
     created_at?: string;
     updated_at?: string;
@@ -202,7 +208,6 @@ export interface CapsurStats {
 export interface Rubro {
     id: number;
     nombre: string;
-    clave: string;
     color_hex?: string | null;
     categoria?: string | null;
     descripcion?: string | null;

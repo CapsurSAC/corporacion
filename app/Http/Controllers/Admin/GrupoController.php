@@ -66,7 +66,7 @@ class GrupoController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Grupo comercial creado correctamente.',
+            'message' => 'Grupo comercial registrado con éxito.',
         ]);
 
         return back();
@@ -111,7 +111,7 @@ class GrupoController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Grupo comercial actualizado correctamente.',
+            'message' => 'Grupo comercial actualizado con éxito.',
         ]);
 
         return back();
@@ -123,12 +123,11 @@ class GrupoController extends Controller
     public function destroy(Request $request, $grupo): RedirectResponse
     {
         $grupoModel = $grupo instanceof Grupo ? $grupo : Grupo::findOrFail($grupo);
-        $nombre = $grupoModel->nombre;
         $grupoModel->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El grupo \"{$nombre}\" ha sido eliminado correctamente.",
+            'message' => 'Grupo comercial eliminado con éxito.',
         ]);
 
         return back();

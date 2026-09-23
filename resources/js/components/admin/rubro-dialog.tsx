@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import CheckIcon from '@mui/icons-material/Check';
 import PaletteIcon from '@mui/icons-material/Palette';
 import TagsIcon from '@mui/icons-material/Sell';
 import {
@@ -16,6 +17,7 @@ import {
     Typography,
     Chip,
     Autocomplete,
+    Tooltip,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
@@ -64,7 +66,6 @@ export function RubroDialog({
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             nombre: '',
-            clave: '',
             color_hex: '#7c3aed',
             categoria: '',
             descripcion: '',
@@ -73,56 +74,28 @@ export function RubroDialog({
         });
 
     const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
-    const [manualClave, setManualClave] = useState(false);
 
     useEffect(() => {
         if (rubro) {
             setData({
                 nombre: rubro.nombre || '',
-                clave: rubro.clave || '',
                 color_hex: rubro.color_hex || '#7c3aed',
                 categoria: rubro.categoria || '',
                 descripcion: rubro.descripcion || '',
                 activo: rubro.activo ?? true,
                 orden: rubro.orden ?? 0,
             });
-            setManualClave(true);
         } else {
             reset();
-            setManualClave(false);
         }
         setClientErrors({});
         clearErrors();
     }, [rubro, open]);
 
     const handleNombreChange = (val: string) => {
-        setData((prev) => {
-            const next = { ...prev, nombre: val };
-            if (!manualClave && !isEditing) {
-                next.clave = val
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9]+/g, '_')
-                    .replace(/^_+|_+$/g, '');
-            }
-            return next;
-        });
+        setData('nombre', val);
         if (clientErrors.nombre) {
             setClientErrors((prev) => ({ ...prev, nombre: undefined as any }));
-        }
-    };
-
-    const handleClaveChange = (val: string) => {
-        setManualClave(true);
-        const formatted = val
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9_]+/g, '_');
-        setData('clave', formatted);
-        if (clientErrors.clave) {
-            setClientErrors((prev) => ({ ...prev, clave: undefined as any }));
         }
     };
 
@@ -131,9 +104,6 @@ export function RubroDialog({
 
         if (!isMinLength(data.nombre.trim(), 2)) {
             errs.nombre = 'El nombre del rubro debe tener al menos 2 caracteres.';
-        }
-        if (isEditing && !isMinLength(data.clave.trim(), 2)) {
-            errs.clave = 'La clave del rubro es obligatoria.';
         }
         if (!isValidHexColor(data.color_hex)) {
             errs.color_hex = 'Debe ser un color hexadecimal válido (ej: #7c3aed).';
@@ -151,7 +121,6 @@ export function RubroDialog({
             put(`/admin/rubros/${rubro.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success('Rubro actualizado correctamente.');
                     onOpenChange(false);
                 },
                 onError: () => {
@@ -162,7 +131,6 @@ export function RubroDialog({
             post(`/admin/rubros`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success('Rubro creado exitosamente.');
                     onOpenChange(false);
                 },
                 onError: () => {
@@ -211,13 +179,13 @@ export function RubroDialog({
                     </Box>
                 </DialogTitle>
 
-                <DialogContent dividers sx={{ p: 3 }}>
-                    <Grid container spacing={2.5}>
-                        {/* Nombre del Rubro */}
-                        <Grid size={{ xs: 12 }}>
+                <DialogContent dividers sx={{ px: 3, py: 2 }}>
+                    <Grid container spacing={1.8}>
+                        {/* Fila 1: Nombre del Rubro (8 cols) y Orden (4 cols) */}
+                        <Grid size={{ xs: 12, sm: 8 }}>
                             <TextField
                                 label="Nombre del Rubro *"
-                                placeholder="Ej: Salud Ocupacional, Mineros, Derecho Ambiental..."
+                                placeholder="Ej: Salud Ocupacional, Mineros..."
                                 fullWidth
                                 size="small"
                                 value={data.nombre}
@@ -227,38 +195,20 @@ export function RubroDialog({
                             />
                         </Grid>
 
-                        {/* Clave interna / Slug */}
-                        <Grid size={{ xs: 12, sm: 7 }}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <TextField
-                                label="Clave identificadora (Slug) *"
-                                placeholder="ej: salud_ocupacional"
-                                fullWidth
-                                size="small"
-                                value={data.clave}
-                                onChange={(e) => handleClaveChange(e.target.value)}
-                                error={!!(clientErrors.clave || errors.clave)}
-                                helperText={
-                                    clientErrors.clave ||
-                                    errors.clave ||
-                                    'Identificador único en minúsculas y guiones bajos'
-                                }
-                            />
-                        </Grid>
-
-                        {/* Orden */}
-                        <Grid size={{ xs: 12, sm: 5 }}>
-                            <TextField
-                                label="Orden de visualización"
+                                label="Orden"
                                 type="number"
                                 fullWidth
                                 size="small"
+                                placeholder="0"
                                 value={data.orden}
                                 onChange={(e) => setData('orden', parseInt(e.target.value) || 0)}
-                                helperText="Prioridad en menús (0 primero)"
+                                slotProps={{ htmlInput: { min: 0 } }}
                             />
                         </Grid>
 
-                        {/* Categoría / Agrupador */}
+                        {/* Fila 2: Categoría / Agrupador */}
                         <Grid size={{ xs: 12 }}>
                             <Autocomplete
                                 freeSolo
@@ -271,81 +221,222 @@ export function RubroDialog({
                                     <TextField
                                         {...params}
                                         label="Categoría o Agrupación (Opcional)"
-                                        placeholder="Ej: CECAVA (Rubros Técnicos), MAGISTER (Educación)..."
+                                        placeholder="Ej: CECAVA (Rubros Técnicos), MAGISTER..."
                                         size="small"
-                                        helperText="Agrupa los rubros en las listas desplegables"
                                     />
                                 )}
                             />
                         </Grid>
 
-                        {/* Color Hex y Selector */}
+                        {/* Fila 3: Color Hex y Selector (Compacto y Elegante) */}
                         <Grid size={{ xs: 12 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                                <PaletteIcon sx={{ fontSize: 16 }} />
-                                COLOR DISTINTIVO DEL RUBRO
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                                <input
-                                    type="color"
-                                    value={data.color_hex}
-                                    onChange={(e) => setData('color_hex', e.target.value)}
-                                    style={{
-                                        width: 44,
-                                        height: 40,
-                                        borderRadius: 8,
-                                        border: '1px solid #ccc',
-                                        cursor: 'pointer',
-                                        padding: 2,
+                            <Box
+                                sx={{
+                                    p: 1.5,
+                                    borderRadius: 1.8,
+                                    bgcolor: (theme) =>
+                                        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                        <PaletteIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.84rem' }}>
+                                            Color del Rubro
+                                        </Typography>
+                                    </Box>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: '0.72rem' }}>
+                                        Identificador visual en catálogo y tablas
+                                    </Typography>
+                                </Box>
+
+                                <Box
+                                    sx={{
+                                        display: 'grid',
+                                        gridTemplateColumns: { xs: '1fr', sm: '1.2fr 0.8fr' },
+                                        gap: 1.5,
+                                        alignItems: 'center',
                                     }}
-                                />
-                                <TextField
-                                    size="small"
-                                    placeholder="#7c3aed"
-                                    value={data.color_hex}
-                                    onChange={(e) => setData('color_hex', e.target.value)}
-                                    error={!!(clientErrors.color_hex || errors.color_hex)}
-                                    helperText={clientErrors.color_hex || errors.color_hex}
-                                    sx={{ width: 140 }}
-                                />
-                            </Box>
-                            {/* Paleta de colores rápidos */}
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-                                {COLOR_PRESETS.map((preset) => (
-                                    <Chip
-                                        key={preset.hex}
-                                        label={preset.name.split(' ')[0]}
-                                        size="small"
-                                        onClick={() => setData('color_hex', preset.hex)}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                                        <Tooltip title="Haz clic para abrir el selector de color" arrow placement="top">
+                                            <Box
+                                                component="label"
+                                                sx={{
+                                                    position: 'relative',
+                                                    width: 40,
+                                                    height: 38,
+                                                    borderRadius: 1.2,
+                                                    bgcolor: isValidHexColor(data.color_hex) ? data.color_hex : '#7c3aed',
+                                                    border: '2px solid',
+                                                    borderColor: 'divider',
+                                                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0,
+                                                    overflow: 'hidden',
+                                                    transition: 'transform 0.15s ease',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.06)',
+                                                        boxShadow: '0 3px 8px rgba(0,0,0,0.18)',
+                                                    },
+                                                }}
+                                            >
+                                                <input
+                                                    type="color"
+                                                    value={isValidHexColor(data.color_hex) ? data.color_hex : '#7c3aed'}
+                                                    onChange={(e) => setData('color_hex', e.target.value)}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '-50%',
+                                                        left: '-50%',
+                                                        width: '200%',
+                                                        height: '200%',
+                                                        opacity: 0,
+                                                        cursor: 'pointer',
+                                                    }}
+                                                />
+                                            </Box>
+                                        </Tooltip>
+                                        <TextField
+                                            size="small"
+                                            label="Código Hex"
+                                            placeholder="#7c3aed"
+                                            value={data.color_hex}
+                                            onChange={(e) => setData('color_hex', e.target.value)}
+                                            error={!!(clientErrors.color_hex || errors.color_hex)}
+                                            helperText={clientErrors.color_hex || errors.color_hex}
+                                            fullWidth
+                                            slotProps={{
+                                                htmlInput: {
+                                                    style: {
+                                                        fontFamily: 'monospace',
+                                                        fontWeight: 700,
+                                                        letterSpacing: '0.04em',
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    </Box>
+
+                                    <Box
                                         sx={{
-                                            bgcolor: `${preset.hex}20`,
-                                            color: preset.hex,
-                                            border: data.color_hex === preset.hex ? `2px solid ${preset.hex}` : `1px solid ${preset.hex}40`,
-                                            fontWeight: 700,
-                                            fontSize: '0.72rem',
-                                            cursor: 'pointer',
-                                            '&:hover': { bgcolor: `${preset.hex}30` },
+                                            p: 0.8,
+                                            borderRadius: 1.2,
+                                            bgcolor: 'background.paper',
+                                            border: '1px dashed',
+                                            borderColor: 'divider',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 0.4,
+                                            minHeight: 46,
+                                            boxSizing: 'border-box',
                                         }}
-                                    />
-                                ))}
+                                    >
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                fontSize: '0.62rem',
+                                                color: 'text.secondary',
+                                                fontWeight: 700,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.04em',
+                                            }}
+                                        >
+                                            Vista previa
+                                        </Typography>
+                                        <Chip
+                                            label={data.nombre?.trim() || 'Rubro de Ejemplo'}
+                                            size="small"
+                                            sx={{
+                                                bgcolor: `${data.color_hex}18`,
+                                                color: data.color_hex,
+                                                fontWeight: 800,
+                                                fontSize: '0.72rem',
+                                                border: `1.5px solid ${data.color_hex}50`,
+                                                px: 0.6,
+                                                height: 22,
+                                                maxWidth: '100%',
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ mt: 1.2, pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.7rem' }}>
+                                            Colores recomendados:
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
+                                            Selección rápida
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+                                        {COLOR_PRESETS.map((preset) => {
+                                            const isSelected = data.color_hex.toLowerCase() === preset.hex.toLowerCase();
+                                            return (
+                                                <Tooltip key={preset.hex} title={preset.name} arrow placement="top">
+                                                    <Box
+                                                        onClick={() => setData('color_hex', preset.hex)}
+                                                        sx={{
+                                                            width: 24,
+                                                            height: 24,
+                                                            borderRadius: '50%',
+                                                            bgcolor: preset.hex,
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            boxShadow: isSelected
+                                                                ? (theme) => `0 0 0 2px ${theme.palette.background.paper}, 0 0 0 3.5px ${preset.hex}`
+                                                                : '0 1px 3px rgba(0,0,0,0.15)',
+                                                            transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                                                            transition: 'all 0.15s ease',
+                                                            '&:hover': {
+                                                                transform: 'scale(1.25)',
+                                                                boxShadow: (theme) => `0 0 0 2px ${theme.palette.background.paper}, 0 0 0 3px ${preset.hex}`,
+                                                            },
+                                                        }}
+                                                    >
+                                                        {isSelected && (
+                                                            <CheckIcon
+                                                                sx={{
+                                                                    color: '#ffffff',
+                                                                    fontSize: 14,
+                                                                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                </Tooltip>
+                                            );
+                                        })}
+                                    </Box>
+                                </Box>
                             </Box>
                         </Grid>
 
-                        {/* Descripción */}
+                        {/* Fila 4: Descripción */}
                         <Grid size={{ xs: 12 }}>
                             <TextField
                                 label="Descripción o Alcance (Opcional)"
                                 placeholder="Describe el perfil, temas o carreras a las que aplica este rubro..."
                                 fullWidth
                                 multiline
-                                rows={2.5}
+                                rows={2}
                                 size="small"
                                 value={data.descripcion}
                                 onChange={(e) => setData('descripcion', e.target.value)}
                             />
                         </Grid>
 
-                        {/* Estado Activo */}
+                        {/* Fila 5: Estado Activo (Compacto) */}
                         <Grid size={{ xs: 12 }}>
                             <FormControlLabel
                                 control={
@@ -353,18 +444,15 @@ export function RubroDialog({
                                         checked={data.activo}
                                         onChange={(e) => setData('activo', e.target.checked)}
                                         color="primary"
+                                        size="small"
                                     />
                                 }
                                 label={
-                                    <Box>
-                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                            Rubro Activo y Disponible
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            Si se desmarca, no aparecerá en nuevos formularios pero se conservará en los existentes.
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.84rem' }}>
+                                        Rubro Activo y Disponible en el catálogo
+                                    </Typography>
                                 }
+                                sx={{ m: 0 }}
                             />
                         </Grid>
                     </Grid>

@@ -201,7 +201,7 @@ class CarreraController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Programa académico actualizado correctamente.',
+            'message' => 'Carrera actualizada con éxito.',
         ]);
 
         return back();
@@ -213,12 +213,11 @@ class CarreraController extends Controller
     public function destroy(Request $request, $carrera): RedirectResponse
     {
         $carreraModel = $carrera instanceof Carrera ? $carrera : Carrera::findOrFail($carrera);
-        $nombre = $carreraModel->nombre;
         $carreraModel->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "El programa \"{$nombre}\" ha sido eliminado correctamente.",
+            'message' => 'Carrera eliminada con éxito.',
         ]);
 
         return back();

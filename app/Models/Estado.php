@@ -14,7 +14,6 @@ class Estado extends Model
 
     protected $fillable = [
         'nombre',
-        'clave',
         'color_hex',
         'descripcion',
         'activo',

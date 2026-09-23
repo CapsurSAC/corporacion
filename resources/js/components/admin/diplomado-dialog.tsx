@@ -59,6 +59,7 @@ export function DiplomadoDialog({
         useForm<{
             comercio_id: string;
             carrera_id: string;
+            rubro_id: string;
             estado_id: string;
             tipo: string;
             nombre: string;
@@ -70,6 +71,7 @@ export function DiplomadoDialog({
         }>({
             comercio_id: defaultComercioId ? String(defaultComercioId) : (comercios[0]?.id ? String(comercios[0].id) : ''),
             carrera_id: defaultCarreraId ? String(defaultCarreraId) : '',
+            rubro_id: '',
             estado_id: '',
             tipo: '',
             nombre: '',
@@ -85,6 +87,7 @@ export function DiplomadoDialog({
             setData({
                 comercio_id: String(diplomado.comercio_id),
                 carrera_id: diplomado.carrera_id ? String(diplomado.carrera_id) : '',
+                rubro_id: diplomado.rubro_id ? String(diplomado.rubro_id) : '',
                 estado_id: diplomado.estado_id ? String(diplomado.estado_id) : '',
                 tipo: diplomado.tipo || '',
                 nombre: diplomado.nombre,
@@ -152,7 +155,6 @@ export function DiplomadoDialog({
             put(`/admin/diplomados/${diplomado.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Diplomado "${data.nombre}" actualizado con éxito.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -164,7 +166,6 @@ export function DiplomadoDialog({
             post(`/admin/diplomados`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Diplomado "${data.nombre}" registrado exitosamente.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -243,9 +244,9 @@ export function DiplomadoDialog({
                                     <InputLabel id="select-tipo-label">Rubro / Categoría</InputLabel>
                                     <Select
                                         labelId="select-tipo-label"
-                                        value={data.tipo}
+                                        value={data.rubro_id}
                                         label="Rubro / Categoría"
-                                        onChange={(e) => setData('tipo', e.target.value)}
+                                        onChange={(e) => setData('rubro_id', e.target.value)}
                                     >
                                         <MenuItem value="">
                                             <Typography variant="body2" color="text.secondary">Sin Categoría / Diplomado Libre</Typography>
@@ -257,7 +258,7 @@ export function DiplomadoDialog({
                                                     {catName}
                                                 </ListSubheader>,
                                                 ...items.map((r) => (
-                                                    <MenuItem key={r.clave} value={r.clave}>
+                                                    <MenuItem key={r.id} value={String(r.id)}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#7c3aed', flexShrink: 0 }} />
                                                             {r.nombre}

@@ -105,9 +105,6 @@ export default function GruposIndex({ grupos = [] }: Props) {
         if (confirmed) {
             router.delete(`/admin/grupos/${grupo.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success(`El grupo comercial "${grupo.nombre}" ha sido eliminado exitosamente.`);
-                },
                 onError: () => {
                     notify.error('No se pudo eliminar el grupo comercial.');
                 },

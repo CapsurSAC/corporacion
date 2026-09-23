@@ -133,9 +133,6 @@ export default function CarrerasIndex({
         if (confirmed) {
             router.delete(`/admin/carreras/${carrera.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success(`Carrera "${carrera.nombre}" eliminada exitosamente.`);
-                },
                 onError: () => {
                     notify.error('No se pudo eliminar la carrera.');
                 },

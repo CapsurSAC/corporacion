@@ -108,7 +108,6 @@ export function CarreraDialog({
             put(`/admin/carreras/${carrera.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Carrera "${data.nombre}" actualizada con éxito.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -120,7 +119,6 @@ export function CarreraDialog({
             post(`/admin/carreras`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Carrera "${data.nombre}" registrada exitosamente.`);
                     onOpenChange(false);
                     reset();
                 },

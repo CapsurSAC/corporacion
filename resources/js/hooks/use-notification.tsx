@@ -137,14 +137,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 }
             } else if (typeof flashObj.toast === 'string') {
                 notifyBase(flashObj.toast, { status: 'success' });
-            }
-
-            if (flashObj.success && typeof flashObj.success === 'string') {
+            } else if (flashObj.success && typeof flashObj.success === 'string') {
                 notifyBase(flashObj.success, { status: 'success' });
             }
 
             if (flashObj.error && typeof flashObj.error === 'string') {
-                notifyBase(flashObj.error, { status: 'error', duration: 5000 });
+                if (!flashObj.toast || (typeof flashObj.toast === 'object' && (flashObj.toast as any).type !== 'error')) {
+                    notifyBase(flashObj.error, { status: 'error', duration: 5000 });
+                }
             }
 
             if (flashObj.warning && typeof flashObj.warning === 'string') {

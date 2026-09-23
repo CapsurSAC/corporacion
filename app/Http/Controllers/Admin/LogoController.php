@@ -98,7 +98,7 @@ class LogoController extends Controller
             'toast' => [
                 'type' => 'success',
                 'title' => '¡Logos Actualizados!',
-                'message' => "Los logotipos institucionales para {$comercio->nombre} se guardaron exitosamente.",
+                'message' => 'Logotipos institucionales actualizados con éxito.',
             ],
         ]);
     }

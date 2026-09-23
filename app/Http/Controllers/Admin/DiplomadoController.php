@@ -25,18 +25,23 @@ class DiplomadoController extends Controller
         $comercioId = $request->query('comercio_id');
         $carreraId = $request->query('carrera_id');
         $estadoId = $request->query('estado_id');
-        $tipo = $request->query('tipo');
+        $rubroId = $request->query('rubro_id');
         $search = $request->query('search');
 
         $diplomadosQuery = Diplomado::query()
-            ->with(['comercio.grupo', 'carrera', 'estado'])
+            ->with(['comercio.grupo', 'carrera', 'estado', 'rubro'])
             ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
             ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
             ->when($estadoId, fn ($query) => $query->where('estado_id', $estadoId))
-            ->when($tipo, fn ($query) => $query->where('tipo', $tipo))
+            ->when($rubroId, function ($query, $rubroId) {
+                if ($rubroId === 'sin_categoria') {
+                    $query->whereNull('rubro_id');
+                } else {
+                    $query->where('rubro_id', $rubroId);
+                }
+            })
             ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                    ->orWhere('tipo', 'like', "%{$search}%")
                     ->orWhere('precio', 'like', "%{$search}%");
             }))
             ->orderBy('id', 'desc');
@@ -74,7 +79,7 @@ class DiplomadoController extends Controller
                 'comercio_id' => $comercioId,
                 'carrera_id' => $carreraId,
                 'estado_id' => $estadoId,
-                'tipo' => $tipo,
+                'rubro_id' => $rubroId,
                 'search' => $search,
             ],
         ]);
@@ -92,6 +97,7 @@ class DiplomadoController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
+            'rubro_id' => ['nullable', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
@@ -104,6 +110,7 @@ class DiplomadoController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'rubro_id.exists' => 'El rubro seleccionado no es válido.',
             'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre del diplomado es obligatorio.',
             'nombre.min' => 'El nombre del diplomado debe tener al menos 3 caracteres.',
@@ -121,6 +128,7 @@ class DiplomadoController extends Controller
         Diplomado::create([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
+            'rubro_id' => $validated['rubro_id'] ?? null,
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,
@@ -154,6 +162,7 @@ class DiplomadoController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
+            'rubro_id' => ['nullable', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'tipo' => ['nullable', 'string', 'max:100'],
@@ -166,6 +175,7 @@ class DiplomadoController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera asociada seleccionada no es válida.',
+            'rubro_id.exists' => 'El rubro seleccionado no es válido.',
             'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre del diplomado es obligatorio.',
             'nombre.min' => 'El nombre del diplomado debe tener al menos 3 caracteres.',
@@ -186,6 +196,7 @@ class DiplomadoController extends Controller
         $diplomadoModel->update([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
+            'rubro_id' => $validated['rubro_id'] ?? null,
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,
@@ -199,7 +210,7 @@ class DiplomadoController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Diplomado actualizado correctamente.',
+            'message' => 'Diplomado actualizado con éxito.',
         ]);
 
         return back();
@@ -211,12 +222,11 @@ class DiplomadoController extends Controller
     public function destroy(Request $request, $diplomado): RedirectResponse
     {
         $diplomadoModel = $diplomado instanceof Diplomado ? $diplomado : Diplomado::findOrFail($diplomado);
-        $nombre = $diplomadoModel->nombre;
         $diplomadoModel->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "Diplomado \"{$nombre}\" eliminado con éxito.",
+            'message' => 'Diplomado eliminado con éxito.',
         ]);
 
         return back();

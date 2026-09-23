@@ -139,7 +139,6 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
             preserveScroll: true,
             onSuccess: () => {
                 setIsSubmitting(false);
-                notify.success(`Logos de ${editingComercio.nombre} actualizados con éxito.`);
                 handleCloseEdit();
             },
             onError: (errors) => {

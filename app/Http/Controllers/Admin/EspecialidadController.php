@@ -217,7 +217,7 @@ class EspecialidadController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => "La especialidad \"{$nombre}\" ha sido eliminada correctamente.",
+            'message' => 'Especialidad eliminada con éxito.',
         ]);
 
         return back();

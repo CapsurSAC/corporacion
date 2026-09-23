@@ -57,6 +57,7 @@ interface Props {
         comercio_id?: string;
         carrera_id?: string;
         estado_id?: string;
+        rubro_id?: string;
         tipo?: string;
         search?: string;
     };
@@ -77,13 +78,13 @@ export default function DiplomadosIndex({
     const [search, setSearch] = useState<string>(filters.search || '');
     const [selectedComercio, setSelectedComercio] = useState<string>(filters.comercio_id || 'all');
     const [selectedCarrera, setSelectedCarrera] = useState<string>(filters.carrera_id || 'all');
-    const [selectedTipo, setSelectedTipo] = useState<string>(filters.tipo || 'all');
+    const [selectedRubroId, setSelectedRubroId] = useState<string>(filters.rubro_id || filters.tipo || 'all');
     const [selectedEstado, setSelectedEstado] = useState<string>(filters.estado_id || 'all');
 
     useEffect(() => {
         setSelectedComercio(filters.comercio_id || 'all');
         setSelectedCarrera(filters.carrera_id || 'all');
-        setSelectedTipo(filters.tipo || 'all');
+        setSelectedRubroId(filters.rubro_id || filters.tipo || 'all');
         setSelectedEstado(filters.estado_id || 'all');
         setSearch(filters.search || '');
     }, [filters]);
@@ -117,7 +118,7 @@ export default function DiplomadosIndex({
         comercio_id?: string;
         carrera_id?: string;
         estado_id?: string;
-        tipo?: string;
+        rubro_id?: string;
         search?: string;
     }) => {
         router.get(
@@ -126,7 +127,7 @@ export default function DiplomadosIndex({
                 comercio_id: newFilters.comercio_id !== undefined ? (newFilters.comercio_id === 'all' ? undefined : newFilters.comercio_id) : (selectedComercio === 'all' ? undefined : selectedComercio),
                 carrera_id: newFilters.carrera_id !== undefined ? (newFilters.carrera_id === 'all' ? undefined : newFilters.carrera_id) : (selectedCarrera === 'all' ? undefined : selectedCarrera),
                 estado_id: newFilters.estado_id !== undefined ? (newFilters.estado_id === 'all' ? undefined : newFilters.estado_id) : (selectedEstado === 'all' ? undefined : selectedEstado),
-                tipo: newFilters.tipo !== undefined ? (newFilters.tipo === 'all' ? undefined : newFilters.tipo) : (selectedTipo === 'all' ? undefined : selectedTipo),
+                rubro_id: newFilters.rubro_id !== undefined ? (newFilters.rubro_id === 'all' ? undefined : newFilters.rubro_id) : (selectedRubroId === 'all' ? undefined : selectedRubroId),
                 search: newFilters.search !== undefined ? (newFilters.search || undefined) : (search || undefined),
             },
             { preserveState: true, replace: true }
@@ -160,9 +161,9 @@ export default function DiplomadosIndex({
         applyFilters({ carrera_id: val });
     };
 
-    const handleTipoChange = (val: string) => {
-        setSelectedTipo(val);
-        applyFilters({ tipo: val });
+    const handleRubroChange = (val: string) => {
+        setSelectedRubroId(val);
+        applyFilters({ rubro_id: val });
     };
 
     const handleEstadoChange = (val: string) => {
@@ -190,9 +191,6 @@ export default function DiplomadosIndex({
         if (confirmed) {
             router.delete(`/admin/diplomados/${diplomado.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success(`Diplomado "${diplomado.nombre}" eliminado exitosamente.`);
-                },
                 onError: () => {
                     notify.error('No se pudo eliminar el diplomado.');
                 },
@@ -200,21 +198,13 @@ export default function DiplomadosIndex({
         }
     };
 
-    const getTipoChip = (tipo?: string | null) => {
-        if (!tipo || tipo === 'general' || tipo === 'libre' || tipo === 'sin_categoria') {
-            return (
-                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
-                    General / Libre
-                </Typography>
-            );
-        }
-
-        const rubroMatch = rubros.find((r) => r.clave === tipo);
-        if (rubroMatch) {
-            const color = rubroMatch.color_hex || '#7c3aed';
+    const getRubroChip = (diplomado: Diplomado) => {
+        const rubro = diplomado.rubro || (diplomado.rubro_id ? rubros.find((r) => r.id === diplomado.rubro_id) : null);
+        if (rubro) {
+            const color = rubro.color_hex || '#7c3aed';
             return (
                 <Chip
-                    label={rubroMatch.nombre}
+                    label={rubro.nombre}
                     size="small"
                     sx={{
                         bgcolor: `${color}15`,
@@ -229,37 +219,28 @@ export default function DiplomadosIndex({
             );
         }
 
-        const tipoLabels: Record<string, { label: string; color: string }> = {
-            ambientales: { label: 'Ambientales', color: '#059669' },
-            calidad_isos: { label: 'Calidad ISOs', color: '#0284c7' },
-            mineros: { label: 'Mineros', color: '#d97706' },
-            administracion: { label: 'Administración', color: '#0d9488' },
-            arquitectura_ingenieria: { label: 'Arq. e Ingeniería', color: '#6366f1' },
-            osha: { label: 'OSHA', color: '#dc2626' },
-            comercio_exterior: { label: 'Comex', color: '#0891b2' },
-            rubro_legal: { label: 'Rubro Legal', color: '#7c3aed' },
-            no_actualizados: { label: 'No Actualizado', color: '#64748b' },
-            nombramiento: { label: 'Nombramiento', color: '#7c3aed' },
-            secundaria: { label: 'Secundaria', color: '#059669' },
-            generico: { label: 'Genérico', color: '#0284c7' },
-        };
-
-        const config = tipoLabels[tipo] || { label: tipo, color: '#4f46e5' };
+        if (diplomado.tipo && diplomado.tipo !== 'general' && diplomado.tipo !== 'sin_categoria' && diplomado.tipo !== 'libre') {
+            return (
+                <Chip
+                    label={diplomado.tipo}
+                    size="small"
+                    sx={{
+                        bgcolor: '#4f46e515',
+                        color: '#4f46e5',
+                        border: '1px solid #4f46e535',
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        height: 22,
+                        borderRadius: 0.8,
+                    }}
+                />
+            );
+        }
 
         return (
-            <Chip
-                label={config.label}
-                size="small"
-                sx={{
-                    bgcolor: `${config.color}15`,
-                    color: config.color,
-                    border: `1px solid ${config.color}35`,
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    height: 22,
-                    borderRadius: 0.8,
-                }}
-            />
+            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}>
+                General / Libre
+            </Typography>
         );
     };
 
@@ -473,15 +454,12 @@ export default function DiplomadosIndex({
                         </FormControl>
 
                         <FormControl size="small" sx={{ minWidth: 220 }}>
-                            <InputLabel id="filtro-tipo-label">Rubro / Categoría</InputLabel>
+                            <InputLabel id="filtro-rubro-label">Rubro / Categoría</InputLabel>
                             <Select
-                                labelId="filtro-tipo-label"
-                                value={selectedTipo}
+                                labelId="filtro-rubro-label"
+                                value={selectedRubroId}
                                 label="Rubro / Categoría"
-                                onChange={(e) => {
-                                    setSelectedTipo(e.target.value);
-                                    applyFilters({ tipo: e.target.value });
-                                }}
+                                onChange={(e) => handleRubroChange(e.target.value)}
                             >
                                 <MenuItem value="all">
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -492,94 +470,14 @@ export default function DiplomadosIndex({
                                 <MenuItem value="sin_categoria">
                                     <Typography variant="body2" color="text.secondary">Libre / Sin Categoría</Typography>
                                 </MenuItem>
-                                {rubros && rubros.length > 0 ? (
-                                    rubros.map((r) => (
-                                        <MenuItem key={r.clave} value={r.clave}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#7c3aed', flexShrink: 0 }} />
-                                                <Typography variant="body2">{r.nombre}</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <>
-                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>CECAVA</ListSubheader>
-                                        <MenuItem value="ambientales">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
-                                                <Typography variant="body2">Ambientales</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="calidad_isos">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
-                                                <Typography variant="body2">Calidad e ISOs</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="mineros">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#d97706' }} />
-                                                <Typography variant="body2">Mineros</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="administracion">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0d9488' }} />
-                                                <Typography variant="body2">Administración</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="arquitectura_ingenieria">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#6366f1' }} />
-                                                <Typography variant="body2">Arq. e Ingeniería</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="osha">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#dc2626' }} />
-                                                <Typography variant="body2">OSHA</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="comercio_exterior">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0891b2' }} />
-                                                <Typography variant="body2">Comercio Exterior</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="rubro_legal">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
-                                                <Typography variant="body2">Rubro Legal</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="no_actualizados">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#64748b' }} />
-                                                <Typography variant="body2">No Actualizados</Typography>
-                                            </Box>
-                                        </MenuItem>
-
-                                        <ListSubheader sx={{ fontWeight: 800, color: 'text.primary', lineHeight: '30px' }}>MAGISTER</ListSubheader>
-                                        <MenuItem value="nombramiento">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#7c3aed' }} />
-                                                <Typography variant="body2">Nombramiento</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="secundaria">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#059669' }} />
-                                                <Typography variant="body2">Secundaria</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                        <MenuItem value="generico">
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LabelIcon sx={{ fontSize: '1.1rem', color: '#0284c7' }} />
-                                                <Typography variant="body2">Genérico</Typography>
-                                            </Box>
-                                        </MenuItem>
-                                    </>
-                                )}
+                                {rubros.map((r) => (
+                                    <MenuItem key={r.id} value={String(r.id)}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#7c3aed', flexShrink: 0 }} />
+                                            <Typography variant="body2">{r.nombre}</Typography>
+                                        </Box>
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         {/* Filtro por Estado */}
@@ -672,11 +570,11 @@ export default function DiplomadosIndex({
                                             No se encontraron diplomados registrados
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
-                                            {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all'
+                                            {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedRubroId !== 'all' || selectedEstado !== 'all'
                                                 ? 'No hay registros que coincidan con los filtros aplicados.'
                                                 : 'Aún no se han registrado diplomados.'}
                                         </Typography>
-                                        {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedTipo !== 'all' || selectedEstado !== 'all' ? (
+                                        {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedRubroId !== 'all' || selectedEstado !== 'all' ? (
                                             <Button
                                                 variant="outlined"
                                                 size="small"
@@ -685,9 +583,9 @@ export default function DiplomadosIndex({
                                                     setSearch('');
                                                     setSelectedComercio('all');
                                                     setSelectedCarrera('all');
-                                                    setSelectedTipo('all');
+                                                    setSelectedRubroId('all');
                                                     setSelectedEstado('all');
-                                                    applyFilters({ comercio_id: 'all', carrera_id: 'all', tipo: 'all', estado_id: 'all', search: '' });
+                                                    applyFilters({ comercio_id: 'all', carrera_id: 'all', rubro_id: 'all', estado_id: 'all', search: '' });
                                                 }}
                                                 sx={{ borderRadius: 1 }}
                                             >
@@ -768,7 +666,7 @@ export default function DiplomadosIndex({
 
                                             {/* Columna 3: Rubro / Tipo */}
                                             <TableCell>
-                                                {getTipoChip(diplomado.tipo)}
+                                                {getRubroChip(diplomado)}
                                             </TableCell>
 
                                             {/* Columna Estado */}

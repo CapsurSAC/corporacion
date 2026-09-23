@@ -79,7 +79,6 @@ export function GrupoDialog({
             put(`/admin/grupos/${grupo.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Grupo "${data.nombre}" actualizado correctamente.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -91,7 +90,6 @@ export function GrupoDialog({
             post(`/admin/grupos`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Grupo "${data.nombre}" creado exitosamente.`);
                     onOpenChange(false);
                     reset();
                 },

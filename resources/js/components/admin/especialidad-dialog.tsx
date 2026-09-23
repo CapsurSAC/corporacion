@@ -159,7 +159,6 @@ export function EspecialidadDialog({
             put(`/admin/especialidades/${especialidad.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Especialidad "${data.nombre}" actualizada con éxito.`);
                     onOpenChange(false);
                     reset();
                 },
@@ -172,7 +171,6 @@ export function EspecialidadDialog({
             post(`/admin/especialidades`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    notify.success(`Especialidad "${data.nombre}" registrada con éxito.`);
                     onOpenChange(false);
                     reset();
                 },

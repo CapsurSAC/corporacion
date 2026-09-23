@@ -154,9 +154,6 @@ export default function EspecialidadesIndex({
         if (confirmed) {
             router.delete(`/admin/especialidades/${especialidad.id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    notify.success('Especialidad eliminada correctamente.');
-                },
                 onError: () => {
                     notify.error('No se pudo eliminar la especialidad.');
                 },

@@ -62,7 +62,7 @@ class RubroManagementTest extends TestCase
         $rubro = Rubro::factory()->create();
 
         Curso::factory()->create([
-            'tipo' => $rubro->clave,
+            'rubro_id' => $rubro->id,
         ]);
 
         $response = $this
@@ -82,7 +82,7 @@ class RubroManagementTest extends TestCase
         $rubro = Rubro::factory()->create();
 
         Diplomado::factory()->create([
-            'tipo' => $rubro->clave,
+            'rubro_id' => $rubro->id,
         ]);
 
         $response = $this

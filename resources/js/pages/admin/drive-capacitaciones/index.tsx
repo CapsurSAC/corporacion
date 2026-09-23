@@ -46,9 +46,6 @@ export default function DriveCapacitacionesIndex({
         e.preventDefault();
         put(`/admin/drive-capacitaciones`, {
             preserveScroll: true,
-            onSuccess: () => {
-                notify.success('Enlaces de redirección guardados exitosamente.');
-            },
             onError: () => {
                 notify.error('Ocurrió un error al guardar los enlaces. Revisa las URLs ingresadas.');
             },

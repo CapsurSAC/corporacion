@@ -24,21 +24,23 @@ class DiplomadoManagementTest extends TestCase
         $user = User::factory()->create();
 
         $comercio = Comercio::factory()->create();
+        $rubroAmbientales = \App\Models\Rubro::factory()->create(['nombre' => 'Ambientales']);
+        $rubroMineros = \App\Models\Rubro::factory()->create(['nombre' => 'Mineros']);
 
         Diplomado::factory()->create([
             'comercio_id' => $comercio->id,
             'nombre' => 'Diplomado en Gestión Ambiental',
-            'tipo' => 'ambientales',
+            'rubro_id' => $rubroAmbientales->id,
         ]);
         Diplomado::factory()->create([
             'comercio_id' => $comercio->id,
             'nombre' => 'Diplomado en Seguridad Minera',
-            'tipo' => 'mineros',
+            'rubro_id' => $rubroMineros->id,
         ]);
 
         $response = $this
             ->actingAs($user)
-            ->get(route('admin.diplomados.index', ));
+            ->get(route('admin.diplomados.index'));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -48,8 +50,7 @@ class DiplomadoManagementTest extends TestCase
 
         $filteredResponse = $this
             ->actingAs($user)
-            ->get(route('admin.diplomados.index', ['tipo' => 'ambientales',
-            ]));
+            ->get(route('admin.diplomados.index', ['rubro_id' => $rubroAmbientales->id]));
 
         $filteredResponse->assertOk();
         $filteredResponse->assertInertia(fn (Assert $page) => $page
