@@ -66,17 +66,20 @@ class EspecialidadUnitTest extends TestCase
         $this->assertTrue($carreraConEsp->especialidades->contains($esp2));
     }
 
-    public function test_comercio_can_access_especialidades_through_carreras(): void
+    public function test_comercio_can_access_especialidades(): void
     {
         $comercio = Comercio::factory()->create();
         $carrera = Carrera::factory()->create(['comercio_id' => $comercio->id]);
-        $especialidad = Especialidad::factory()->create(['carrera_id' => $carrera->id]);
+        $especialidad = Especialidad::factory()->create([
+            'comercio_id' => $comercio->id,
+            'carrera_id' => $carrera->id,
+        ]);
 
         $this->assertCount(1, $comercio->especialidades);
         $this->assertTrue($comercio->especialidades->contains($especialidad));
     }
 
-    public function test_deleting_carrera_cascades_to_especialidades(): void
+    public function test_deleting_carrera_sets_null_on_especialidades(): void
     {
         $carrera = Carrera::factory()->create();
         $especialidad = Especialidad::factory()->create(['carrera_id' => $carrera->id]);
@@ -85,7 +88,8 @@ class EspecialidadUnitTest extends TestCase
 
         $carrera->delete();
 
-        $this->assertDatabaseMissing('especialidades', ['id' => $especialidad->id]);
+        $this->assertDatabaseHas('especialidades', ['id' => $especialidad->id]);
+        $this->assertNull($especialidad->fresh()->carrera_id);
     }
 
     public function test_deleting_rubro_cascades_to_especialidades(): void

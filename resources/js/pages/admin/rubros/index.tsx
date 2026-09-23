@@ -34,7 +34,7 @@ import {
 import { useState } from 'react';
 import { RubroDialog } from '@/components/admin/rubro-dialog';
 import { useNotification } from '@/hooks/use-notification';
-import { confirmDeleteAlert, showErrorAlert } from '@/lib/swal';
+import { confirmDeleteAlert } from '@/lib/swal';
 import { dashboard } from '@/routes';
 import type { Rubro } from '@/types';
 
@@ -108,31 +108,6 @@ export default function RubrosIndex({
     };
 
     const handleDelete = async (rubro: Rubro) => {
-        const diplomados = rubro.diplomados_count || 0;
-        const cursos = rubro.cursos_count || 0;
-        const especialidades = rubro.especialidades_count || 0;
-        const totalAsociados = diplomados + cursos + especialidades;
-
-        if (totalAsociados > 0) {
-            const detalles: string[] = [];
-            if (especialidades > 0) {
-                detalles.push(`${especialidades} especialidad${especialidades > 1 ? 'es' : ''}`);
-            }
-            if (diplomados > 0) {
-                detalles.push(`${diplomados} diplomado${diplomados > 1 ? 's' : ''}`);
-            }
-            if (cursos > 0) {
-                detalles.push(`${cursos} curso${cursos > 1 ? 's' : ''}`);
-            }
-
-            const detallesTexto = detalles.join(', ');
-            const mensaje = `No se puede eliminar el rubro "${rubro.nombre}" porque tiene ${detallesTexto} asociado${totalAsociados > 1 ? 's' : ''}. Si deseas ocultarlo del catálogo, puedes desactivarlo desde la opción de editar.`;
-
-            await showErrorAlert('No se puede eliminar el rubro', mensaje);
-            notify.error(mensaje);
-            return;
-        }
-
         const confirmed = await confirmDeleteAlert({
             title: '¿Eliminar Rubro?',
             text: `¿Estás seguro de eliminar permanentemente el rubro "${rubro.nombre}"? Esta acción no se puede deshacer.`,
@@ -143,17 +118,23 @@ export default function RubrosIndex({
                 preserveScroll: true,
                 onSuccess: (page) => {
                     const pageAny = page as any;
+                    const flash = pageAny?.props?.flash || pageAny?.flash;
                     const isError =
-                        pageAny?.flash?.toast?.type === 'error' ||
-                        pageAny?.props?.flash?.toast?.type === 'error' ||
-                        pageAny?.props?.flash?.error;
+                        flash?.toast?.type === 'error' ||
+                        Boolean(flash?.error);
 
-                    if (!isError) {
+                    if (isError) {
+                        const errorMsg = flash?.toast?.message || flash?.error;
+                        if (errorMsg) {
+                            notify.error(errorMsg);
+                        }
+                    } else {
                         notify.success(`Rubro "${rubro.nombre}" eliminado con éxito.`);
                     }
                 },
-                onError: () => {
-                    notify.error('No se pudo eliminar el rubro.');
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    notify.error(typeof firstError === 'string' ? firstError : 'No se pudo eliminar el rubro.');
                 },
             });
         }
@@ -615,29 +596,21 @@ export default function RubrosIndex({
                                                         </IconButton>
                                                     </Tooltip>
 
-                                                    {(() => {
-                                                        const totalAsociados = (rubro.especialidades_count || 0) + (rubro.diplomados_count || 0) + (rubro.cursos_count || 0);
-                                                        return (
-                                                            <Tooltip title={totalAsociados > 0 ? `No se puede eliminar (${totalAsociados} elementos vinculados)` : "Eliminar Rubro"}>
-                                                                <span>
-                                                                    <IconButton
-                                                                        size="small"
-                                                                        color="error"
-                                                                        onClick={() => handleDelete(rubro)}
-                                                                        sx={{
-                                                                            border: '1px solid',
-                                                                            borderColor: totalAsociados > 0 ? 'action.disabledBackground' : 'divider',
-                                                                            borderRadius: 1,
-                                                                            opacity: totalAsociados > 0 ? 0.6 : 1,
-                                                                            '&:hover': { bgcolor: totalAsociados > 0 ? 'action.hover' : 'error.lighter' },
-                                                                        }}
-                                                                    >
-                                                                        <DeleteIcon fontSize="small" />
-                                                                    </IconButton>
-                                                                </span>
-                                                            </Tooltip>
-                                                        );
-                                                    })()}
+                                                    <Tooltip title="Eliminar Rubro">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="error"
+                                                            onClick={() => handleDelete(rubro)}
+                                                            sx={{
+                                                                border: '1px solid',
+                                                                borderColor: 'divider',
+                                                                borderRadius: 1,
+                                                                '&:hover': { bgcolor: 'error.lighter' },
+                                                            }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

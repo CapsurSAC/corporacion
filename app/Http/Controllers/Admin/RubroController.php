@@ -181,8 +181,10 @@ class RubroController extends Controller
                 $detalles[] = "{$cursosCount} " . ($cursosCount === 1 ? 'curso' : 'cursos');
             }
 
+            $totalCount = $especialidadesCount + $diplomadosCount + $cursosCount;
             $detallesTexto = implode(', ', $detalles);
-            $mensajeError = "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} asociados. Puedes desactivarlo.";
+            $asociadoTexto = $totalCount === 1 ? ($especialidadesCount === 1 ? 'asociada' : 'asociado') : 'asociados';
+            $mensajeError = "No se puede eliminar el rubro \"{$rubroModel->nombre}\" porque tiene {$detallesTexto} {$asociadoTexto}. Puedes desactivarlo.";
 
             Inertia::flash('toast', [
                 'type' => 'error',

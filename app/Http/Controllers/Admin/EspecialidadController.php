@@ -91,7 +91,7 @@ class EspecialidadController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
-            'rubro_id' => ['required', 'exists:rubros,id'],
+            'rubro_id' => ['nullable', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'flyer' => ['nullable', 'string', 'max:500'],
@@ -103,7 +103,6 @@ class EspecialidadController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera seleccionada no es válida.',
-            'rubro_id.required' => 'Debes seleccionar obligatoriamente un rubro para esta especialidad.',
             'rubro_id.exists' => 'El rubro seleccionado no es válido.',
             'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre de la especialidad es obligatorio.',
@@ -122,7 +121,7 @@ class EspecialidadController extends Controller
         Especialidad::create([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
-            'rubro_id' => $validated['rubro_id'],
+            'rubro_id' => $validated['rubro_id'] ?? null,
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,
@@ -155,7 +154,7 @@ class EspecialidadController extends Controller
         $validated = $request->validate([
             'comercio_id' => ['required', 'exists:comercios,id'],
             'carrera_id' => ['nullable', 'exists:carreras,id'],
-            'rubro_id' => ['required', 'exists:rubros,id'],
+            'rubro_id' => ['nullable', 'exists:rubros,id'],
             'estado_id' => ['nullable', 'exists:estados,id'],
             'nombre' => ['required', 'string', 'min:3', 'max:255'],
             'flyer' => ['nullable', 'string', 'max:500'],
@@ -167,7 +166,6 @@ class EspecialidadController extends Controller
             'comercio_id.required' => 'Debes seleccionar el comercio o instituto responsable.',
             'comercio_id.exists' => 'El comercio seleccionado no es válido.',
             'carrera_id.exists' => 'La carrera seleccionada no es válida.',
-            'rubro_id.required' => 'Debes seleccionar obligatoriamente un rubro para esta especialidad.',
             'rubro_id.exists' => 'El rubro seleccionado no es válido.',
             'estado_id.exists' => 'El estado seleccionado no es válido.',
             'nombre.required' => 'El nombre de la especialidad es obligatorio.',
@@ -189,7 +187,7 @@ class EspecialidadController extends Controller
         $especialidadModel->update([
             'comercio_id' => $validated['comercio_id'],
             'carrera_id' => $validated['carrera_id'] ?? null,
-            'rubro_id' => $validated['rubro_id'],
+            'rubro_id' => $validated['rubro_id'] ?? null,
             'estado_id' => $validated['estado_id'] ?? null,
             'nombre' => trim($validated['nombre']),
             'slug' => $slug,

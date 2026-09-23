@@ -33,8 +33,7 @@ Para tu comodidad, se han generado en la raíz de tu proyecto local:
 - `database/migrations/2026_09_15_000001_add_rubro_id_to_especialidades_table.php` *(**NUEVA MIGRACIÓN**: añade clave foránea `rubro_id` obligatoria)*
 - `database/factories/EspecialidadFactory.php` *(**NUEVO**)*
 - `database/factories/RubroFactory.php` *(**NUEVO**)*
-- `database/seeders/DatabaseSeeder.php` *(Modificado: llama a `EspecialidadSeeder`)*
-- `database/seeders/EspecialidadSeeder.php` *(**NUEVO**: seeder de especialidades con rubros)*
+- `database/seeders/DatabaseSeeder.php` *(Modificado: seeders eliminados y deshabilitados para proteger datos en producción)*
 
 ### D. Rutas (`routes/`)
 - `routes/web.php` *(Modificado: registradas las rutas `admin.especialidades`)*

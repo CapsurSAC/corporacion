@@ -608,7 +608,7 @@ export default function EspecialidadesIndex({
                                             </Box>
                                         </TableCell>
 
-                                        {/* Rubro (1 Obligatorio) */}
+                                        {/* Rubro */}
                                         <TableCell>
                                             {esp.rubro ? (
                                                 <Chip
@@ -626,9 +626,18 @@ export default function EspecialidadesIndex({
                                                     }}
                                                 />
                                             ) : (
-                                                <Typography variant="caption" color="error">
-                                                    No asignado
-                                                </Typography>
+                                                <Chip
+                                                    label="Especialidad Libre"
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{
+                                                        height: 22,
+                                                        fontSize: '0.7rem',
+                                                        color: 'text.secondary',
+                                                        borderColor: 'divider',
+                                                        bgcolor: 'action.hover',
+                                                    }}
+                                                />
                                             )}
                                         </TableCell>
 

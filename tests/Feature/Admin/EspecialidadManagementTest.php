@@ -83,10 +83,12 @@ class EspecialidadManagementTest extends TestCase
     public function test_authenticated_user_can_create_especialidad(): void
     {
         $user = User::factory()->create();
+        $comercio = Comercio::factory()->create();
         $carrera = Carrera::factory()->create();
         $rubro = Rubro::factory()->create();
 
         $data = [
+            'comercio_id' => $comercio->id,
             'carrera_id' => $carrera->id,
             'rubro_id' => $rubro->id,
             'nombre' => 'Especialidad en Inteligencia Artificial y Datos',
@@ -103,6 +105,7 @@ class EspecialidadManagementTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('especialidades', [
+            'comercio_id' => $comercio->id,
             'carrera_id' => $carrera->id,
             'rubro_id' => $rubro->id,
             'nombre' => 'Especialidad en Inteligencia Artificial y Datos',
@@ -111,28 +114,57 @@ class EspecialidadManagementTest extends TestCase
         ]);
     }
 
-    public function test_especialidad_requires_rubro_id_and_carrera_id(): void
+    public function test_authenticated_user_can_create_especialidad_libre_without_rubro(): void
+    {
+        $user = User::factory()->create();
+        $comercio = Comercio::factory()->create();
+
+        $data = [
+            'comercio_id' => $comercio->id,
+            'carrera_id' => null,
+            'rubro_id' => null,
+            'nombre' => 'Especialidad Libre Sin Categoria',
+            'precio' => 'S/ 350',
+        ];
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('admin.especialidades.store'), $data);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('especialidades', [
+            'comercio_id' => $comercio->id,
+            'carrera_id' => null,
+            'rubro_id' => null,
+            'nombre' => 'Especialidad Libre Sin Categoria',
+        ]);
+    }
+
+    public function test_especialidad_requires_nombre_and_comercio_id(): void
     {
         $user = User::factory()->create();
 
         $response = $this
             ->actingAs($user)
             ->post(route('admin.especialidades.store'), [
-                'nombre' => 'Especialidad sin rubro ni carrera',
+                'carrera_id' => null,
+                'rubro_id' => null,
             ]);
 
-        $response->assertSessionHasErrors(['carrera_id', 'rubro_id']);
+        $response->assertSessionHasErrors(['nombre', 'comercio_id']);
     }
 
     public function test_authenticated_user_can_update_especialidad(): void
     {
         $user = User::factory()->create();
+        $comercio = Comercio::factory()->create();
         $carrera1 = Carrera::factory()->create();
         $carrera2 = Carrera::factory()->create();
         $rubro1 = Rubro::factory()->create();
         $rubro2 = Rubro::factory()->create();
 
         $especialidad = Especialidad::factory()->create([
+            'comercio_id' => $comercio->id,
             'carrera_id' => $carrera1->id,
             'rubro_id' => $rubro1->id,
             'nombre' => 'Nombre Antiguo',
@@ -142,6 +174,7 @@ class EspecialidadManagementTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->put(route('admin.especialidades.update', $especialidad), [
+                'comercio_id' => $comercio->id,
                 'carrera_id' => $carrera2->id,
                 'rubro_id' => $rubro2->id,
                 'nombre' => 'Nombre Actualizado de Especialidad',
@@ -151,11 +184,41 @@ class EspecialidadManagementTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseHas('especialidades', [
             'id' => $especialidad->id,
+            'comercio_id' => $comercio->id,
             'carrera_id' => $carrera2->id,
             'rubro_id' => $rubro2->id,
             'nombre' => 'Nombre Actualizado de Especialidad',
             'slug' => 'nombre-actualizado-de-especialidad',
             'precio' => 'S/ 600',
+        ]);
+    }
+
+    public function test_authenticated_user_can_update_especialidad_to_libre(): void
+    {
+        $user = User::factory()->create();
+        $comercio = Comercio::factory()->create();
+        $rubro = Rubro::factory()->create();
+
+        $especialidad = Especialidad::factory()->create([
+            'comercio_id' => $comercio->id,
+            'rubro_id' => $rubro->id,
+            'nombre' => 'Especialidad con Rubro',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->put(route('admin.especialidades.update', $especialidad), [
+                'comercio_id' => $comercio->id,
+                'carrera_id' => null,
+                'rubro_id' => null,
+                'nombre' => 'Especialidad ahora Libre',
+            ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('especialidades', [
+            'id' => $especialidad->id,
+            'rubro_id' => null,
+            'nombre' => 'Especialidad ahora Libre',
         ]);
     }
 

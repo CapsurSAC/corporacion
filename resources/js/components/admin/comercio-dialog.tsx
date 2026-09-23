@@ -80,8 +80,6 @@ export function ComercioDialog({
             codigo: string;
             sigla: string;
             color_hex: string;
-            logo_modo_claro: string;
-            logo_modo_oscuro: string;
             pagina_web: string;
             plataforma_carrera: string;
             como_ingresar_plataforma: string;
@@ -107,8 +105,6 @@ export function ComercioDialog({
             codigo: '',
             sigla: '',
             color_hex: '#1d4ed8',
-            logo_modo_claro: '',
-            logo_modo_oscuro: '',
             pagina_web: '',
             plataforma_carrera: '',
             como_ingresar_plataforma: '',
@@ -138,8 +134,6 @@ export function ComercioDialog({
                 codigo: comercio.codigo || '',
                 sigla: comercio.sigla || '',
                 color_hex: comercio.color_hex || '#1d4ed8',
-                logo_modo_claro: comercio.logo_modo_claro || '',
-                logo_modo_oscuro: comercio.logo_modo_oscuro || '',
                 pagina_web: comercio.pagina_web || '',
                 plataforma_carrera: comercio.plataforma_carrera || '',
                 como_ingresar_plataforma: comercio.como_ingresar_plataforma || '',
@@ -419,31 +413,6 @@ export function ComercioDialog({
                                 </Box>
                             </Box>
 
-                            {/* Logotipos para Fondo Claro y Fondo Oscuro */}
-                            <Grid container spacing={2}>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <TextField
-                                        label="Logo Modo Claro (Ruta / URL)"
-                                        value={data.logo_modo_claro}
-                                        onChange={(e) => setData('logo_modo_claro', e.target.value)}
-                                        placeholder="/logos-comercios/..."
-                                        fullWidth
-                                        size="small"
-                                        helperText="Para fondos blancos (ej. catálogo público)"
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <TextField
-                                        label="Logo Modo Oscuro (Ruta / URL)"
-                                        value={data.logo_modo_oscuro}
-                                        onChange={(e) => setData('logo_modo_oscuro', e.target.value)}
-                                        placeholder="/logos-comercios/..."
-                                        fullWidth
-                                        size="small"
-                                        helperText="Para fondos oscuros (ej. modo noche)"
-                                    />
-                                </Grid>
-                            </Grid>
 
                             <TextField
                                 label="Descripción"
