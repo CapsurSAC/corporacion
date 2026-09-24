@@ -31,7 +31,13 @@ class CursoController extends Controller
         $cursosQuery = Curso::query()
             ->with(['comercio.grupo', 'carrera', 'estado', 'rubro'])
             ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
-            ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
+            ->when($carreraId, function ($query, $carreraId) {
+                if ($carreraId === 'no_corresponde' || $carreraId === 'sin_carrera' || $carreraId === 'directa') {
+                    $query->whereNull('carrera_id');
+                } else {
+                    $query->where('carrera_id', $carreraId);
+                }
+            })
             ->when($estadoId, fn ($query) => $query->where('estado_id', $estadoId))
             ->when($rubroId, function ($query, $rubroId) {
                 if ($rubroId === 'sin_categoria') {

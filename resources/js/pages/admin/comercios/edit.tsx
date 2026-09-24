@@ -2019,7 +2019,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                     Nueva Especialidad Directa
                                                                 </Button>
                                                             </Link>
-                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
                                                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: brandColor, textDecoration: 'underline' } }}>
                                                                     Ver todas en módulo
                                                                 </Typography>
@@ -2135,7 +2135,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                                             </Link>
                                                                                         </Tooltip>
                                                                                         <Tooltip title="Administrar / Eliminar en módulo de Especialidades" arrow>
-                                                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}`}>
+                                                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}&carrera_id=no_corresponde`}>
                                                                                                 <IconButton size="small" color="error">
                                                                                                     <DeleteIcon sx={{ fontSize: 16 }} />
                                                                                                 </IconButton>
@@ -2158,7 +2158,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                                 Puedes registrar especialidades independientes que pertenezcan a la institución sin depender de una carrera específica.
                                                             </Typography>
-                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/especialidades?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
                                                                     size="small"
                                                                     variant="contained"
@@ -2191,7 +2191,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                             DIPLOMADOS DIRECTOS DEL COMERCIO ({diplomadosDirectos.length})
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
                                                                     size="small"
                                                                     variant="outlined"
@@ -2214,7 +2214,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                     Nuevo Diplomado Directo
                                                                 </Button>
                                                             </Link>
-                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
                                                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: brandColor, textDecoration: 'underline' } }}>
                                                                     Ver todos en módulo
                                                                 </Typography>
@@ -2306,7 +2306,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                                         </Link>
                                                                                     </Tooltip>
                                                                                     <Tooltip title="Administrar / Eliminar en módulo de Diplomados" arrow>
-                                                                                        <Link href={`/admin/diplomados?comercio_id=${comercio.id}`}>
+                                                                                        <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde`}>
                                                                                             <IconButton size="small" color="error">
                                                                                                 <DeleteIcon sx={{ fontSize: 16 }} />
                                                                                             </IconButton>
@@ -2328,7 +2328,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                                 Puedes crear diplomados institucionales directos que no pertenezcan a una carrera en particular.
                                                             </Typography>
-                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
                                                                     size="small"
                                                                     variant="contained"
@@ -2361,7 +2361,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                             CURSOS DIRECTOS DEL COMERCIO ({cursosDirectos.length})
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
                                                                     size="small"
                                                                     variant="outlined"
@@ -2384,7 +2384,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                     Nuevo Curso Directo
                                                                 </Button>
                                                             </Link>
-                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
                                                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.72rem', '&:hover': { color: brandColor, textDecoration: 'underline' } }}>
                                                                     Ver todos en módulo
                                                                 </Typography>
@@ -2476,7 +2476,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                                         </Link>
                                                                                     </Tooltip>
                                                                                     <Tooltip title="Administrar / Eliminar en módulo de Cursos" arrow>
-                                                                                        <Link href={`/admin/cursos?comercio_id=${comercio.id}`}>
+                                                                                        <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde`}>
                                                                                             <IconButton size="small" color="error">
                                                                                                 <DeleteIcon sx={{ fontSize: 16 }} />
                                                                                             </IconButton>
@@ -2498,7 +2498,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                                 Puedes crear cursos institucionales libres que pertenezcan a la institución.
                                                             </Typography>
-                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
+                                                            <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
                                                                     size="small"
                                                                     variant="contained"

@@ -29,7 +29,13 @@ class EspecialidadController extends Controller
 
         $especialidadesQuery = Especialidad::query()
             ->with(['comercio.grupo', 'carrera', 'rubro', 'estado'])
-            ->when($carreraId, fn ($query) => $query->where('carrera_id', $carreraId))
+            ->when($carreraId, function ($query, $carreraId) {
+                if ($carreraId === 'no_corresponde' || $carreraId === 'sin_carrera' || $carreraId === 'directa') {
+                    $query->whereNull('carrera_id');
+                } else {
+                    $query->where('carrera_id', $carreraId);
+                }
+            })
             ->when($rubroId, fn ($query) => $query->where('rubro_id', $rubroId))
             ->when($comercioId, fn ($query) => $query->where('comercio_id', $comercioId))
             ->when($estadoId, fn ($query) => $query->where('estado_id', $estadoId))

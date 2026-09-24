@@ -1,6 +1,7 @@
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BlockIcon from '@mui/icons-material/Block';
 import CategoryIcon from '@mui/icons-material/Category';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
@@ -148,6 +149,8 @@ export default function DiplomadosIndex({
         setSelectedComercio(val);
         const carreraValida =
             val === 'all' ||
+            selectedCarrera === 'all' ||
+            selectedCarrera === 'no_corresponde' ||
             carreras.some((c) => String(c.id) === selectedCarrera && String(c.comercio_id) === String(val));
         const nextCarrera = carreraValida ? selectedCarrera : 'all';
         if (!carreraValida) {
@@ -440,6 +443,12 @@ export default function DiplomadosIndex({
                                         <Typography variant="body2">Todas las carreras</Typography>
                                     </Box>
                                 </MenuItem>
+                                <MenuItem value="no_corresponde">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <BlockIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">No corresponde</Typography>
+                                    </Box>
+                                </MenuItem>
                                 {filteredCarreras.map((c) => (
                                     <MenuItem key={c.id} value={String(c.id)}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -541,15 +550,6 @@ export default function DiplomadosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
                                     DIPLOMADO / ESPECIALIZACIÓN
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 150 }}>
-                                    COMERCIO
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140 }}>
-                                    RUBRO / TIPO
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
-                                    ESTADO
-                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -564,7 +564,7 @@ export default function DiplomadosIndex({
                         <TableBody>
                             {diplomados.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={4} sx={{ textAlign: 'center', py: 5 }}>
                                         <WorkspacePremiumIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron diplomados registrados
@@ -642,55 +642,7 @@ export default function DiplomadosIndex({
                                                 </Box>
                                             </TableCell>
 
-                                            {/* Columna 2: Comercio */}
-                                            <TableCell>
-                                                {diplomado.comercio ? (
-                                                    <Chip
-                                                        avatar={<ComercioBadge comercio={diplomado.comercio} size={18} />}
-                                                        label={diplomado.comercio.sigla || diplomado.comercio.codigo || diplomado.comercio.nombre}
-                                                        size="small"
-                                                        sx={{
-                                                            bgcolor: `${brandColor}18`,
-                                                            color: brandColor,
-                                                            border: `1px solid ${brandColor}35`,
-                                                            fontWeight: 700,
-                                                            fontSize: '0.72rem',
-                                                            height: 24,
-                                                            borderRadius: 0.8,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* Columna 3: Rubro / Tipo */}
-                                            <TableCell>
-                                                {getRubroChip(diplomado)}
-                                            </TableCell>
-
-                                            {/* Columna Estado */}
-                                            <TableCell sx={{ textAlign: 'center' }}>
-                                                {diplomado.estado ? (
-                                                    <Chip
-                                                        label={diplomado.estado.nombre}
-                                                        size="small"
-                                                        sx={{
-                                                            bgcolor: diplomado.estado.color_hex ? `${diplomado.estado.color_hex}18` : 'grey.100',
-                                                            color: diplomado.estado.color_hex || 'text.primary',
-                                                            border: `1px solid ${diplomado.estado.color_hex ? `${diplomado.estado.color_hex}40` : 'divider'}`,
-                                                            fontWeight: 700,
-                                                            fontSize: '0.72rem',
-                                                            height: 24,
-                                                            borderRadius: 1,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Typography variant="caption" color="text.disabled">—</Typography>
-                                                )}
-                                            </TableCell>
-
-                                            {/* Columna 4: Recursos Multimedia */}
+                                            {/* Columna: Recursos Multimedia */}
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, alignItems: 'center' }}>
                                                     {diplomado.brochure && (
@@ -853,7 +805,7 @@ export default function DiplomadosIndex({
                 rubros={rubros}
                 estados={estados}
                 defaultComercioId={selectedComercio !== 'all' ? Number(selectedComercio) : undefined}
-                defaultCarreraId={filters.carrera_id ? Number(filters.carrera_id) : undefined}
+                defaultCarreraId={filters.carrera_id && filters.carrera_id !== 'all' && filters.carrera_id !== 'no_corresponde' ? Number(filters.carrera_id) : undefined}
             />
         </>
     );

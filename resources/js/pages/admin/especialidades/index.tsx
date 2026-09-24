@@ -1,6 +1,7 @@
 import { Head, router, Link } from '@inertiajs/react';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BlockIcon from '@mui/icons-material/Block';
 import CategoryIcon from '@mui/icons-material/Category';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
@@ -332,6 +333,8 @@ export default function EspecialidadesIndex({
                                     setSelectedComercio(nextComercio);
                                     const carreraValida =
                                         nextComercio === 'all' ||
+                                        selectedCarrera === 'all' ||
+                                        selectedCarrera === 'no_corresponde' ||
                                         carreras.some((c) => String(c.id) === selectedCarrera && String(c.comercio_id) === String(nextComercio));
                                     const nextCarrera = carreraValida ? selectedCarrera : 'all';
                                     if (!carreraValida) {
@@ -370,6 +373,12 @@ export default function EspecialidadesIndex({
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
                                         <Typography variant="body2">Todas las carreras</Typography>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="no_corresponde">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <BlockIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                                        <Typography variant="body2">No corresponde</Typography>
                                     </Box>
                                 </MenuItem>
                                 {filteredCarreras.map((c) => (
@@ -478,15 +487,6 @@ export default function EspecialidadesIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
                                     ESPECIALIDAD ACADÉMICA
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 180 }}>
-                                    CARRERA MATRIZ
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 160 }}>
-                                    RUBRO VINCULADO
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
-                                    ESTADO
-                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 200 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -501,7 +501,7 @@ export default function EspecialidadesIndex({
                         <TableBody>
                             {especialidades.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={4} sx={{ textAlign: 'center', py: 5 }}>
                                         <SchoolIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron especialidades registradas
@@ -570,96 +570,6 @@ export default function EspecialidadesIndex({
                                                     </Typography>
                                                 </Box>
                                             </Box>
-                                        </TableCell>
-
-                                        {/* Carrera Matriz */}
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                                {esp.carrera ? (
-                                                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                                        {esp.carrera.nombre}
-                                                    </Typography>
-                                                ) : (
-                                                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary', fontSize: '0.82rem' }}>
-                                                        Directo del comercio
-                                                    </Typography>
-                                                )}
-                                                {(esp.comercio || esp.carrera?.comercio) && (
-                                                    <Chip
-                                                        avatar={<ComercioBadge comercio={(esp.comercio || esp.carrera?.comercio)!} size={16} />}
-                                                        label={(esp.comercio || esp.carrera?.comercio)!.sigla || (esp.comercio || esp.carrera?.comercio)!.codigo || (esp.comercio || esp.carrera?.comercio)!.nombre}
-                                                        size="small"
-                                                        sx={{
-                                                            width: 'fit-content',
-                                                            height: 22,
-                                                            fontSize: '0.68rem',
-                                                            bgcolor: (esp.comercio || esp.carrera?.comercio)!.color_hex
-                                                                ? `${(esp.comercio || esp.carrera?.comercio)!.color_hex}15`
-                                                                : 'grey.100',
-                                                            color: (esp.comercio || esp.carrera?.comercio)!.color_hex || 'text.primary',
-                                                            fontWeight: 700,
-                                                            borderRadius: 0.8,
-                                                        }}
-                                                    />
-                                                )}
-                                            </Box>
-                                        </TableCell>
-
-                                        {/* Rubro */}
-                                        <TableCell>
-                                            {esp.rubro ? (
-                                                <Chip
-                                                    label={esp.rubro.nombre}
-                                                    size="small"
-                                                    sx={{
-                                                        height: 24,
-                                                        fontSize: '0.74rem',
-                                                        fontWeight: 700,
-                                                        bgcolor: esp.rubro.color_hex ? `${esp.rubro.color_hex}18` : 'primary.50',
-                                                        color: esp.rubro.color_hex || 'primary.main',
-                                                        border: '1px solid',
-                                                        borderColor: esp.rubro.color_hex ? `${esp.rubro.color_hex}40` : 'primary.200',
-                                                        borderRadius: 1,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Chip
-                                                    label="Especialidad Libre"
-                                                    size="small"
-                                                    variant="outlined"
-                                                    sx={{
-                                                        height: 22,
-                                                        fontSize: '0.7rem',
-                                                        color: 'text.secondary',
-                                                        borderColor: 'divider',
-                                                        bgcolor: 'action.hover',
-                                                    }}
-                                                />
-                                            )}
-                                        </TableCell>
-
-                                        {/* Estado */}
-                                        <TableCell sx={{ textAlign: 'center' }}>
-                                            {esp.estado ? (
-                                                <Chip
-                                                    label={esp.estado.nombre}
-                                                    size="small"
-                                                    sx={{
-                                                        height: 24,
-                                                        fontSize: '0.72rem',
-                                                        fontWeight: 700,
-                                                        bgcolor: esp.estado.color_hex ? `${esp.estado.color_hex}18` : 'grey.100',
-                                                        color: esp.estado.color_hex || 'text.primary',
-                                                        border: '1px solid',
-                                                        borderColor: esp.estado.color_hex ? `${esp.estado.color_hex}40` : 'divider',
-                                                        borderRadius: 1,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Typography variant="caption" color="text.disabled">
-                                                    —
-                                                </Typography>
-                                            )}
                                         </TableCell>
 
                                         {/* Recursos Multimedia */}
@@ -802,7 +712,7 @@ export default function EspecialidadesIndex({
                 rubros={rubros}
                 estados={estados}
                 defaultComercioId={selectedComercio !== 'all' ? Number(selectedComercio) : null}
-                defaultCarreraId={selectedCarrera !== 'all' ? Number(selectedCarrera) : null}
+                defaultCarreraId={selectedCarrera !== 'all' && selectedCarrera !== 'no_corresponde' ? Number(selectedCarrera) : null}
                 defaultRubroId={selectedRubro !== 'all' ? Number(selectedRubro) : null}
             />
         </>
