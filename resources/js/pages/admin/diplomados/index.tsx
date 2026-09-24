@@ -550,6 +550,12 @@ export default function DiplomadosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
                                     DIPLOMADO / ESPECIALIZACIÓN
                                 </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140 }}>
+                                    RUBRO
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
+                                    ESTADO
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -564,10 +570,10 @@ export default function DiplomadosIndex({
                         <TableBody>
                             {diplomados.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
                                         <WorkspacePremiumIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                                            No se encontraron diplomados registrados
+                                             No se encontraron diplomados registrados
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.8 }}>
                                             {search || selectedComercio !== 'all' || selectedCarrera !== 'all' || selectedRubroId !== 'all' || selectedEstado !== 'all'
@@ -640,6 +646,32 @@ export default function DiplomadosIndex({
                                                         )}
                                                     </Box>
                                                 </Box>
+                                            </TableCell>
+
+                                            {/* Columna: Rubro */}
+                                            <TableCell>
+                                                {getRubroChip(diplomado)}
+                                            </TableCell>
+
+                                            {/* Columna: Estado */}
+                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                {diplomado.estado ? (
+                                                    <Chip
+                                                        label={diplomado.estado.nombre}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: diplomado.estado.color_hex ? `${diplomado.estado.color_hex}18` : 'grey.100',
+                                                            color: diplomado.estado.color_hex || 'text.primary',
+                                                            border: `1px solid ${diplomado.estado.color_hex ? `${diplomado.estado.color_hex}40` : 'divider'}`,
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem',
+                                                            height: 24,
+                                                            borderRadius: 1,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Typography variant="caption" color="text.disabled">—</Typography>
+                                                )}
                                             </TableCell>
 
                                             {/* Columna: Recursos Multimedia */}

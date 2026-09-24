@@ -548,6 +548,12 @@ export default function CursosIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
                                     CURSO / TALLER FORMATIVO
                                 </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140 }}>
+                                    RUBRO
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
+                                    ESTADO
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 240 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -562,7 +568,7 @@ export default function CursosIndex({
                         <TableBody>
                             {cursos.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
                                         <MenuBookIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron cursos registrados
@@ -638,6 +644,32 @@ export default function CursosIndex({
                                                         )}
                                                     </Box>
                                                 </Box>
+                                            </TableCell>
+
+                                            {/* Columna: Rubro */}
+                                            <TableCell>
+                                                {getRubroChip(curso)}
+                                            </TableCell>
+
+                                            {/* Columna: Estado */}
+                                            <TableCell sx={{ textAlign: 'center' }}>
+                                                {curso.estado ? (
+                                                    <Chip
+                                                        label={curso.estado.nombre}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: curso.estado.color_hex ? `${curso.estado.color_hex}18` : 'grey.100',
+                                                            color: curso.estado.color_hex || 'text.primary',
+                                                            border: `1px solid ${curso.estado.color_hex ? `${curso.estado.color_hex}40` : 'divider'}`,
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem',
+                                                            height: 24,
+                                                            borderRadius: 1,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Typography variant="caption" color="text.disabled">—</Typography>
+                                                )}
                                             </TableCell>
 
                                             {/* Columna: Recursos Multimedia */}

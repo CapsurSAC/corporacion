@@ -487,6 +487,12 @@ export default function EspecialidadesIndex({
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 260, py: 1.5 }}>
                                     ESPECIALIDAD ACADÉMICA
                                 </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 160 }}>
+                                    RUBRO
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 140, textAlign: 'center' }}>
+                                    ESTADO
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem', minWidth: 200 }}>
                                     RECURSOS MULTIMEDIA
                                 </TableCell>
@@ -501,7 +507,7 @@ export default function EspecialidadesIndex({
                         <TableBody>
                             {especialidades.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} sx={{ textAlign: 'center', py: 5 }}>
+                                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 5 }}>
                                         <SchoolIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.2 }} />
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                                             No se encontraron especialidades registradas
@@ -565,11 +571,75 @@ export default function EspecialidadesIndex({
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                                         {esp.nombre}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                                        slug: {esp.slug}
-                                                    </Typography>
+                                                    {esp.carrera ? (
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.1 }}>
+                                                            <SchoolIcon sx={{ fontSize: 12 }} />
+                                                            <span>Carrera: {esp.carrera.nombre}</span>
+                                                        </Typography>
+                                                    ) : (
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                            slug: {esp.slug}
+                                                        </Typography>
+                                                    )}
                                                 </Box>
                                             </Box>
+                                        </TableCell>
+
+                                        {/* Rubro */}
+                                        <TableCell>
+                                            {esp.rubro ? (
+                                                <Chip
+                                                    label={esp.rubro.nombre}
+                                                    size="small"
+                                                    sx={{
+                                                        height: 24,
+                                                        fontSize: '0.74rem',
+                                                        fontWeight: 700,
+                                                        bgcolor: esp.rubro.color_hex ? `${esp.rubro.color_hex}18` : 'primary.50',
+                                                        color: esp.rubro.color_hex || 'primary.main',
+                                                        border: '1px solid',
+                                                        borderColor: esp.rubro.color_hex ? `${esp.rubro.color_hex}40` : 'primary.200',
+                                                        borderRadius: 1,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Chip
+                                                    label="Especialidad Libre"
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{
+                                                        height: 22,
+                                                        fontSize: '0.7rem',
+                                                        color: 'text.secondary',
+                                                        borderColor: 'divider',
+                                                        bgcolor: 'action.hover',
+                                                    }}
+                                                />
+                                            )}
+                                        </TableCell>
+
+                                        {/* Estado */}
+                                        <TableCell sx={{ textAlign: 'center' }}>
+                                            {esp.estado ? (
+                                                <Chip
+                                                    label={esp.estado.nombre}
+                                                    size="small"
+                                                    sx={{
+                                                        height: 24,
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 700,
+                                                        bgcolor: esp.estado.color_hex ? `${esp.estado.color_hex}18` : 'grey.100',
+                                                        color: esp.estado.color_hex || 'text.primary',
+                                                        border: '1px solid',
+                                                        borderColor: esp.estado.color_hex ? `${esp.estado.color_hex}40` : 'divider',
+                                                        borderRadius: 1,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Typography variant="caption" color="text.disabled">
+                                                    —
+                                                </Typography>
+                                            )}
                                         </TableCell>
 
                                         {/* Recursos Multimedia */}
