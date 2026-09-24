@@ -30,7 +30,7 @@ interface AcademicOfferExplorerProps {
 interface FlattenedProgram {
     id: string;
     nombre: string;
-    categoria: 'carrera' | 'diplomado' | 'curso';
+    categoria: 'carrera' | 'diplomado' | 'curso' | 'especialidad';
     tipoLabel?: string;
     modalidad?: string;
     duracion?: string;
@@ -46,7 +46,7 @@ export default function AcademicOfferExplorer({
     onSelectComercio,
 }: AcademicOfferExplorerProps) {
     const [search, setSearch] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<'all' | 'carrera' | 'diplomado' | 'curso'>('all');
+    const [selectedCategory, setSelectedCategory] = useState<'all' | 'carrera' | 'diplomado' | 'curso' | 'especialidad'>('all');
     const [selectedComercioId, setSelectedComercioId] = useState<string>('all');
 
     // Extraer todos los comercios activos
@@ -117,6 +117,23 @@ export default function AcademicOfferExplorer({
                     });
                 });
             }
+
+            // Especialidades
+            if (com.especialidades) {
+                com.especialidades.forEach((esp) => {
+                    programs.push({
+                        id: `esp_${esp.id}`,
+                        nombre: esp.nombre,
+                        categoria: 'especialidad',
+                        tipoLabel: esp.rubro?.nombre ? `Especialidad: ${esp.rubro.nombre}` : 'Especialidad',
+                        precio: esp.precio ? `S/. ${esp.precio}` : undefined,
+                        brochure: esp.brochure || undefined,
+                        flyer: esp.flyer || undefined,
+                        youtube: esp.youtube || undefined,
+                        comercio: com,
+                    });
+                });
+            }
         });
 
         return programs;
@@ -149,6 +166,7 @@ export default function AcademicOfferExplorer({
     }, [allPrograms, search, selectedCategory, selectedComercioId]);
 
     const totalCarreras = allPrograms.filter((p) => p.categoria === 'carrera').length;
+    const totalEspecialidades = allPrograms.filter((p) => p.categoria === 'especialidad').length;
     const totalDiplomados = allPrograms.filter((p) => p.categoria === 'diplomado').length;
     const totalCursos = allPrograms.filter((p) => p.categoria === 'curso').length;
 
@@ -170,7 +188,7 @@ export default function AcademicOfferExplorer({
             >
                 <TextField
                     size="small"
-                    placeholder="Buscar programa formativo, diplomado, curso o marca..."
+                    placeholder="Buscar programa formativo, especialidad, diplomado o curso..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     sx={{ flex: 1, minWidth: { xs: '100%', sm: 300 } }}
@@ -212,30 +230,46 @@ export default function AcademicOfferExplorer({
                             onClick={() => setSelectedCategory('all')}
                             sx={{ fontWeight: 700 }}
                         />
-                        <Chip
-                            label={`Carreras (${totalCarreras})`}
-                            size="small"
-                            clickable
-                            color={selectedCategory === 'carrera' ? 'primary' : 'default'}
-                            onClick={() => setSelectedCategory('carrera')}
-                            sx={{ fontWeight: 700 }}
-                        />
-                        <Chip
-                            label={`Diplomados (${totalDiplomados})`}
-                            size="small"
-                            clickable
-                            color={selectedCategory === 'diplomado' ? 'primary' : 'default'}
-                            onClick={() => setSelectedCategory('diplomado')}
-                            sx={{ fontWeight: 700 }}
-                        />
-                        <Chip
-                            label={`Cursos (${totalCursos})`}
-                            size="small"
-                            clickable
-                            color={selectedCategory === 'curso' ? 'primary' : 'default'}
-                            onClick={() => setSelectedCategory('curso')}
-                            sx={{ fontWeight: 700 }}
-                        />
+                        {totalCarreras > 0 && (
+                            <Chip
+                                label={`Carreras (${totalCarreras})`}
+                                size="small"
+                                clickable
+                                color={selectedCategory === 'carrera' ? 'primary' : 'default'}
+                                onClick={() => setSelectedCategory('carrera')}
+                                sx={{ fontWeight: 700 }}
+                            />
+                        )}
+                        {totalEspecialidades > 0 && (
+                            <Chip
+                                label={`Especialidades (${totalEspecialidades})`}
+                                size="small"
+                                clickable
+                                color={selectedCategory === 'especialidad' ? 'info' : 'default'}
+                                onClick={() => setSelectedCategory('especialidad')}
+                                sx={{ fontWeight: 700 }}
+                            />
+                        )}
+                        {totalDiplomados > 0 && (
+                            <Chip
+                                label={`Diplomados (${totalDiplomados})`}
+                                size="small"
+                                clickable
+                                color={selectedCategory === 'diplomado' ? 'secondary' : 'default'}
+                                onClick={() => setSelectedCategory('diplomado')}
+                                sx={{ fontWeight: 700 }}
+                            />
+                        )}
+                        {totalCursos > 0 && (
+                            <Chip
+                                label={`Cursos (${totalCursos})`}
+                                size="small"
+                                clickable
+                                color={selectedCategory === 'curso' ? 'success' : 'default'}
+                                onClick={() => setSelectedCategory('curso')}
+                                sx={{ fontWeight: 700 }}
+                            />
+                        )}
                     </Box>
                 </Box>
             </Paper>
@@ -260,6 +294,8 @@ export default function AcademicOfferExplorer({
                             switch (item.categoria) {
                                 case 'carrera':
                                     return { color: 'primary' as const, label: 'CARRERA' };
+                                case 'especialidad':
+                                    return { color: 'info' as const, label: 'ESPECIALIDAD' };
                                 case 'diplomado':
                                     return { color: 'secondary' as const, label: 'DIPLOMADO' };
                                 case 'curso':
@@ -370,7 +406,13 @@ export default function AcademicOfferExplorer({
                                             variant="text"
                                             onClick={() => onSelectComercio(item.comercio)}
                                             endIcon={<LaunchIcon fontSize="small" />}
-                                            sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.8rem' }}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                fontSize: '0.8rem',
+                                                color: brandColor,
+                                                '&:hover': { bgcolor: `${brandColor}10` },
+                                            }}
                                         >
                                             Ver Ficha de la Marca
                                         </Button>
@@ -385,7 +427,17 @@ export default function AcademicOfferExplorer({
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     startIcon={<PictureAsPdfIcon fontSize="small" />}
-                                                    sx={{ textTransform: 'none', fontSize: '0.75rem', borderRadius: 1.5 }}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        fontSize: '0.75rem',
+                                                        borderRadius: 1.5,
+                                                        color: brandColor,
+                                                        borderColor: brandColor,
+                                                        '&:hover': {
+                                                            borderColor: brandColor,
+                                                            bgcolor: `${brandColor}10`,
+                                                        },
+                                                    }}
                                                 >
                                                     Brochure
                                                 </Button>

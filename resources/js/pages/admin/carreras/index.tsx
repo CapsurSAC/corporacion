@@ -69,8 +69,17 @@ export default function CarrerasIndex({
     const [selectedCarrera, setSelectedCarrera] = useState<Carrera | null>(null);
 
     useEffect(() => {
+        setSelectedComercio(filters.comercio_id || 'all');
+        setSearch(filters.search || '');
+    }, [filters]);
+
+    useEffect(() => {
         if (typeof window === 'undefined') return;
         const params = new URLSearchParams(window.location.search);
+        const paramComercio = params.get('comercio_id');
+        if (paramComercio && paramComercio !== 'all') {
+            setSelectedComercio(paramComercio);
+        }
         if (params.get('create') === '1' || params.get('create') === 'true') {
             setSelectedCarrera(null);
             setDialogOpen(true);
@@ -608,7 +617,7 @@ export default function CarrerasIndex({
                 onOpenChange={setDialogOpen}
                 carrera={selectedCarrera}
                 comercios={comercios}
-                
+                defaultComercioId={selectedComercio !== 'all' && selectedComercio ? Number(selectedComercio) : null}
             />
         </>
     );

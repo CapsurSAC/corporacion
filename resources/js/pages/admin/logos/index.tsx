@@ -527,9 +527,19 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                                         component="label"
                                         variant="outlined"
                                         startIcon={<CloudUploadIcon />}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+                                        sx={{
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 700,
+                                            color: (theme) => (theme.palette.mode === 'dark' ? '#ffffff' : '#000000'),
+                                            borderColor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000'),
+                                            '&:hover': {
+                                                borderColor: (theme) => (theme.palette.mode === 'dark' ? '#ffffff' : '#000000'),
+                                                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'),
+                                            },
+                                        }}
                                     >
-                                        Subir Archivo PNG / SVG Claro
+                                        {claroFile ? `Archivo: ${claroFile.name}` : 'Subir Archivo PNG / SVG Claro'}
                                         <input
                                             type="file"
                                             hidden
@@ -537,22 +547,6 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                                             onChange={handleClaroFileChange}
                                         />
                                     </Button>
-
-                                    <Divider>O especifica la ruta</Divider>
-
-                                    <TextField
-                                        label="Ruta o URL del Logo Claro"
-                                        placeholder="/logos-comercios/..."
-                                        value={claroPath}
-                                        onChange={(e) => {
-                                            setClaroPath(e.target.value);
-                                            setClaroFile(null);
-                                            setClaroPreview(e.target.value || null);
-                                        }}
-                                        fullWidth
-                                        size="small"
-                                        helperText="Ruta relativa en public o enlace web directo"
-                                    />
                                 </Box>
                             )}
 
@@ -590,11 +584,20 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                                     <Button
                                         component="label"
                                         variant="outlined"
-                                        color="info"
                                         startIcon={<CloudUploadIcon />}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+                                        sx={{
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 700,
+                                            color: (theme) => (theme.palette.mode === 'dark' ? '#ffffff' : '#000000'),
+                                            borderColor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000'),
+                                            '&:hover': {
+                                                borderColor: (theme) => (theme.palette.mode === 'dark' ? '#ffffff' : '#000000'),
+                                                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'),
+                                            },
+                                        }}
                                     >
-                                        Subir Archivo PNG / SVG Oscuro
+                                        {oscuroFile ? `Archivo: ${oscuroFile.name}` : 'Subir Archivo PNG / SVG Oscuro'}
                                         <input
                                             type="file"
                                             hidden
@@ -602,22 +605,6 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                                             onChange={handleOscuroFileChange}
                                         />
                                     </Button>
-
-                                    <Divider>O especifica la ruta</Divider>
-
-                                    <TextField
-                                        label="Ruta o URL del Logo Oscuro"
-                                        placeholder="/logos-comercios/..."
-                                        value={oscuroPath}
-                                        onChange={(e) => {
-                                            setOscuroPath(e.target.value);
-                                            setOscuroFile(null);
-                                            setOscuroPreview(e.target.value || null);
-                                        }}
-                                        fullWidth
-                                        size="small"
-                                        helperText="Ruta relativa en public o enlace web directo"
-                                    />
                                 </Box>
                             )}
                         </DialogContent>

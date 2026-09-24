@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BusinessIcon from '@mui/icons-material/Business';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -54,6 +55,7 @@ interface WelcomeProps {
         totalCarreras: number;
         totalDiplomados: number;
         totalCursos: number;
+        totalEspecialidades?: number;
     };
     initialComercio?: Comercio | null;
     driveLinks?: {
@@ -70,6 +72,7 @@ export default function Welcome({
         totalCarreras: 5,
         totalDiplomados: 37,
         totalCursos: 34,
+        totalEspecialidades: 0,
     },
     initialComercio = null,
     driveLinks = {
@@ -179,10 +182,11 @@ export default function Welcome({
                     com.resolucion_creacion?.toLowerCase().includes(term) ||
                     com.resolucion_revalidacion?.toLowerCase().includes(term);
 
-                // Búsqueda profunda en carreras, diplomados y cursos del comercio
+                // Búsqueda profunda en carreras, diplomados, cursos y especialidades del comercio
                 const matchCarreras = com.carreras?.some((c) => c.nombre.toLowerCase().includes(term));
                 const matchDiplomados = com.diplomados?.some((d) => d.nombre.toLowerCase().includes(term));
                 const matchCursos = com.cursos?.some((cur) => cur.nombre.toLowerCase().includes(term));
+                const matchEspecialidades = com.especialidades?.some((esp) => esp.nombre.toLowerCase().includes(term));
 
                 if (
                     !matchNombre &&
@@ -192,7 +196,8 @@ export default function Welcome({
                     !matchResolucion &&
                     !matchCarreras &&
                     !matchDiplomados &&
-                    !matchCursos
+                    !matchCursos &&
+                    !matchEspecialidades
                 ) {
                     return false;
                 }
@@ -202,7 +207,7 @@ export default function Welcome({
         });
     }, [allComercios, selectedGrupoId, searchQuery]);
 
-    const totalProgramas = stats.totalCarreras + stats.totalDiplomados + stats.totalCursos;
+    const totalProgramas = stats.totalCarreras + stats.totalDiplomados + stats.totalCursos + (stats.totalEspecialidades || 0);
 
     return (
         <>
@@ -322,48 +327,118 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* Hero Banner Corporativo de Consulta */}
+                {/* Hero Banner Corporativo de Consulta - Ultra Rápido y Optimizado */}
                 <Box
                     sx={{
                         pt: { xs: 6, md: 8 },
                         pb: { xs: 6, md: 7 },
-                        background: 'linear-gradient(135deg, #0f1f38 0%, #0c43a3 55%, #081426 100%)',
                         color: '#ffffff',
                         textAlign: 'center',
                         position: 'relative',
                         overflow: 'hidden',
+                        background: 'linear-gradient(135deg, #091322 0%, #0c3e8a 52%, #060e1d 100%)',
+                        '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            inset: 0,
+                            backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px)',
+                            backgroundSize: '24px 24px',
+                            pointerEvents: 'none',
+                        },
+                        '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: '100%',
+                            maxWidth: '1200px',
+                            height: '100%',
+                            background: 'radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 70%)',
+                            pointerEvents: 'none',
+                        },
                     }}
                 >
                     <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+                        {/* Badge Flotante */}
+                        <Box
+                            sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 1.2,
+                                px: 2,
+                                py: 0.6,
+                                mb: 2,
+                                borderRadius: 5,
+                                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    bgcolor: '#22c55e',
+                                    boxShadow: '0 0 8px #22c55e',
+                                }}
+                            />
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    fontWeight: 800,
+                                    letterSpacing: '0.1em',
+                                    fontSize: '0.73rem',
+                                    textTransform: 'uppercase',
+                                    color: 'rgba(255, 255, 255, 0.95)',
+                                }}
+                            >
+                                Portal Integral de Consulta Corporativa
+                            </Typography>
+                        </Box>
 
+                        {/* Título Principal */}
                         <Typography
                             variant="h2"
                             sx={{
                                 fontWeight: 900,
-                                letterSpacing: '-0.02em',
-                                fontSize: { xs: '2.2rem', sm: '3.2rem', md: '3.8rem' },
-                                mb: 1.5,
+                                letterSpacing: '-0.025em',
+                                fontSize: { xs: '2.4rem', sm: '3.4rem', md: '4rem' },
+                                lineHeight: 1.15,
+                                mb: 1.8,
                             }}
                         >
-                            GRUPO <Box component="span" sx={{ color: '#60a5fa' }}>CAPSUR</Box>
+                            GRUPO{' '}
+                            <Box
+                                component="span"
+                                sx={{
+                                    background: 'linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                }}
+                            >
+                                CAPSUR
+                            </Box>
                         </Typography>
 
+                        {/* Subtítulo */}
                         <Typography
                             variant="h6"
                             sx={{
-                                color: 'rgba(255, 255, 255, 0.9)',
+                                color: 'rgba(255, 255, 255, 0.88)',
                                 fontWeight: 400,
                                 lineHeight: 1.6,
-                                mb: 4,
+                                mb: 3.5,
                                 maxWidth: 780,
                                 mx: 'auto',
-                                fontSize: { xs: '1rem', md: '1.15rem' },
+                                fontSize: { xs: '1rem', md: '1.14rem' },
                             }}
                         >
-                            Portal de consulta corporativa para colaboradores. Información institucional, códigos ESCALE MINEDU, resoluciones oficiales, aulas virtuales y oferta académica de todas nuestras marcas.
+                            Portal de consulta para colaboradores. Información institucional, códigos ESCALE MINEDU, resoluciones oficiales, aulas virtuales y oferta formativa completa de todas nuestras marcas.
                         </Typography>
 
-                        {/* Buscador Rápido en el Hero */}
+                        {/* Buscador Rápido en el Hero - 100% Fluido */}
                         <Box sx={{ maxWidth: 680, mx: 'auto', mb: 3 }}>
                             <TextField
                                 fullWidth
@@ -371,20 +446,34 @@ export default function Welcome({
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 sx={{
-                                    bgcolor: 'rgba(255, 255, 255, 0.96)',
+                                    bgcolor: (theme) =>
+                                        theme.palette.mode === 'dark'
+                                            ? 'rgba(15, 23, 42, 0.96)'
+                                            : '#ffffff',
                                     borderRadius: 2.5,
+                                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: 2.5,
-                                        height: 54,
-                                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)',
-                                        color: '#0f172a',
+                                        height: 52,
+                                        color: (theme) => (theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a'),
+                                        fontSize: '0.96rem',
+                                        '& fieldset': {
+                                            borderColor: 'rgba(255, 255, 255, 0.25)',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#38bdf8',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#0284c7',
+                                            borderWidth: 2,
+                                        },
                                     },
                                 }}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <SearchIcon color="primary" sx={{ ml: 1, mr: 0.5 }} />
+                                                <SearchIcon sx={{ ml: 1, mr: 0.5, color: '#0284c7', fontSize: 22 }} />
                                             </InputAdornment>
                                         ),
                                         endAdornment: searchQuery ? (
@@ -399,7 +488,7 @@ export default function Welcome({
                             />
                         </Box>
 
-                        {/* Botones de Capacitaciones Drive con Tooltips (Debajo del buscador en el Header) */}
+                        {/* Botones de Capacitaciones Drive */}
                         <Box
                             sx={{
                                 display: 'flex',
@@ -418,28 +507,26 @@ export default function Welcome({
                                 <Button
                                     variant="contained"
                                     size="medium"
-                                    startIcon={<FolderSharedIcon sx={{ fontSize: 19 }} />}
-                                    endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
+                                    startIcon={<FolderSharedIcon sx={{ fontSize: 18 }} />}
+                                    endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
                                     onClick={() => handleRedirect(driveLinks?.escifor, 'ESCIFOR')}
                                     sx={{
-                                        bgcolor: 'rgba(255, 255, 255, 0.16)',
-                                        backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                                        bgcolor: 'rgba(255, 255, 255, 0.14)',
+                                        border: '1px solid rgba(255, 255, 255, 0.3)',
                                         color: '#ffffff',
                                         fontWeight: 800,
                                         fontSize: '0.86rem',
                                         letterSpacing: '0.02em',
                                         px: 2.8,
-                                        py: 1,
+                                        py: 0.9,
                                         borderRadius: 2,
                                         textTransform: 'none',
                                         boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
                                         transition: 'all 0.2s ease',
                                         '&:hover': {
-                                            bgcolor: 'rgba(255, 255, 255, 0.28)',
-                                            borderColor: '#ffffff',
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.25)',
+                                            borderColor: '#38bdf8',
+                                            transform: 'translateY(-1px)',
                                         },
                                     }}
                                 >
@@ -455,19 +542,18 @@ export default function Welcome({
                                 <Button
                                     variant="contained"
                                     size="medium"
-                                    startIcon={<FolderSharedIcon sx={{ fontSize: 19 }} />}
-                                    endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
+                                    startIcon={<FolderSharedIcon sx={{ fontSize: 18 }} />}
+                                    endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
                                     onClick={() => handleRedirect(driveLinks?.multimarca, 'MULTIMARCA')}
                                     sx={{
                                         bgcolor: 'rgba(34, 197, 94, 0.22)',
-                                        backdropFilter: 'blur(10px)',
                                         border: '1px solid rgba(74, 222, 128, 0.45)',
                                         color: '#ffffff',
                                         fontWeight: 800,
                                         fontSize: '0.86rem',
                                         letterSpacing: '0.02em',
                                         px: 2.8,
-                                        py: 1,
+                                        py: 0.9,
                                         borderRadius: 2,
                                         textTransform: 'none',
                                         boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
@@ -475,8 +561,7 @@ export default function Welcome({
                                         '&:hover': {
                                             bgcolor: 'rgba(34, 197, 94, 0.35)',
                                             borderColor: '#4ade80',
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.35)',
+                                            transform: 'translateY(-1px)',
                                         },
                                     }}
                                 >
@@ -488,37 +573,67 @@ export default function Welcome({
                         {/* Indicadores en vivo */}
                         <Box
                             sx={{
-                                display: 'flex',
+                                display: 'inline-flex',
                                 justifyContent: 'center',
+                                alignItems: 'center',
                                 flexWrap: 'wrap',
-                                gap: { xs: 1.5, sm: 3 },
-                                pt: 1,
+                                gap: { xs: 1.2, sm: 2 },
+                                p: { xs: 1, sm: 1.2 },
+                                px: { xs: 2, sm: 2.5 },
+                                borderRadius: 3,
+                                bgcolor: 'rgba(0, 0, 0, 0.25)',
+                                border: '1px solid rgba(255, 255, 255, 0.12)',
                             }}
                         >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <DomainIcon sx={{ fontSize: 18, color: '#60a5fa' }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <DomainIcon sx={{ fontSize: 17, color: '#60a5fa' }} />
                                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
                                     {stats.totalGrupos} Grupos Corporativos
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <StorefrontIcon sx={{ fontSize: 18, color: '#34d399' }} />
+                            <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.18)', display: { xs: 'none', sm: 'block' } }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <StorefrontIcon sx={{ fontSize: 17, color: '#34d399' }} />
                                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
                                     {stats.totalComercios} Marcas Institucionales
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <SchoolIcon sx={{ fontSize: 18, color: '#facc15' }} />
+                            <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.18)', display: { xs: 'none', sm: 'block' } }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <SchoolIcon sx={{ fontSize: 17, color: '#facc15' }} />
                                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
                                     {stats.totalCarreras} Carreras Acreditadas
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <WorkspacePremiumIcon sx={{ fontSize: 18, color: '#a78bfa' }} />
+                            {(stats.totalEspecialidades || 0) > 0 && (
+                                <>
+                                    <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.18)', display: { xs: 'none', sm: 'block' } }} />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                        <AutoAwesomeIcon sx={{ fontSize: 17, color: '#38bdf8' }} />
+                                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
+                                            {stats.totalEspecialidades} {stats.totalEspecialidades === 1 ? 'Especialidad' : 'Especialidades'}
+                                        </Typography>
+                                    </Box>
+                                </>
+                            )}
+                            <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.18)', display: { xs: 'none', sm: 'block' } }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <WorkspacePremiumIcon sx={{ fontSize: 17, color: '#a78bfa' }} />
                                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
                                     {stats.totalDiplomados} Diplomados
                                 </Typography>
                             </Box>
+                            {(stats.totalCursos || 0) > 0 && (
+                                <>
+                                    <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.18)', display: { xs: 'none', sm: 'block' } }} />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                        <MenuBookIcon sx={{ fontSize: 17, color: '#4ade80' }} />
+                                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.95)', fontWeight: 700 }}>
+                                            {stats.totalCursos} {stats.totalCursos === 1 ? 'Curso' : 'Cursos'}
+                                        </Typography>
+                                    </Box>
+                                </>
+                            )}
                         </Box>
                     </Container>
                 </Box>
@@ -626,8 +741,10 @@ export default function Welcome({
                                     {filteredComercios.map((comercio) => {
                                         const brandColor = comercio.color_hex || '#0c43a3';
                                         const carrerasCount = comercio.carreras?.length || comercio.carreras_count || 0;
+                                        const especialidadesCount = comercio.especialidades?.length || comercio.especialidades_count || 0;
                                         const diplomadosCount = comercio.diplomados?.length || comercio.diplomados_count || 0;
                                         const cursosCount = comercio.cursos?.length || comercio.cursos_count || 0;
+                                        const hasOferta = carrerasCount > 0 || especialidadesCount > 0 || diplomadosCount > 0 || cursosCount > 0;
 
                                         return (
                                             <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={comercio.id}>
@@ -763,7 +880,7 @@ export default function Welcome({
                                                         <Box sx={{ mb: 2.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
                                                             {comercio.escale_minedu && (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                    <VerifiedUserIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                                                                    <VerifiedUserIcon sx={{ fontSize: 16, color: brandColor }} />
                                                                     <Typography variant="caption" sx={{ fontWeight: 700 }}>
                                                                         ESCALE:{' '}
                                                                         <Box component="span" sx={{ color: 'text.secondary', fontWeight: 600 }}>
@@ -776,7 +893,7 @@ export default function Welcome({
                                                             {comercio.resolucion_creacion && (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
-                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main', flexShrink: 0 }} />
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: brandColor, flexShrink: 0 }} />
                                                                         <Typography variant="caption" sx={{ fontWeight: 700 }}>
                                                                             R. Creación:
                                                                         </Typography>
@@ -785,7 +902,6 @@ export default function Welcome({
                                                                         <Button
                                                                             size="small"
                                                                             variant="outlined"
-                                                                            color="primary"
                                                                             component="a"
                                                                             href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
                                                                             target="_blank"
@@ -800,6 +916,12 @@ export default function Welcome({
                                                                                 fontSize: '0.72rem',
                                                                                 fontWeight: 700,
                                                                                 lineHeight: 1.4,
+                                                                                color: brandColor,
+                                                                                borderColor: brandColor,
+                                                                                '&:hover': {
+                                                                                    borderColor: brandColor,
+                                                                                    bgcolor: `${brandColor}10`,
+                                                                                },
                                                                             }}
                                                                         >
                                                                             Ver documento
@@ -815,7 +937,7 @@ export default function Welcome({
                                                             {comercio.resolucion_revalidacion && (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
-                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: 'info.main', flexShrink: 0 }} />
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: brandColor, flexShrink: 0 }} />
                                                                         <Typography variant="caption" sx={{ fontWeight: 700 }}>
                                                                             R. Revalidación:
                                                                         </Typography>
@@ -824,7 +946,6 @@ export default function Welcome({
                                                                         <Button
                                                                             size="small"
                                                                             variant="outlined"
-                                                                            color="info"
                                                                             component="a"
                                                                             href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
                                                                             target="_blank"
@@ -839,6 +960,12 @@ export default function Welcome({
                                                                                 fontSize: '0.72rem',
                                                                                 fontWeight: 700,
                                                                                 lineHeight: 1.4,
+                                                                                color: brandColor,
+                                                                                borderColor: brandColor,
+                                                                                '&:hover': {
+                                                                                    borderColor: brandColor,
+                                                                                    bgcolor: `${brandColor}10`,
+                                                                                },
                                                                             }}
                                                                         >
                                                                             Ver documento
@@ -887,32 +1014,66 @@ export default function Welcome({
                                                             )}
                                                         </Box>
 
-                                                        <Divider sx={{ mb: 2 }} />
-
                                                         {/* Píldoras de Oferta Académica */}
-                                                        <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
-                                                            <Chip
-                                                                label={`${carrerasCount} Carreras`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                color={carrerasCount > 0 ? 'primary' : 'default'}
-                                                                sx={{ fontWeight: 700, fontSize: '0.72rem' }}
-                                                            />
-                                                            <Chip
-                                                                label={`${diplomadosCount} Diplomados`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                color={diplomadosCount > 0 ? 'secondary' : 'default'}
-                                                                sx={{ fontWeight: 700, fontSize: '0.72rem' }}
-                                                            />
-                                                            <Chip
-                                                                label={`${cursosCount} Cursos`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                color={cursosCount > 0 ? 'success' : 'default'}
-                                                                sx={{ fontWeight: 700, fontSize: '0.72rem' }}
-                                                            />
-                                                        </Box>
+                                                        {hasOferta && (
+                                                            <>
+                                                                <Divider sx={{ mb: 2 }} />
+                                                                <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
+                                                                    {carrerasCount > 0 && (
+                                                                        <Chip
+                                                                            label={`${carrerasCount} ${carrerasCount === 1 ? 'Carrera' : 'Carreras'}`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                fontSize: '0.72rem',
+                                                                                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                                                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000',
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    {especialidadesCount > 0 && (
+                                                                        <Chip
+                                                                            label={`${especialidadesCount} ${especialidadesCount === 1 ? 'Especialidad' : 'Especialidades'}`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                fontSize: '0.72rem',
+                                                                                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                                                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000',
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    {diplomadosCount > 0 && (
+                                                                        <Chip
+                                                                            label={`${diplomadosCount} ${diplomadosCount === 1 ? 'Diplomado' : 'Diplomados'}`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                fontSize: '0.72rem',
+                                                                                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                                                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000',
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    {cursosCount > 0 && (
+                                                                        <Chip
+                                                                            label={`${cursosCount} ${cursosCount === 1 ? 'Curso' : 'Cursos'}`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{
+                                                                                fontWeight: 700,
+                                                                                fontSize: '0.72rem',
+                                                                                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                                                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : '#000000',
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </Box>
+                                                            </>
+                                                        )}
                                                     </CardContent>
 
                                                     {/* Pie de Tarjeta con Acciones Rápidas */}
@@ -954,7 +1115,7 @@ export default function Welcome({
                                                                         href={comercio.plataforma_carrera}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        sx={{ color: 'text.secondary', '&:hover': { color: 'info.main' } }}
+                                                                        sx={{ color: 'text.secondary', '&:hover': { color: brandColor } }}
                                                                     >
                                                                         <SchoolIcon fontSize="small" />
                                                                     </IconButton>

@@ -60,7 +60,7 @@ export default function ComercioDetailModal({
     const isDark = theme.palette.mode === 'dark';
     const [currentTab, setCurrentTab] = useState(0);
     const [offerSearch, setOfferSearch] = useState('');
-    const [offerTypeFilter, setOfferTypeFilter] = useState<'all' | 'carreras' | 'diplomados' | 'cursos'>('all');
+    const [offerTypeFilter, setOfferTypeFilter] = useState<'all' | 'carreras' | 'especialidades' | 'diplomados' | 'cursos'>('all');
     const [copiedText, setCopiedText] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -68,6 +68,7 @@ export default function ComercioDetailModal({
 
     const brandColor = comercio.color_hex || '#0c43a3';
     const carreras = comercio.carreras || [];
+    const especialidades = comercio.especialidades || [];
     const diplomados = comercio.diplomados || [];
     const cursos = comercio.cursos || [];
 
@@ -82,6 +83,12 @@ export default function ComercioDetailModal({
 
     // Resumen institucional para copiar rápidamente al portapapeles
     const handleCopyQuickSummary = () => {
+        const ofertaParts: string[] = [];
+        if (carreras.length > 0) ofertaParts.push(`${carreras.length} ${carreras.length === 1 ? 'Carrera' : 'Carreras'}`);
+        if (especialidades.length > 0) ofertaParts.push(`${especialidades.length} ${especialidades.length === 1 ? 'Especialidad' : 'Especialidades'}`);
+        if (diplomados.length > 0) ofertaParts.push(`${diplomados.length} ${diplomados.length === 1 ? 'Diplomado' : 'Diplomados'}`);
+        if (cursos.length > 0) ofertaParts.push(`${cursos.length} ${cursos.length === 1 ? 'Curso' : 'Cursos'}`);
+
         const lines = [
             `📌 *${comercio.nombre}* (${comercio.sigla || comercio.codigo || ''})`,
             `🏛️ Grupo: ${comercio.grupo?.nombre || 'Grupo Capsur'}`,
@@ -91,7 +98,7 @@ export default function ComercioDetailModal({
             comercio.resolucion_revalidacion ? `✅ Resolución de Revalidación: ${comercio.resolucion_revalidacion}` : '',
             comercio.escale_minedu ? `🎓 Código ESCALE MINEDU: ${comercio.escale_minedu}` : '',
             comercio.link_directo_escale ? `🔗 Verificación ESCALE: ${comercio.link_directo_escale}` : '',
-            `📚 Oferta Académica: ${carreras.length} Carreras | ${diplomados.length} Diplomados | ${cursos.length} Cursos`,
+            ofertaParts.length > 0 ? `📚 Oferta Académica: ${ofertaParts.join(' | ')}` : '',
         ].filter(Boolean);
 
         handleCopy(lines.join('\n'), 'Resumen Copiado');
@@ -99,7 +106,7 @@ export default function ComercioDetailModal({
 
     // Filtro de oferta formativa
     const filteredCarreras = useMemo(() => {
-        if (offerTypeFilter === 'diplomados' || offerTypeFilter === 'cursos') return [];
+        if (offerTypeFilter !== 'all' && offerTypeFilter !== 'carreras') return [];
         return carreras.filter((c) =>
             c.nombre.toLowerCase().includes(offerSearch.toLowerCase()) ||
             (c.codigo && c.codigo.toLowerCase().includes(offerSearch.toLowerCase())) ||
@@ -107,8 +114,16 @@ export default function ComercioDetailModal({
         );
     }, [carreras, offerSearch, offerTypeFilter]);
 
+    const filteredEspecialidades = useMemo(() => {
+        if (offerTypeFilter !== 'all' && offerTypeFilter !== 'especialidades') return [];
+        return especialidades.filter((e) =>
+            e.nombre.toLowerCase().includes(offerSearch.toLowerCase()) ||
+            (e.rubro?.nombre && e.rubro.nombre.toLowerCase().includes(offerSearch.toLowerCase()))
+        );
+    }, [especialidades, offerSearch, offerTypeFilter]);
+
     const filteredDiplomados = useMemo(() => {
-        if (offerTypeFilter === 'carreras' || offerTypeFilter === 'cursos') return [];
+        if (offerTypeFilter !== 'all' && offerTypeFilter !== 'diplomados') return [];
         return diplomados.filter((d) =>
             d.nombre.toLowerCase().includes(offerSearch.toLowerCase()) ||
             (d.tipo && d.tipo.toLowerCase().includes(offerSearch.toLowerCase()))
@@ -116,14 +131,14 @@ export default function ComercioDetailModal({
     }, [diplomados, offerSearch, offerTypeFilter]);
 
     const filteredCursos = useMemo(() => {
-        if (offerTypeFilter === 'carreras' || offerTypeFilter === 'diplomados') return [];
+        if (offerTypeFilter !== 'all' && offerTypeFilter !== 'cursos') return [];
         return cursos.filter((c) =>
             c.nombre.toLowerCase().includes(offerSearch.toLowerCase()) ||
             (c.tipo && c.tipo.toLowerCase().includes(offerSearch.toLowerCase()))
         );
     }, [cursos, offerSearch, offerTypeFilter]);
 
-    const totalFiltered = filteredCarreras.length + filteredDiplomados.length + filteredCursos.length;
+    const totalFiltered = filteredCarreras.length + filteredEspecialidades.length + filteredDiplomados.length + filteredCursos.length;
 
     return (
         <>
@@ -253,7 +268,18 @@ export default function ComercioDetailModal({
                                 variant="outlined"
                                 startIcon={<ContentCopyIcon fontSize="small" />}
                                 onClick={handleCopyQuickSummary}
-                                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}
+                                sx={{
+                                    borderRadius: 2,
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.8rem',
+                                    color: brandColor,
+                                    borderColor: brandColor,
+                                    '&:hover': {
+                                        borderColor: brandColor,
+                                        bgcolor: `${brandColor}12`,
+                                    },
+                                }}
                             >
                                 {copiedText === 'Resumen Copiado' ? '¡Copiado!' : 'Copiar Resumen'}
                             </Button>
@@ -272,12 +298,19 @@ export default function ComercioDetailModal({
                         variant="scrollable"
                         scrollButtons="auto"
                         sx={{
+                            '& .MuiTabs-indicator': {
+                                bgcolor: brandColor,
+                                height: 3,
+                            },
                             '& .MuiTab-root': {
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.88rem',
                                 minHeight: 48,
                                 gap: 1,
+                                '&.Mui-selected': {
+                                    color: `${brandColor} !important`,
+                                },
                             },
                         }}
                     >
@@ -286,7 +319,7 @@ export default function ComercioDetailModal({
                         <Tab
                             icon={<SchoolIcon fontSize="small" />}
                             iconPosition="start"
-                            label={`Oferta Formativa (${carreras.length + diplomados.length + cursos.length})`}
+                            label={`Oferta Formativa (${carreras.length + especialidades.length + diplomados.length + cursos.length})`}
                         />
                         <Tab icon={<MenuBookIcon fontSize="small" />} iconPosition="start" label="Enlaces & Descargas" />
                     </Tabs>
@@ -302,7 +335,7 @@ export default function ComercioDetailModal({
                             {/* Descripción */}
                             {comercio.descripcion && (
                                 <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, bgcolor: 'action.hover' }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.8, color: 'primary.main' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.8, color: brandColor }}>
                                         Sobre la Institución
                                     </Typography>
                                     <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>
@@ -353,7 +386,7 @@ export default function ComercioDetailModal({
                                         <Grid size={{ xs: 12, sm: 6 }}>
                                             <Card variant="outlined" sx={{ borderRadius: 2, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Avatar sx={{ bgcolor: isGoogleDriveUrl(comercio.plataforma_carrera) ? 'rgba(38, 132, 252, 0.12)' : 'info.light', color: 'info.dark', width: 38, height: 38 }}>
+                                                    <Avatar sx={{ bgcolor: isGoogleDriveUrl(comercio.plataforma_carrera) ? 'rgba(38, 132, 252, 0.12)' : `${brandColor}18`, color: brandColor, width: 38, height: 38 }}>
                                                         {isGoogleDriveUrl(comercio.plataforma_carrera) ? <GoogleDriveIcon size={20} /> : <SchoolIcon fontSize="small" />}
                                                     </Avatar>
                                                     <Box>
@@ -368,14 +401,23 @@ export default function ComercioDetailModal({
                                                 <Button
                                                     size="small"
                                                     variant="contained"
-                                                    color="info"
                                                     component="a"
                                                     href={comercio.plataforma_carrera}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     startIcon={isGoogleDriveUrl(comercio.plataforma_carrera) ? <GoogleDriveIcon size={15} /> : undefined}
                                                     endIcon={<LaunchIcon fontSize="small" />}
-                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontWeight: 700,
+                                                        bgcolor: brandColor,
+                                                        color: '#ffffff',
+                                                        '&:hover': {
+                                                            bgcolor: brandColor,
+                                                            filter: 'brightness(0.9)',
+                                                        },
+                                                    }}
                                                 >
                                                     Ingresar
                                                 </Button>
@@ -387,10 +429,10 @@ export default function ComercioDetailModal({
 
                             {/* Instructivo para Ingresar a la Plataforma */}
                             {comercio.como_ingresar_plataforma && (
-                                <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, bgcolor: 'background.paper', borderColor: 'info.main' }}>
+                                <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, bgcolor: 'background.paper', borderColor: brandColor }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                        <InfoOutlinedIcon color="info" fontSize="small" />
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'info.main' }}>
+                                        <InfoOutlinedIcon sx={{ color: brandColor }} fontSize="small" />
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColor }}>
                                             ¿Cómo ingresar al Aula Virtual? (Guía para el Alumno)
                                         </Typography>
                                     </Box>
@@ -401,7 +443,15 @@ export default function ComercioDetailModal({
                                         size="small"
                                         startIcon={<ContentCopyIcon fontSize="small" />}
                                         onClick={() => handleCopy(comercio.como_ingresar_plataforma || '', 'Instructivo')}
-                                        sx={{ mt: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
+                                        sx={{
+                                            mt: 1.5,
+                                            textTransform: 'none',
+                                            fontSize: '0.78rem',
+                                            color: brandColor,
+                                            '&:hover': {
+                                                bgcolor: `${brandColor}10`,
+                                            },
+                                        }}
                                     >
                                         {copiedText === 'Instructivo' ? '¡Instructivo Copiado!' : 'Copiar Instructivo para Alumno'}
                                     </Button>
@@ -520,7 +570,7 @@ export default function ComercioDetailModal({
                             {comercio.fotos && comercio.fotos.length > 0 && (
                                 <Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                                        <PhotoLibraryIcon fontSize="small" color="primary" />
+                                        <PhotoLibraryIcon fontSize="small" sx={{ color: brandColor }} />
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                             Galería Fotográfica ({comercio.fotos.length})
                                         </Typography>
@@ -613,14 +663,14 @@ export default function ComercioDetailModal({
                                 sx={{
                                     p: 2.5,
                                     borderRadius: 2,
-                                    bgcolor: 'primary.main',
+                                    bgcolor: brandColor,
                                     color: '#ffffff',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 2,
                                 }}
                             >
-                                <VerifiedUserIcon sx={{ fontSize: 40, color: '#54d8ee' }} />
+                                <VerifiedUserIcon sx={{ fontSize: 40, color: '#ffffff' }} />
                                 <Box>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                                         Acreditación y Cumplimiento Normativo MINEDU
@@ -646,7 +696,7 @@ export default function ComercioDetailModal({
                                             gap: 2,
                                             transition: 'all 0.2s ease',
                                             '&:hover': {
-                                                borderColor: 'primary.main',
+                                                borderColor: brandColor,
                                                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
                                             },
                                         }}
@@ -654,7 +704,7 @@ export default function ComercioDetailModal({
                                         <Box>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <WorkspacePremiumIcon color="primary" fontSize="small" />
+                                                    <WorkspacePremiumIcon sx={{ color: brandColor }} fontSize="small" />
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                                                         Resolución de Creación
                                                     </Typography>
@@ -663,9 +713,8 @@ export default function ComercioDetailModal({
                                                     <Chip
                                                         label="Documento Oficial"
                                                         size="small"
-                                                        color="primary"
                                                         variant="outlined"
-                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem' }}
+                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem', color: brandColor, borderColor: brandColor }}
                                                     />
                                                 )}
                                             </Box>
@@ -686,7 +735,7 @@ export default function ComercioDetailModal({
                                                         gap: 1.5,
                                                     }}
                                                 >
-                                                    <Avatar sx={{ bgcolor: 'primary.main', color: '#ffffff', width: 38, height: 38 }}>
+                                                    <Avatar sx={{ bgcolor: brandColor, color: '#ffffff', width: 38, height: 38 }}>
                                                         <PictureAsPdfIcon fontSize="small" />
                                                     </Avatar>
                                                     <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -710,14 +759,23 @@ export default function ComercioDetailModal({
                                                 <Button
                                                     size="small"
                                                     variant="contained"
-                                                    color="primary"
                                                     component="a"
                                                     href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     startIcon={<PictureAsPdfIcon fontSize="small" />}
                                                     endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
-                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontWeight: 700,
+                                                        bgcolor: brandColor,
+                                                        color: '#ffffff',
+                                                        '&:hover': {
+                                                            bgcolor: brandColor,
+                                                            filter: 'brightness(0.9)',
+                                                        },
+                                                    }}
                                                 >
                                                     Ver documento
                                                 </Button>
@@ -726,7 +784,17 @@ export default function ComercioDetailModal({
                                                     variant="outlined"
                                                     startIcon={<ContentCopyIcon fontSize="small" />}
                                                     onClick={() => handleCopy(comercio.resolucion_creacion || '', 'R. Creación')}
-                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontSize: '0.78rem',
+                                                        color: brandColor,
+                                                        borderColor: brandColor,
+                                                        '&:hover': {
+                                                            borderColor: brandColor,
+                                                            bgcolor: `${brandColor}10`,
+                                                        },
+                                                    }}
                                                 >
                                                     {copiedText === 'R. Creación' ? '¡Enlace Copiado!' : 'Copiar enlace'}
                                                 </Button>
@@ -749,7 +817,7 @@ export default function ComercioDetailModal({
                                             gap: 2,
                                             transition: 'all 0.2s ease',
                                             '&:hover': {
-                                                borderColor: 'success.main',
+                                                borderColor: brandColor,
                                                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
                                             },
                                         }}
@@ -757,7 +825,7 @@ export default function ComercioDetailModal({
                                         <Box>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                    <CheckCircleIcon sx={{ color: brandColor }} fontSize="small" />
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                                                         Resolución de Revalidación
                                                     </Typography>
@@ -766,9 +834,8 @@ export default function ComercioDetailModal({
                                                     <Chip
                                                         label="Documento Oficial"
                                                         size="small"
-                                                        color="success"
                                                         variant="outlined"
-                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem' }}
+                                                        sx={{ fontWeight: 700, height: 22, fontSize: '0.7rem', color: brandColor, borderColor: brandColor }}
                                                     />
                                                 )}
                                             </Box>
@@ -789,7 +856,7 @@ export default function ComercioDetailModal({
                                                         gap: 1.5,
                                                     }}
                                                 >
-                                                    <Avatar sx={{ bgcolor: 'success.main', color: '#ffffff', width: 38, height: 38 }}>
+                                                    <Avatar sx={{ bgcolor: brandColor, color: '#ffffff', width: 38, height: 38 }}>
                                                         <PictureAsPdfIcon fontSize="small" />
                                                     </Avatar>
                                                     <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -813,24 +880,42 @@ export default function ComercioDetailModal({
                                                 <Button
                                                     size="small"
                                                     variant="contained"
-                                                    color="success"
                                                     component="a"
                                                     href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     startIcon={<PictureAsPdfIcon fontSize="small" />}
                                                     endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
-                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontWeight: 700,
+                                                        bgcolor: brandColor,
+                                                        color: '#ffffff',
+                                                        '&:hover': {
+                                                            bgcolor: brandColor,
+                                                            filter: 'brightness(0.9)',
+                                                        },
+                                                    }}
                                                 >
                                                     Ver documento
                                                 </Button>
                                                 <Button
                                                     size="small"
                                                     variant="outlined"
-                                                    color="success"
                                                     startIcon={<ContentCopyIcon fontSize="small" />}
                                                     onClick={() => handleCopy(comercio.resolucion_revalidacion || '', 'R. Revalidación')}
-                                                    sx={{ borderRadius: 1.5, textTransform: 'none', fontSize: '0.78rem' }}
+                                                    sx={{
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        fontSize: '0.78rem',
+                                                        color: brandColor,
+                                                        borderColor: brandColor,
+                                                        '&:hover': {
+                                                            borderColor: brandColor,
+                                                            bgcolor: `${brandColor}10`,
+                                                        },
+                                                    }}
                                                 >
                                                     {copiedText === 'R. Revalidación' ? '¡Enlace Copiado!' : 'Copiar enlace'}
                                                 </Button>
@@ -844,7 +929,7 @@ export default function ComercioDetailModal({
                                     <Card variant="outlined" sx={{ borderRadius: 2.5, p: 2.5, bgcolor: 'action.hover' }}>
                                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
                                             <Box>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: brandColor }}>
                                                     Registro Oficial ESCALE MINEDU
                                                 </Typography>
                                                 <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, letterSpacing: '0.05em' }}>
@@ -862,7 +947,17 @@ export default function ComercioDetailModal({
                                                         size="small"
                                                         startIcon={<ContentCopyIcon fontSize="small" />}
                                                         onClick={() => handleCopy(comercio.escale_minedu || '', 'ESCALE')}
-                                                        sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600 }}
+                                                        sx={{
+                                                            borderRadius: 1.5,
+                                                            textTransform: 'none',
+                                                            fontWeight: 600,
+                                                            color: brandColor,
+                                                            borderColor: brandColor,
+                                                            '&:hover': {
+                                                                borderColor: brandColor,
+                                                                bgcolor: `${brandColor}10`,
+                                                            },
+                                                        }}
                                                     >
                                                         {copiedText === 'ESCALE' ? '¡Código Copiado!' : 'Copiar Código'}
                                                     </Button>
@@ -870,14 +965,23 @@ export default function ComercioDetailModal({
                                                 {comercio.link_directo_escale && (
                                                     <Button
                                                         variant="contained"
-                                                        color="primary"
                                                         size="small"
                                                         component="a"
                                                         href={comercio.link_directo_escale}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         endIcon={<LaunchIcon fontSize="small" />}
-                                                        sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                        sx={{
+                                                            borderRadius: 1.5,
+                                                            textTransform: 'none',
+                                                            fontWeight: 700,
+                                                            bgcolor: brandColor,
+                                                            color: '#ffffff',
+                                                            '&:hover': {
+                                                                bgcolor: brandColor,
+                                                                filter: 'brightness(0.9)',
+                                                            },
+                                                        }}
                                                     >
                                                         Verificar en ESCALE
                                                     </Button>
@@ -913,7 +1017,7 @@ export default function ComercioDetailModal({
                             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, alignItems: 'center', justifyContent: 'space-between' }}>
                                 <TextField
                                     size="small"
-                                    placeholder="Buscar por carrera, diplomado o curso..."
+                                    placeholder="Buscar por carrera, especialidad, diplomado o curso..."
                                     value={offerSearch}
                                     onChange={(e) => setOfferSearch(e.target.value)}
                                     sx={{ flex: 1, minWidth: { xs: '100%', sm: 260 } }}
@@ -930,21 +1034,43 @@ export default function ComercioDetailModal({
 
                                 <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
                                     <Chip
-                                        label={`Todos (${carreras.length + diplomados.length + cursos.length})`}
+                                        label={`Todos (${carreras.length + especialidades.length + diplomados.length + cursos.length})`}
                                         size="small"
                                         clickable
-                                        color={offerTypeFilter === 'all' ? 'primary' : 'default'}
                                         onClick={() => setOfferTypeFilter('all')}
-                                        sx={{ fontWeight: 700 }}
+                                        sx={{
+                                            fontWeight: 700,
+                                            ...(offerTypeFilter === 'all'
+                                                ? { bgcolor: brandColor, color: '#ffffff', borderColor: brandColor, '&:hover': { bgcolor: brandColor, filter: 'brightness(0.9)' } }
+                                                : {}),
+                                        }}
                                     />
                                     {carreras.length > 0 && (
                                         <Chip
                                             label={`Carreras (${carreras.length})`}
                                             size="small"
                                             clickable
-                                            color={offerTypeFilter === 'carreras' ? 'primary' : 'default'}
                                             onClick={() => setOfferTypeFilter('carreras')}
-                                            sx={{ fontWeight: 700 }}
+                                            sx={{
+                                                fontWeight: 700,
+                                                ...(offerTypeFilter === 'carreras'
+                                                    ? { bgcolor: brandColor, color: '#ffffff', borderColor: brandColor, '&:hover': { bgcolor: brandColor, filter: 'brightness(0.9)' } }
+                                                    : {}),
+                                            }}
+                                        />
+                                    )}
+                                    {especialidades.length > 0 && (
+                                        <Chip
+                                            label={`Especialidades (${especialidades.length})`}
+                                            size="small"
+                                            clickable
+                                            onClick={() => setOfferTypeFilter('especialidades')}
+                                            sx={{
+                                                fontWeight: 700,
+                                                ...(offerTypeFilter === 'especialidades'
+                                                    ? { bgcolor: brandColor, color: '#ffffff', borderColor: brandColor, '&:hover': { bgcolor: brandColor, filter: 'brightness(0.9)' } }
+                                                    : {}),
+                                            }}
                                         />
                                     )}
                                     {diplomados.length > 0 && (
@@ -952,9 +1078,13 @@ export default function ComercioDetailModal({
                                             label={`Diplomados (${diplomados.length})`}
                                             size="small"
                                             clickable
-                                            color={offerTypeFilter === 'diplomados' ? 'primary' : 'default'}
                                             onClick={() => setOfferTypeFilter('diplomados')}
-                                            sx={{ fontWeight: 700 }}
+                                            sx={{
+                                                fontWeight: 700,
+                                                ...(offerTypeFilter === 'diplomados'
+                                                    ? { bgcolor: brandColor, color: '#ffffff', borderColor: brandColor, '&:hover': { bgcolor: brandColor, filter: 'brightness(0.9)' } }
+                                                    : {}),
+                                            }}
                                         />
                                     )}
                                     {cursos.length > 0 && (
@@ -962,9 +1092,13 @@ export default function ComercioDetailModal({
                                             label={`Cursos (${cursos.length})`}
                                             size="small"
                                             clickable
-                                            color={offerTypeFilter === 'cursos' ? 'primary' : 'default'}
                                             onClick={() => setOfferTypeFilter('cursos')}
-                                            sx={{ fontWeight: 700 }}
+                                            sx={{
+                                                fontWeight: 700,
+                                                ...(offerTypeFilter === 'cursos'
+                                                    ? { bgcolor: brandColor, color: '#ffffff', borderColor: brandColor, '&:hover': { bgcolor: brandColor, filter: 'brightness(0.9)' } }
+                                                    : {}),
+                                            }}
                                         />
                                     )}
                                 </Box>
@@ -982,7 +1116,7 @@ export default function ComercioDetailModal({
                                     {/* Carreras */}
                                     {filteredCarreras.length > 0 && (
                                         <Box>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'primary.main', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: brandColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                                 Carreras Profesionales & Técnicas ({filteredCarreras.length})
                                             </Typography>
                                             <Grid container spacing={1.5}>
@@ -995,7 +1129,7 @@ export default function ComercioDetailModal({
                                                                         {carr.nombre}
                                                                     </Typography>
                                                                     {carr.codigo && <Chip label={carr.codigo} size="small" variant="outlined" sx={{ fontWeight: 700 }} />}
-                                                                    {carr.modalidad && <Chip label={carr.modalidad.toUpperCase()} size="small" color="info" sx={{ fontWeight: 700 }} />}
+                                                                    {carr.modalidad && <Chip label={carr.modalidad.toUpperCase()} size="small" sx={{ fontWeight: 700, bgcolor: `${brandColor}15`, color: brandColor }} />}
                                                                 </Box>
                                                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
                                                                     Duración: {carr.duracion || '3 años (Modular)'} • {carr.resolucion ? `Resolución: ${carr.resolucion}` : 'Acreditado MINEDU'}
@@ -1012,7 +1146,16 @@ export default function ComercioDetailModal({
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         startIcon={<PictureAsPdfIcon fontSize="small" />}
-                                                                        sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            borderRadius: 1.5,
+                                                                            color: brandColor,
+                                                                            borderColor: brandColor,
+                                                                            '&:hover': {
+                                                                                borderColor: brandColor,
+                                                                                bgcolor: `${brandColor}10`,
+                                                                            },
+                                                                        }}
                                                                     >
                                                                         Brochure
                                                                     </Button>
@@ -1026,9 +1169,87 @@ export default function ComercioDetailModal({
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         startIcon={<MenuBookIcon fontSize="small" />}
-                                                                        sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            borderRadius: 1.5,
+                                                                            color: brandColor,
+                                                                            borderColor: brandColor,
+                                                                            '&:hover': {
+                                                                                borderColor: brandColor,
+                                                                                bgcolor: `${brandColor}10`,
+                                                                            },
+                                                                        }}
                                                                     >
                                                                         Malla
+                                                                    </Button>
+                                                                )}
+                                                            </Box>
+                                                        </Card>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        </Box>
+                                    )}
+
+                                    {/* Especialidades */}
+                                    {filteredEspecialidades.length > 0 && (
+                                        <Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: brandColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                                Especialidades ({filteredEspecialidades.length})
+                                            </Typography>
+                                            <Grid container spacing={1.5}>
+                                                {filteredEspecialidades.map((esp) => (
+                                                    <Grid size={{ xs: 12, sm: 6 }} key={esp.id}>
+                                                        <Card variant="outlined" sx={{ p: 2, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                                            <Box>
+                                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.3 }}>
+                                                                    {esp.nombre}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                                                                    {esp.rubro?.nombre && (
+                                                                        <Chip label={esp.rubro.nombre} size="small" sx={{ fontSize: '0.7rem' }} />
+                                                                    )}
+                                                                    {esp.precio && (
+                                                                        <Chip label={`S/. ${esp.precio}`} size="small" color="success" variant="outlined" sx={{ fontWeight: 700 }} />
+                                                                    )}
+                                                                </Box>
+                                                            </Box>
+
+                                                            <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
+                                                                {esp.brochure && (
+                                                                    <Button
+                                                                        size="small"
+                                                                        variant="text"
+                                                                        component="a"
+                                                                        href={esp.brochure}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        startIcon={<PictureAsPdfIcon fontSize="small" />}
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            fontSize: '0.78rem',
+                                                                            color: brandColor,
+                                                                            '&:hover': {
+                                                                                bgcolor: `${brandColor}10`,
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        Brochure
+                                                                    </Button>
+                                                                )}
+                                                                {esp.youtube && (
+                                                                    <Button
+                                                                        size="small"
+                                                                        variant="text"
+                                                                        color="error"
+                                                                        component="a"
+                                                                        href={esp.youtube}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        startIcon={<YouTubeIcon fontSize="small" />}
+                                                                        sx={{ textTransform: 'none', fontSize: '0.78rem' }}
+                                                                    >
+                                                                        Video
                                                                     </Button>
                                                                 )}
                                                             </Box>
@@ -1042,7 +1263,7 @@ export default function ComercioDetailModal({
                                     {/* Diplomados */}
                                     {filteredDiplomados.length > 0 && (
                                         <Box>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'secondary.main', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: brandColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                                 Diplomados de Especialización ({filteredDiplomados.length})
                                             </Typography>
                                             <Grid container spacing={1.5}>
@@ -1069,7 +1290,14 @@ export default function ComercioDetailModal({
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         startIcon={<PictureAsPdfIcon fontSize="small" />}
-                                                                        sx={{ textTransform: 'none', fontSize: '0.78rem' }}
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            fontSize: '0.78rem',
+                                                                            color: brandColor,
+                                                                            '&:hover': {
+                                                                                bgcolor: `${brandColor}10`,
+                                                                            },
+                                                                        }}
                                                                     >
                                                                         Brochure
                                                                     </Button>
@@ -1100,7 +1328,7 @@ export default function ComercioDetailModal({
                                     {/* Cursos */}
                                     {filteredCursos.length > 0 && (
                                         <Box>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'success.main', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: brandColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                                 Cursos & Certificaciones Técnicas ({filteredCursos.length})
                                             </Typography>
                                             <Grid container spacing={1.5}>
@@ -1127,7 +1355,14 @@ export default function ComercioDetailModal({
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         startIcon={<PictureAsPdfIcon fontSize="small" />}
-                                                                        sx={{ textTransform: 'none', fontSize: '0.78rem' }}
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            fontSize: '0.78rem',
+                                                                            color: brandColor,
+                                                                            '&:hover': {
+                                                                                bgcolor: `${brandColor}10`,
+                                                                            },
+                                                                        }}
                                                                     >
                                                                         Brochure
                                                                     </Button>
@@ -1191,7 +1426,16 @@ export default function ComercioDetailModal({
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 endIcon={<LaunchIcon fontSize="small" />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none' }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    color: brandColor,
+                                                    borderColor: brandColor,
+                                                    '&:hover': {
+                                                        borderColor: brandColor,
+                                                        bgcolor: `${brandColor}10`,
+                                                    },
+                                                }}
                                             >
                                                 Abrir
                                             </Button>
@@ -1202,7 +1446,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <PictureAsPdfIcon color="secondary" />
+                                                <PictureAsPdfIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Brochure Vacaciones Útiles
@@ -1215,14 +1459,23 @@ export default function ComercioDetailModal({
                                             <Button
                                                 size="small"
                                                 variant="contained"
-                                                color="secondary"
                                                 component="a"
                                                 href={comercio.brochure_vacaciones_utiles.startsWith('http') ? comercio.brochure_vacaciones_utiles : `https://${comercio.brochure_vacaciones_utiles}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 startIcon={<PictureAsPdfIcon fontSize="small" />}
                                                 endIcon={<LaunchIcon fontSize="small" />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    bgcolor: brandColor,
+                                                    color: '#ffffff',
+                                                    '&:hover': {
+                                                        bgcolor: brandColor,
+                                                        filter: 'brightness(0.9)',
+                                                    },
+                                                }}
                                             >
                                                 Ver documento
                                             </Button>
@@ -1234,7 +1487,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <MenuBookIcon color="primary" />
+                                                <MenuBookIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Malla Curricular General
@@ -1252,7 +1505,16 @@ export default function ComercioDetailModal({
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 endIcon={<LaunchIcon fontSize="small" />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none' }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    color: brandColor,
+                                                    borderColor: brandColor,
+                                                    '&:hover': {
+                                                        borderColor: brandColor,
+                                                        bgcolor: `${brandColor}10`,
+                                                    },
+                                                }}
                                             >
                                                 Abrir
                                             </Button>
@@ -1264,7 +1526,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <WorkspacePremiumIcon color="secondary" />
+                                                <WorkspacePremiumIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Modelo de Certificado
@@ -1282,7 +1544,16 @@ export default function ComercioDetailModal({
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 endIcon={<LaunchIcon fontSize="small" />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none' }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    color: brandColor,
+                                                    borderColor: brandColor,
+                                                    '&:hover': {
+                                                        borderColor: brandColor,
+                                                        bgcolor: `${brandColor}10`,
+                                                    },
+                                                }}
                                             >
                                                 Abrir
                                             </Button>
@@ -1294,7 +1565,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <VerifiedUserIcon color="success" />
+                                                <VerifiedUserIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Enlace Directo ESCALE
@@ -1312,7 +1583,16 @@ export default function ComercioDetailModal({
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 endIcon={<LaunchIcon fontSize="small" />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none' }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    color: brandColor,
+                                                    borderColor: brandColor,
+                                                    '&:hover': {
+                                                        borderColor: brandColor,
+                                                        bgcolor: `${brandColor}10`,
+                                                    },
+                                                }}
                                             >
                                                 Consultar
                                             </Button>
@@ -1323,7 +1603,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <WorkspacePremiumIcon color="primary" />
+                                                <WorkspacePremiumIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Resolución de Creación
@@ -1336,14 +1616,23 @@ export default function ComercioDetailModal({
                                             <Button
                                                 size="small"
                                                 variant="contained"
-                                                color="primary"
                                                 component="a"
                                                 href={comercio.resolucion_creacion.startsWith('http') ? comercio.resolucion_creacion : `https://${comercio.resolucion_creacion}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 startIcon={<PictureAsPdfIcon fontSize="small" />}
                                                 endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    bgcolor: brandColor,
+                                                    color: '#ffffff',
+                                                    '&:hover': {
+                                                        bgcolor: brandColor,
+                                                        filter: 'brightness(0.9)',
+                                                    },
+                                                }}
                                             >
                                                 Ver documento
                                             </Button>
@@ -1355,7 +1644,7 @@ export default function ComercioDetailModal({
                                     <Grid size={{ xs: 12, sm: 6 }}>
                                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <CheckCircleIcon color="success" />
+                                                <CheckCircleIcon sx={{ color: brandColor }} />
                                                 <Box>
                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                                         Resolución de Revalidación
@@ -1368,14 +1657,23 @@ export default function ComercioDetailModal({
                                             <Button
                                                 size="small"
                                                 variant="contained"
-                                                color="success"
                                                 component="a"
                                                 href={comercio.resolucion_revalidacion.startsWith('http') ? comercio.resolucion_revalidacion : `https://${comercio.resolucion_revalidacion}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 startIcon={<PictureAsPdfIcon fontSize="small" />}
                                                 endIcon={<LaunchIcon sx={{ fontSize: '15px !important' }} />}
-                                                sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 700 }}
+                                                sx={{
+                                                    borderRadius: 1.5,
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    bgcolor: brandColor,
+                                                    color: '#ffffff',
+                                                    '&:hover': {
+                                                        bgcolor: brandColor,
+                                                        filter: 'brightness(0.9)',
+                                                    },
+                                                }}
                                             >
                                                 Ver documento
                                             </Button>
@@ -1435,7 +1733,7 @@ export default function ComercioDetailModal({
                             {comercio.fotos && comercio.fotos.length > 0 && (
                                 <Box sx={{ mt: 2 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                                        <PhotoLibraryIcon color="primary" sx={{ fontSize: 20 }} />
+                                        <PhotoLibraryIcon sx={{ fontSize: 20, color: brandColor }} />
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                             Galería Fotográfica y Sedes ({comercio.fotos.length})
                                         </Typography>
@@ -1525,8 +1823,16 @@ export default function ComercioDetailModal({
                                                                     href={fotoUrl.startsWith('http') ? fotoUrl : `https://${fotoUrl}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    color="primary"
-                                                                    sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
+                                                                    sx={{
+                                                                        border: '1px solid',
+                                                                        borderColor: 'divider',
+                                                                        borderRadius: 1.5,
+                                                                        color: brandColor,
+                                                                        '&:hover': {
+                                                                            borderColor: brandColor,
+                                                                            bgcolor: `${brandColor}10`,
+                                                                        },
+                                                                    }}
                                                                 >
                                                                     <LaunchIcon fontSize="small" />
                                                                 </IconButton>
@@ -1550,7 +1856,21 @@ export default function ComercioDetailModal({
                         size="small"
                         sx={{ bgcolor: 'action.hover', fontWeight: 800, fontSize: '0.7rem', letterSpacing: 0.5 }}
                     />
-                    <Button onClick={onClose} variant="contained" color="primary" sx={{ borderRadius: 1.5, px: 3, fontWeight: 700 }}>
+                    <Button
+                        onClick={onClose}
+                        variant="contained"
+                        sx={{
+                            borderRadius: 1.5,
+                            px: 3,
+                            fontWeight: 700,
+                            bgcolor: brandColor,
+                            color: '#ffffff',
+                            '&:hover': {
+                                bgcolor: brandColor,
+                                filter: 'brightness(0.9)',
+                            },
+                        }}
+                    >
                         Cerrar Ficha
                     </Button>
                 </DialogActions>

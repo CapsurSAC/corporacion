@@ -67,13 +67,14 @@ export function CarreraDialog({
                 modelo_certificado: carrera.modelo_certificado || '',
             });
         } else {
-            reset();
-
-            if (defaultComercioId) {
-                setData('comercio_id', String(defaultComercioId));
-            } else if (comercios.length > 0) {
-                setData('comercio_id', String(comercios[0].id));
-            }
+            const targetComercioId = defaultComercioId ? String(defaultComercioId) : (comercios[0]?.id ? String(comercios[0].id) : '');
+            setData({
+                comercio_id: targetComercioId,
+                nombre: '',
+                url_malla_curricular: '',
+                url_declaracion_jurada: '',
+                modelo_certificado: '',
+            });
         }
 
         setClientErrors({});

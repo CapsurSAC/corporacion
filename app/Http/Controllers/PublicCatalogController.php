@@ -6,6 +6,7 @@ use App\Models\Carrera;
 use App\Models\Comercio;
 use App\Models\Curso;
 use App\Models\Diplomado;
+use App\Models\Especialidad;
 use App\Models\Grupo;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -28,8 +29,9 @@ class PublicCatalogController extends Controller
                             'carreras' => fn ($q) => $q->orderBy('nombre', 'asc'),
                             'diplomados' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
                             'cursos' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
+                            'especialidades' => fn ($q) => $q->latest('id'),
                         ])
-                        ->withCount(['carreras', 'diplomados', 'cursos'])
+                        ->withCount(['carreras', 'diplomados', 'cursos', 'especialidades'])
                         ->orderBy('nombre', 'asc');
                 },
             ])
@@ -42,6 +44,7 @@ class PublicCatalogController extends Controller
             'totalCarreras' => Carrera::count(),
             'totalDiplomados' => Diplomado::count(),
             'totalCursos' => Curso::count(),
+            'totalEspecialidades' => Especialidad::count(),
         ];
 
         $driveLinks = [
@@ -68,7 +71,9 @@ class PublicCatalogController extends Controller
                 'carreras' => fn ($q) => $q->orderBy('nombre', 'asc'),
                 'diplomados' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
                 'cursos' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
+                'especialidades' => fn ($q) => $q->latest('id'),
             ])
+            ->withCount(['carreras', 'diplomados', 'cursos', 'especialidades'])
             ->firstOrFail();
 
         $grupos = Grupo::query()
@@ -80,8 +85,9 @@ class PublicCatalogController extends Controller
                             'carreras' => fn ($q) => $q->orderBy('nombre', 'asc'),
                             'diplomados' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
                             'cursos' => fn ($q) => $q->orderBy('tipo', 'asc')->latest('id'),
+                            'especialidades' => fn ($q) => $q->latest('id'),
                         ])
-                        ->withCount(['carreras', 'diplomados', 'cursos'])
+                        ->withCount(['carreras', 'diplomados', 'cursos', 'especialidades'])
                         ->orderBy('nombre', 'asc');
                 },
             ])
@@ -94,6 +100,7 @@ class PublicCatalogController extends Controller
             'totalCarreras' => Carrera::count(),
             'totalDiplomados' => Diplomado::count(),
             'totalCursos' => Curso::count(),
+            'totalEspecialidades' => Especialidad::count(),
         ];
 
         $driveLinks = [

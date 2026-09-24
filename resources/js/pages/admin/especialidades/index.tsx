@@ -136,6 +136,23 @@ export default function EspecialidadesIndex({
         applyFilters({ search: '' });
     };
 
+    const hasActiveFilters = Boolean(
+        search ||
+        selectedComercio !== 'all' ||
+        selectedCarrera !== 'all' ||
+        selectedRubro !== 'all' ||
+        selectedEstado !== 'all'
+    );
+
+    const handleResetAllFilters = () => {
+        setSearch('');
+        setSelectedComercio('all');
+        setSelectedCarrera('all');
+        setSelectedRubro('all');
+        setSelectedEstado('all');
+        applyFilters({ comercio_id: 'all', carrera_id: 'all', rubro_id: 'all', estado_id: 'all', search: '' });
+    };
+
     const handleCreate = () => {
         setEditingEspecialidad(null);
         setDialogOpen(true);
@@ -277,52 +294,96 @@ export default function EspecialidadesIndex({
                 </Paper>
 
                 {/* BARRA DE HERRAMIENTAS CRUD */}
+                {/* BARRA DE HERRAMIENTAS CRUD */}
                 <Paper
                     elevation={0}
                     sx={{
-                        p: 1.8,
+                        p: 2,
                         borderRadius: 1.5,
                         border: '1px solid',
                         borderColor: 'divider',
                         bgcolor: 'background.paper',
                         display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        alignItems: { xs: 'stretch', md: 'center' },
-                        justifyContent: 'space-between',
+                        flexDirection: 'column',
                         gap: 2,
                         width: '100%',
                         boxSizing: 'border-box',
                     }}
                 >
-                    <Box component="form" onSubmit={handleSearchSubmit} sx={{ flex: 1, maxWidth: { xs: '100%', md: 360 } }}>
-                        <TextField
-                            placeholder="Buscar especialidad o tema..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            fullWidth
-                            size="small"
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon fontSize="small" color="action" />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: search ? (
-                                        <InputAdornment position="end">
-                                            <IconButton size="small" onClick={handleClearSearch}>
-                                                <ClearIcon fontSize="small" />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ) : null,
-                                },
-                            }}
-                        />
+                    {/* Fila 1: Buscador y Acciones */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'stretch', sm: 'center' },
+                            justifyContent: 'space-between',
+                            gap: 1.5,
+                        }}
+                    >
+                        <Box component="form" onSubmit={handleSearchSubmit} sx={{ flex: 1, maxWidth: { xs: '100%', sm: 460 } }}>
+                            <TextField
+                                placeholder="Buscar especialidad o tema..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                fullWidth
+                                size="small"
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon fontSize="small" color="action" />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: search ? (
+                                            <InputAdornment position="end">
+                                                <IconButton size="small" onClick={handleClearSearch}>
+                                                    <ClearIcon fontSize="small" />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ) : null,
+                                    },
+                                }}
+                            />
+                        </Box>
+
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<ClearIcon fontSize="small" />}
+                                onClick={handleResetAllFilters}
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: 1,
+                                    color: 'text.secondary',
+                                    borderColor: 'divider',
+                                    fontWeight: 600,
+                                    fontSize: '0.8rem',
+                                    height: 38,
+                                    whiteSpace: 'nowrap',
+                                    alignSelf: { xs: 'flex-start', sm: 'center' },
+                                }}
+                            >
+                                Limpiar filtros
+                            </Button>
+                        )}
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {/* Fila 2: Grid de Filtros */}
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                sm: 'repeat(2, 1fr)',
+                                lg: 'repeat(4, 1fr)',
+                            },
+                            gap: 1.5,
+                            width: '100%',
+                        }}
+                    >
                         {/* Filtro por Comercio */}
-                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
+                        <FormControl size="small" fullWidth>
                             <InputLabel id="filter-comercio-label">Comercio / Sede</InputLabel>
                             <Select
                                 labelId="filter-comercio-label"
@@ -342,11 +403,20 @@ export default function EspecialidadesIndex({
                                     }
                                     applyFilters({ comercio_id: nextComercio, carrera_id: nextCarrera });
                                 }}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    },
+                                }}
                             >
                                 <MenuItem value="all">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                                         <ComercioAllBadge size={22} label="ALL" />
-                                        <Typography variant="body2">Todos los comercios</Typography>
+                                        <Typography variant="body2" noWrap>Todos los comercios</Typography>
                                     </Box>
                                 </MenuItem>
                                 {comercios.map((c) => (
@@ -358,7 +428,7 @@ export default function EspecialidadesIndex({
                         </FormControl>
 
                         {/* Filtro por Carrera */}
-                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
+                        <FormControl size="small" fullWidth>
                             <InputLabel id="filter-carrera-label">Carrera Matriz</InputLabel>
                             <Select
                                 labelId="filter-carrera-label"
@@ -368,24 +438,33 @@ export default function EspecialidadesIndex({
                                     setSelectedCarrera(e.target.value);
                                     applyFilters({ carrera_id: e.target.value });
                                 }}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    },
+                                }}
                             >
                                 <MenuItem value="all">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
-                                        <Typography variant="body2">Todas las carreras</Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                                        <SchoolIcon sx={{ fontSize: '1.1rem', color: 'text.secondary', flexShrink: 0 }} />
+                                        <Typography variant="body2" noWrap>Todas las carreras</Typography>
                                     </Box>
                                 </MenuItem>
                                 <MenuItem value="no_corresponde">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <BlockIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
-                                        <Typography variant="body2">No corresponde</Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                                        <BlockIcon sx={{ fontSize: '1rem', color: 'text.secondary', flexShrink: 0 }} />
+                                        <Typography variant="body2" noWrap>No corresponde</Typography>
                                     </Box>
                                 </MenuItem>
                                 {filteredCarreras.map((c) => (
                                     <MenuItem key={c.id} value={String(c.id)}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <SchoolIcon sx={{ fontSize: '1rem', color: c.comercio?.color_hex || 'primary.main' }} />
-                                            <Typography variant="body2">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, overflow: 'hidden' }}>
+                                            <SchoolIcon sx={{ fontSize: '1rem', color: c.comercio?.color_hex || 'primary.main', flexShrink: 0 }} />
+                                            <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {c.nombre}
                                             </Typography>
                                         </Box>
@@ -395,7 +474,7 @@ export default function EspecialidadesIndex({
                         </FormControl>
 
                         {/* Filtro por Rubro */}
-                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 190 } }}>
+                        <FormControl size="small" fullWidth>
                             <InputLabel id="filter-rubro-label">Rubro Asignado</InputLabel>
                             <Select
                                 labelId="filter-rubro-label"
@@ -405,18 +484,27 @@ export default function EspecialidadesIndex({
                                     setSelectedRubro(e.target.value);
                                     applyFilters({ rubro_id: e.target.value });
                                 }}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    },
+                                }}
                             >
                                 <MenuItem value="all">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <CategoryIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />
-                                        <Typography variant="body2">Todos los rubros</Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                                        <CategoryIcon sx={{ fontSize: '1.1rem', color: 'text.secondary', flexShrink: 0 }} />
+                                        <Typography variant="body2" noWrap>Todos los rubros</Typography>
                                     </Box>
                                 </MenuItem>
                                 {rubros.map((r) => (
                                     <MenuItem key={r.id} value={String(r.id)}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, overflow: 'hidden' }}>
                                             <LabelIcon sx={{ fontSize: '1.1rem', color: r.color_hex || '#0284c7', flexShrink: 0 }} />
-                                            <Typography variant="body2">{r.nombre}</Typography>
+                                            <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.nombre}</Typography>
                                         </Box>
                                     </MenuItem>
                                 ))}
@@ -424,7 +512,7 @@ export default function EspecialidadesIndex({
                         </FormControl>
 
                         {/* Filtro por Estado */}
-                        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 160 } }}>
+                        <FormControl size="small" fullWidth>
                             <InputLabel id="filter-estado-label">Estado</InputLabel>
                             <Select
                                 labelId="filter-estado-label"
@@ -434,22 +522,32 @@ export default function EspecialidadesIndex({
                                     setSelectedEstado(e.target.value);
                                     applyFilters({ estado_id: e.target.value });
                                 }}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    },
+                                }}
                             >
                                 <MenuItem value="all">
-                                    <Typography variant="body2">Todos los estados</Typography>
+                                    <Typography variant="body2" noWrap>Todos los estados</Typography>
                                 </MenuItem>
                                 {estados.map((est) => (
                                     <MenuItem key={est.id} value={String(est.id)}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                                             <Box
                                                 sx={{
                                                     width: 8,
                                                     height: 8,
                                                     borderRadius: '50%',
                                                     bgcolor: est.color_hex || '#94a3b8',
+                                                    flexShrink: 0,
                                                 }}
                                             />
-                                            <Typography variant="body2">{est.nombre}</Typography>
+                                            <Typography variant="body2" noWrap>{est.nombre}</Typography>
                                         </Box>
                                     </MenuItem>
                                 ))}
