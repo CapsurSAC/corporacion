@@ -1850,12 +1850,7 @@ export default function ComercioDetailModal({
                 </DialogContent>
 
                 {/* Pie del modal */}
-                <DialogActions sx={{ px: { xs: 2, sm: 3 }, py: 2, borderTop: 1, borderColor: 'divider', justifyContent: 'space-between' }}>
-                    <Chip
-                        label="MODO CONSULTA • SOLO LECTURA"
-                        size="small"
-                        sx={{ bgcolor: 'action.hover', fontWeight: 800, fontSize: '0.7rem', letterSpacing: 0.5 }}
-                    />
+                <DialogActions sx={{ px: { xs: 2, sm: 3 }, py: 2, borderTop: 1, borderColor: 'divider', justifyContent: 'flex-end' }}>
                     <Button
                         onClick={onClose}
                         variant="contained"

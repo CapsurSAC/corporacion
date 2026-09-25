@@ -194,3 +194,9 @@ html.dark .capsur-swal-popup-toast,
     box-shadow: none !important;
     text-transform: none !important;
 }
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 76px;
+}
+
