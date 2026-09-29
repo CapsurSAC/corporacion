@@ -26,7 +26,7 @@ jobs:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
         run: |
-          response=$(curl -sS \
+          response=$(curl -sS -v \
             -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
             "https://corporacioncapsur.com:2083/execute/VersionControl/update?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion&branch=main")
 
