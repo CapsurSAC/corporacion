@@ -407,6 +407,7 @@ export default function Welcome({
                     }}
                 >
                     <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {/* Logotipo Oficial GRUPO CAPSUR */}
                         <Box
                             component="a"
                             href="#inicio"
