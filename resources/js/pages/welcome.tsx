@@ -391,7 +391,6 @@ export default function Welcome({
             <Head title="Grupo CAPSUR | Formación que impulsa tu futuro profesional" />
 
             <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', color: '#0f172a', display: 'flex', flexDirection: 'column' }}>
-                {/* 1. Header / Navbar Superior idéntico al diseño */}
                 <Box
                     component="header"
                     sx={{
