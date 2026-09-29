@@ -12,14 +12,14 @@ jobs:
 
 
     steps:
-      - name: Test cPanel authentication
+      - name: Check repository status
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
         run: |
           curl -sS \
             -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
-            "https://corporacioncapsur.com:2083/execute/Variables/list"
+            "https://corporacioncapsur.com:2083/execute/VersionControl/info?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion"
 
       - name: Update repository on cPanel
         env:
