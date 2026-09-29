@@ -9,7 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+
+
     steps:
+      - name: Test cPanel authentication
+        env:
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
+        run: |
+          curl -sS \
+            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
+            "https://corporacioncapsur.com:2083/execute/Variables/list"
+
       - name: Update repository on cPanel
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
