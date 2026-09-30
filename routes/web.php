@@ -82,4 +82,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+Route::get('/_diagnostico-env-73921', function () {
+    $envPath = app()->environmentPath();
+    $envFile = $envPath . DIRECTORY_SEPARATOR . '.env';
+
+    return response()->json([
+        'environment_path' => $envPath,
+        'env_file' => $envFile,
+        'env_exists' => file_exists($envFile),
+        'env_readable' => is_readable($envFile),
+        'db_from_env' => env('DB_CONNECTION'),
+        'db_from_config' => config('database.default'),
+    ]);
+});
+
 require __DIR__.'/settings.php';
