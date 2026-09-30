@@ -22,7 +22,12 @@ jobs:
           echo "$response"
 
           echo "$response" | grep -q '"status":1' || exit 1
-
+    
+      - name: Install Composer dependencies
+        run: |
+          curl -sS https://getcomposer.org/installer | php
+          php composer.phar install --no-dev --optimize-autoloader
+          
       - name: Deploy application
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
