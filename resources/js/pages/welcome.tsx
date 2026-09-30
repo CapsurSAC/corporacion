@@ -431,6 +431,8 @@ export default function Welcome({
                                 }}
                             />
                         </Box>
+
+                        {/* Menú de Navegación Central */}
                         <Box
                             component="nav"
                             sx={{
