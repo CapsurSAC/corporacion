@@ -10,24 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader
+
+
       - name: Update repository on cPanel
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
         run: |
-          response=$(curl -sS -v \
+          response=$(curl -sS \
             -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
             "https://corporacioncapsur.com:2083/execute/VersionControl/update?repository_root=%2Fhome%2Fcorporacioncapsu%2Fapp_corporacion&branch=main")
 
           echo "$response"
 
           echo "$response" | grep -q '"status":1' || exit 1
-    
-      - name: Install Composer dependencies
-        run: |
-          curl -sS https://getcomposer.org/installer | php
-          php composer.phar install --no-dev --optimize-autoloader
-          
+
+
       - name: Deploy application
         env:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
