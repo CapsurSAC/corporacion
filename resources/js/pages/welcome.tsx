@@ -555,8 +555,6 @@ export default function Welcome({
                         </Box>
                     </Container>
                 </Box>
-
-                {/* 2. Hero Section - Réplica Exacta de la Composición Visual */}
                 <Box
                     id="inicio"
                     sx={{
