@@ -4,11 +4,17 @@ import BusinessIcon from '@mui/icons-material/Business';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ClearIcon from '@mui/icons-material/Clear';
+import DescriptionIcon from '@mui/icons-material/Description';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import FlightIcon from '@mui/icons-material/Flight';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import LanguageIcon from '@mui/icons-material/Language';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -151,6 +157,7 @@ export default function Welcome({
     const [selectedComercio, setSelectedComercio] = useState<Comercio | null>(initialComercio);
     const [detailModalOpen, setDetailModalOpen] = useState<boolean>(Boolean(initialComercio));
 
+
     // Filtros del directorio de marcas
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGrupoId, setSelectedGrupoId] = useState<number | 'all'>('all');
@@ -165,6 +172,28 @@ export default function Welcome({
 
     // Bandera para evitar conflictos entre el scroll manual y el scroll spy
     const isManualScrollingRef = useRef(false);
+    const scrollRafRef = useRef<number | null>(null);
+
+
+    // Cancelar animación de desplazamiento si el usuario interactúa manualmente con la rueda o pantalla
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const cancelProgrammedScroll = () => {
+            if (isManualScrollingRef.current && scrollRafRef.current) {
+                cancelAnimationFrame(scrollRafRef.current);
+                scrollRafRef.current = null;
+                isManualScrollingRef.current = false;
+            }
+        };
+
+        window.addEventListener('wheel', cancelProgrammedScroll, { passive: true });
+        window.addEventListener('touchmove', cancelProgrammedScroll, { passive: true });
+        return () => {
+            window.removeEventListener('wheel', cancelProgrammedScroll);
+            window.removeEventListener('touchmove', cancelProgrammedScroll);
+        };
+    }, []);
 
     // Detección automática de sección activa durante el scroll del usuario
     useEffect(() => {
@@ -176,7 +205,7 @@ export default function Welcome({
 
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    const scrollPos = window.pageYOffset + 140;
+                    const scrollPos = (window.pageYOffset || document.documentElement.scrollTop) + 120;
                     // Lista ordenada según la aparición en la página
                     const sectionIds = ['inicio', 'marcas', 'nosotros', 'beneficios', 'contacto'];
 
@@ -184,8 +213,8 @@ export default function Welcome({
                         const id = sectionIds[i];
                         const el = document.getElementById(id);
                         if (el) {
-                            const top = el.offsetTop;
-                            if (scrollPos >= top) {
+                            const top = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+                            if (scrollPos >= top - 20) {
                                 setActiveNav(id);
                                 break;
                             }
@@ -268,6 +297,8 @@ export default function Welcome({
         });
     }, [allComercios, selectedGrupoId, searchQuery]);
 
+
+
     const handleOpenLogin = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (loginAnchorEl === event.currentTarget) {
             setLoginAnchorEl(null);
@@ -299,9 +330,15 @@ export default function Welcome({
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
-    // Desplazamiento animado suave cinemático con curva cúbica
-    const smoothScrollTo = (targetPosition: number, duration = 750) => {
+    // Desplazamiento animado veloz y ultra fluido con desaceleración cinematográfica (ease-out cuártico)
+    const smoothScrollTo = (targetPosition: number, duration = 360) => {
         if (typeof window === 'undefined') return;
+
+        // Cancelar animación anterior si el usuario hace clics rápidos consecutivos
+        if (scrollRafRef.current) {
+            cancelAnimationFrame(scrollRafRef.current);
+            scrollRafRef.current = null;
+        }
 
         const startPosition = window.pageYOffset || document.documentElement.scrollTop;
         const distance = targetPosition - startPosition;
@@ -310,29 +347,29 @@ export default function Welcome({
         isManualScrollingRef.current = true;
         let startTime: number | null = null;
 
-        // Easing cúbico suave (aceleración gradual inicial y desaceleración fluida al llegar)
-        const easeInOutCubic = (t: number) => {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        };
+        // Curva reactiva instantánea: acelera en el primer frame y desacelera suavemente como seda
+        const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
 
         const step = (currentTime: number) => {
             if (startTime === null) startTime = currentTime;
             const timeElapsed = currentTime - startTime;
             const progress = Math.min(timeElapsed / duration, 1);
-            const ease = easeInOutCubic(progress);
+            const ease = easeOutQuart(progress);
 
             window.scrollTo(0, Math.round(startPosition + distance * ease));
 
             if (timeElapsed < duration) {
-                requestAnimationFrame(step);
+                scrollRafRef.current = requestAnimationFrame(step);
             } else {
+                scrollRafRef.current = null;
+                window.scrollTo(0, targetPosition);
                 setTimeout(() => {
                     isManualScrollingRef.current = false;
-                }, 100);
+                }, 50);
             }
         };
 
-        requestAnimationFrame(step);
+        scrollRafRef.current = requestAnimationFrame(step);
     };
 
     // Navegar y desplazarse suavemente a una sección
@@ -340,7 +377,7 @@ export default function Welcome({
         setActiveNav(sectionId);
 
         if (sectionId === 'inicio') {
-            smoothScrollTo(0, 650);
+            smoothScrollTo(0, 300);
             return;
         }
 
@@ -348,11 +385,12 @@ export default function Welcome({
         if (element) {
             const header = document.querySelector('header');
             const headerHeight = header ? header.offsetHeight : 70;
-            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-            const targetOffset = Math.max(0, elementTop - headerHeight - 12);
+            const elementTop = element.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+            const targetOffset = Math.max(0, elementTop - headerHeight - 10);
 
             const distance = Math.abs(targetOffset - (window.pageYOffset || 0));
-            const duration = Math.min(950, Math.max(500, Math.round(distance * 0.45)));
+            // Cálculo cinemático por raíz cuadrada: respuesta entre 260ms y 450ms según distancia
+            const duration = Math.min(450, Math.max(260, Math.round(Math.sqrt(distance) * 8.2)));
 
             smoothScrollTo(targetOffset, duration);
         }
@@ -384,6 +422,12 @@ export default function Welcome({
         } else {
             handleNavClick('marcas');
         }
+    };
+
+    // Filtrar y navegar directamente a una carrera específica desde el Hero
+    const handleCareerClick = (query: string) => {
+        setSearchQuery(query);
+        handleNavClick('marcas');
     };
 
     return (
@@ -438,7 +482,7 @@ export default function Welcome({
                             sx={{
                                 display: { xs: 'none', md: 'flex' },
                                 alignItems: 'center',
-                                gap: { md: 3.5, lg: 4.5 },
+                                gap: { md: 1, lg: 1.8 },
                             }}
                         >
                             {NAV_ITEMS.map((item) => {
@@ -452,8 +496,17 @@ export default function Welcome({
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
-                                            py: 0.5,
+                                            py: 0.7,
+                                            px: { md: 1.4, lg: 1.8 },
+                                            borderRadius: '8px',
                                             position: 'relative',
+                                            transition: 'background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.12s ease',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(0, 86, 214, 0.05)',
+                                            },
+                                            '&:active': {
+                                                transform: 'scale(0.96)',
+                                            },
                                         }}
                                     >
                                         <Typography
@@ -461,7 +514,8 @@ export default function Welcome({
                                                 fontSize: '0.94rem',
                                                 fontWeight: isActive ? 700 : 500,
                                                 color: isActive ? '#0056d6' : '#334155',
-                                                transition: 'all 0.18s ease',
+                                                letterSpacing: '-0.01em',
+                                                transition: 'color 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
                                                 '&:hover': {
                                                     color: '#0056d6',
                                                 },
@@ -472,14 +526,15 @@ export default function Welcome({
                                         <Box
                                             sx={{
                                                 position: 'absolute',
-                                                bottom: -4,
-                                                width: 24,
+                                                bottom: 0,
+                                                width: isActive ? 28 : 0,
                                                 height: 3,
                                                 bgcolor: '#0056d6',
                                                 borderRadius: 99,
-                                                transition: 'all 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                boxShadow: isActive ? '0 2px 8px rgba(0, 86, 214, 0.35)' : 'none',
+                                                transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
                                                 opacity: isActive ? 1 : 0,
-                                                transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
+                                                transform: isActive ? 'scaleX(1)' : 'scaleX(0.3)',
                                                 transformOrigin: 'center',
                                             }}
                                         />
@@ -561,222 +616,465 @@ export default function Welcome({
                     id="inicio"
                     sx={{
                         position: 'relative',
-                        overflow: 'hidden',
-                        bgcolor: '#ffffff',
-                        background: 'linear-gradient(180deg, #f8fbff 0%, #ffffff 65%, #f0f7ff 100%)',
-                        pt: { xs: 1.5, sm: 2, md: 10 },
-                        pb: { xs: 6, md: 15 },
-                        px: 5,
+                        bgcolor: '#f8fbff',
+                        pt: { xs: 4, md: 6, lg: 7 },
+                        pb: { xs: 7, md: 9, lg: 10 },
+                        px: { xs: 2, sm: 3, md: 5, lg: 6 },
                         scrollMarginTop: { xs: '65px', md: '75px' },
+                        overflow: 'hidden',
                     }}
                 >
-                    {/* Gráficos dinámicos de onda azul / listón curvado en el fondo */}
-                    <Box
-                        component="svg"
-                        viewBox="0 0 1440 550"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        sx={{
-                            position: 'absolute',
-                            top: 0,
-                            right: 0,
-                            width: '100%',
-                            height: '100%',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                            display: { xs: 'none', md: 'block' },
-                        }}
-                    >
-                        <defs>
-                            <linearGradient id="heroRibbon" x1="1400" y1="10" x2="400" y2="500" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#0066ff" stopOpacity="0.85" />
-                                <stop offset="55%" stopColor="#0052cc" stopOpacity="0.95" />
-                                <stop offset="100%" stopColor="#0077ff" stopOpacity="0.4" />
-                            </linearGradient>
-                            <linearGradient id="heroGlowFloor" x1="720" y1="350" x2="720" y2="550" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#0066ff" stopOpacity="0.22" />
-                                <stop offset="100%" stopColor="#0066ff" stopOpacity="0" />
-                            </linearGradient>
-                        </defs>
-                        {/* Piso resplandeciente */}
-                        <path
-                            d="M1440 40 C1200 50 1050 140 940 240 C830 350 680 430 420 460 C260 480 120 470 0 445 L0 550 L1440 550 Z"
-                            fill="url(#heroGlowFloor)"
-                        />
-                        {/* Listón principal azul vivo */}
-                        <path
-                            d="M1440 10 C1220 20 1090 120 990 230 C890 340 720 420 490 450 C330 470 170 460 30 430"
-                            stroke="url(#heroRibbon)"
-                            strokeWidth="24"
-                            strokeLinecap="round"
-                            fill="none"
-                            style={{ filter: 'drop-shadow(0 8px 24px rgba(0, 102, 255, 0.35))' }}
-                        />
-                        {/* Acento cian fino secundario */}
-                        <path
-                            d="M1440 45 C1250 55 1130 150 1040 255 C950 360 790 435 570 460 C420 475 270 468 120 440"
-                            stroke="#38bdf8"
-                            strokeWidth="6"
-                            strokeLinecap="round"
-                            strokeOpacity="0.5"
-                            fill="none"
-                        />
-                    </Box>
-
                     <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-                        <Grid container spacing={{ xs: 3, md: 3 }} sx={{ alignItems: 'center' }}>
-                            {/* Columna Izquierda: Contenido Textual */}
-                            <Grid size={{ xs: 12, md: 6, lg: 6.5 }}>
-                                <Box sx={{ maxWidth: 640 }}>
-                                    {/* Tagline / Overline */}
-                                    <Typography
+                        {/* Contenido Hero: Textual (Izquierda) + Composición Visual de Profesionales (Derecha) */}
+                        <Grid container spacing={{ xs: 4, lg: 4 }} sx={{ alignItems: 'center' }}>
+                            {/* Columna Izquierda: Copywriting y CTAs */}
+                            <Grid size={{ xs: 12, md: 6, lg: 5.5 }}>
+                                <Box sx={{ maxWidth: 580 }}>
+                                    {/* Pill Badge Superior: TU FUTURO COMIENZA AQUÍ */}
+                                    <Box
                                         sx={{
-                                            fontSize: { xs: '0.72rem', sm: '0.8rem', md: '0.82rem' },
-                                            fontWeight: 700,
-                                            letterSpacing: '0.16em',
-                                            textTransform: 'uppercase',
-                                            color: '#64748b',
-                                            mb: 1.5,
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 1.2,
+                                            px: 1.8,
+                                            py: 0.7,
+                                            borderRadius: 99,
+                                            bgcolor: '#ffffff',
+                                            border: '1px solid #dbeafe',
+                                            boxShadow: '0 2px 8px rgba(0, 86, 214, 0.06)',
+                                            mb: 3,
                                         }}
                                     >
-                                        EDUCACIÓN · CAPACITACIÓN · DESARROLLO · OPORTUNIDADES
-                                    </Typography>
+                                        <Box
+                                            sx={{
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: 99,
+                                                bgcolor: '#0056d6',
+                                            }}
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontSize: { xs: '0.72rem', sm: '0.78rem' },
+                                                fontWeight: 800,
+                                                letterSpacing: '0.08em',
+                                                textTransform: 'uppercase',
+                                                color: '#1e293b',
+                                            }}
+                                        >
+                                            Tu futuro comienza aquí
+                                        </Typography>
+                                    </Box>
 
-                                    {/* Título Principal H1 */}
+                                    {/* Título Principal */}
                                     <Typography
                                         component="h1"
                                         sx={{
-                                            fontSize: { xs: '2.4rem', sm: '3.2rem', md: '3.8rem', lg: '4.5rem' },
-                                            fontWeight: 900,
-                                            lineHeight: 1.06,
+                                            fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem', lg: '4.75rem' },
+                                            fontWeight: 800,
+                                            lineHeight: 1.05,
                                             letterSpacing: '-0.035em',
                                             color: '#09152a',
-                                            mb: 2.2,
+                                            mb: 2.5,
                                         }}
                                     >
-                                        Formación que<br />
+                                        Carreras que<br />
                                         <Box component="span" sx={{ color: '#0056d6' }}>
-                                            impulsa tu futuro
-                                        </Box><br />
-                                        profesional
+                                            impulsan
+                                        </Box>{' '}
+                                        tu futuro
                                     </Typography>
 
-                                    {/* Descripción */}
+                                    {/* Bajada / Subtítulo */}
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: '0.98rem', sm: '1.05rem', md: '1.14rem' },
-                                            color: '#475569',
+                                            fontSize: { xs: '0.98rem', sm: '1.05rem', md: '1.1rem' },
+                                            color: '#64748b',
                                             lineHeight: 1.6,
                                             fontWeight: 400,
-                                            maxWidth: 540,
-                                            mb: 3.5,
+                                            maxWidth: 520,
+                                            mb: 4,
                                         }}
                                     >
-                                        En Grupo CAPSUR integramos educación, capacitación y soluciones especializadas para que más personas y empresas alcancen un futuro con más oportunidades.
+                                        Formación práctica y actualizada para que desarrolles tu talento y te conviertas en un profesional preparado para el mundo real a través de nuestras prestigiosas instituciones.
                                     </Typography>
 
-                                    {/* Botones de Acción (CTAs) */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                                    {/* Grupo de Acciones / CTAs duales */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2.5 }}>
+                                        {/* Botón Principal Azul Oscuro con Píldora de Flecha Circular */}
                                         <Button
                                             variant="contained"
                                             onClick={() => handleNavClick('marcas')}
-                                            endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
                                             sx={{
-                                                bgcolor: '#0056d6',
+                                                bgcolor: '#0a2240',
                                                 color: '#ffffff',
-                                                px: { xs: 3, sm: 3.8 },
-                                                py: 1.35,
+                                                pl: { xs: 3, sm: 3.5 },
+                                                pr: 1,
+                                                py: 0.9,
                                                 borderRadius: 99,
                                                 fontWeight: 700,
                                                 fontSize: '0.94rem',
                                                 textTransform: 'none',
-                                                boxShadow: '0 6px 20px rgba(0, 86, 214, 0.32)',
+                                                boxShadow: '0 8px 24px rgba(10, 34, 64, 0.25)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1.8,
                                                 transition: 'all 0.22s ease',
                                                 '&:hover': {
-                                                    bgcolor: '#0041a8',
-                                                    transform: 'translateY(-1.5px)',
-                                                    boxShadow: '0 8px 24px rgba(0, 86, 214, 0.42)',
+                                                    bgcolor: '#06162c',
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: '0 12px 30px rgba(10, 34, 64, 0.35)',
                                                 },
                                             }}
                                         >
-                                            Conoce nuestros programas
+                                            Conoce nuestras carreras
+                                            <Box
+                                                sx={{
+                                                    width: 38,
+                                                    height: 38,
+                                                    borderRadius: 99,
+                                                    bgcolor: '#ffffff',
+                                                    color: '#0a2240',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    transition: 'transform 0.2s ease',
+                                                    '&:hover': {
+                                                        transform: 'translateX(2px)',
+                                                    },
+                                                }}
+                                            >
+                                                <ArrowForwardIcon sx={{ fontSize: 18, color: '#0a2240' }} />
+                                            </Box>
                                         </Button>
 
-                                        <Button
-                                            variant="outlined"
+                                        {/* Botón Secundario: Play circular + Conoce más sobre Grupo CAPSUR */}
+                                        <Box
+                                            component="button"
                                             onClick={() => handleNavClick('nosotros')}
                                             sx={{
-                                                bgcolor: '#ffffff',
-                                                borderColor: '#cbd5e1',
-                                                borderWidth: 1.5,
-                                                color: '#0f172a',
-                                                px: { xs: 2.8, sm: 3.4 },
-                                                py: 1.35,
-                                                borderRadius: 99,
-                                                fontWeight: 700,
-                                                fontSize: '0.94rem',
-                                                textTransform: 'none',
-                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                                                transition: 'all 0.22s ease',
+                                                background: 'none',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1.5,
+                                                p: 0.5,
+                                                transition: 'opacity 0.2s ease',
                                                 '&:hover': {
-                                                    borderColor: '#94a3b8',
-                                                    bgcolor: '#f8fafc',
-                                                    borderWidth: 1.5,
-                                                    transform: 'translateY(-1.5px)',
-                                                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+                                                    opacity: 0.85,
                                                 },
                                             }}
                                         >
-                                            Sobre Grupo CAPSUR
-                                        </Button>
+                                            <Box
+                                                sx={{
+                                                    width: 48,
+                                                    height: 48,
+                                                    borderRadius: 99,
+                                                    bgcolor: '#ffffff',
+                                                    border: '1.5px solid #e2e8f0',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: '#0a2240',
+                                                    boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
+                                                    transition: 'all 0.2s ease',
+                                                }}
+                                            >
+                                                <PlayArrowIcon sx={{ fontSize: 22, color: '#0a2240', ml: '2px' }} />
+                                            </Box>
+                                            <Box sx={{ textAlign: 'left' }}>
+                                                <Typography sx={{ fontSize: '0.86rem', fontWeight: 600, color: '#334155', lineHeight: 1.25 }}>
+                                                    Conoce más sobre<br />
+                                                    <Box component="span" sx={{ fontWeight: 800, color: '#09152a' }}>Grupo CAPSUR</Box>
+                                                </Typography>
+                                            </Box>
+                                        </Box>
                                     </Box>
                                 </Box>
                             </Grid>
 
-                            {/* Columna Derecha: Imagen del Montaje de los 5 Profesionales */}
-                            <Grid size={{ xs: 12, md: 6, lg: 5.5 }}>
+                            {/* Columna Derecha: Montaje de los 5 Profesionales con Formas Orgánicas y Etiquetas Flotantes */}
+                            <Grid size={{ xs: 12, md: 6, lg: 6.5 }}>
                                 <Box
                                     sx={{
                                         position: 'relative',
+                                        width: '100%',
+                                        maxWidth: { xs: 460, sm: 540, md: 640 },
+                                        mx: 'auto',
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: '100%',
                                     }}
                                 >
-                                    {/* Halo de luz azul en la base */}
+                                    {/* Contenedor con Forma Orgánica Azul Hielo de Fondo */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            bottom: 0,
-                                            left: '10%',
-                                            right: '10%',
-                                            height: '50%',
-                                            background: 'radial-gradient(ellipse at 50% 90%, rgba(0, 102, 255, 0.28) 0%, rgba(0, 70, 200, 0.08) 50%, transparent 75%)',
-                                            filter: 'blur(30px)',
+                                            top: { xs: '6%', md: '4%' },
+                                            left: { xs: '2%', md: '6%' },
+                                            right: { xs: '2%', md: '0%' },
+                                            bottom: { xs: '4%', md: '2%' },
+                                            bgcolor: '#dbeafe',
+                                            borderRadius: { xs: '36px', sm: '50px', md: '56px 64px 64px 120px' },
+                                            overflow: 'hidden',
                                             zIndex: 0,
-                                            pointerEvents: 'none',
                                         }}
-                                    />
+                                    >
+                                        {/* Imagen arquitectónica del campus sutilmente difuminada en el fondo */}
+                                        <Box
+                                            component="img"
+                                            src="/images/campus-backdrop.jpg"
+                                            alt="Campus universitario"
+                                            sx={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                opacity: 0.35,
+                                                filter: 'saturate(0.9)',
+                                            }}
+                                        />
+                                        {/* Gradiente suave sobre el fondo */}
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                background: 'linear-gradient(135deg, rgba(219, 234, 254, 0.75) 0%, rgba(240, 247, 255, 0.4) 100%)',
+                                            }}
+                                        />
+                                    </Box>
 
-                                    {/* Fotografía de los 5 profesionales */}
+                                    {/* Tarjeta Flotante Superior Derecha: "Profesionales para un mundo sin límites" */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '2%', md: '4%' },
+                                            right: { xs: '0%', md: '-2%' },
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(10px)',
+                                            borderRadius: '16px',
+                                            py: 1.2,
+                                            px: 1.6,
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 4,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1.4,
+                                            maxWidth: { xs: 200, sm: 220 },
+                                        }}
+                                    >
+                                        <Box sx={{ flex: 1 }}>
+                                            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: '#09152a', lineHeight: 1.2 }}>
+                                                Profesionales
+                                            </Typography>
+                                            <Typography sx={{ fontSize: '0.7rem', color: '#64748b', lineHeight: 1.2 }}>
+                                                para un mundo sin límites
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                width: 28,
+                                                height: 28,
+                                                borderRadius: 99,
+                                                bgcolor: '#e0f2fe',
+                                                color: '#0284c7',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <NorthEastIcon sx={{ fontSize: 16 }} />
+                                        </Box>
+                                    </Box>
+
+                                    {/* Fotografía Central de los 5 Profesionales */}
                                     <Box
                                         component="img"
                                         src="/images/hero-capsur.png"
                                         alt="Profesionales y técnicos de Grupo CAPSUR"
                                         sx={{
                                             position: 'relative',
-                                            zIndex: 1,
+                                            zIndex: 2,
                                             width: '100%',
-                                            maxWidth: { xs: 460, sm: 540, md: 620 },
                                             height: 'auto',
                                             display: 'block',
                                             filter: 'drop-shadow(0 14px 28px rgba(0, 40, 120, 0.16))',
                                         }}
                                     />
+
+                                    {/* Etiquetas Flotantes en Cada Profesional */}
+                                    {/* 1. Turismo */}
+                                    <Box
+                                        onClick={() => handleCareerClick('turismo')}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '52%', sm: '54%' },
+                                            left: { xs: '20%', sm: '21%' },
+                                            transform: 'translateX(-50%)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(8px)',
+                                            borderRadius: 99,
+                                            py: 0.6,
+                                            px: { xs: 1.2, sm: 1.6 },
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.8,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
+                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
+                                            },
+                                        }}
+                                    >
+                                        <FlightIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
+                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
+                                            Turismo
+                                        </Typography>
+                                    </Box>
+
+                                    {/* 2. Docencia */}
+                                    <Box
+                                        onClick={() => handleCareerClick('educacion')}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '42%', sm: '44%' },
+                                            left: { xs: '36%', sm: '37%' },
+                                            transform: 'translateX(-50%)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(8px)',
+                                            borderRadius: 99,
+                                            py: 0.6,
+                                            px: { xs: 1.2, sm: 1.6 },
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.8,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
+                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
+                                            },
+                                        }}
+                                    >
+                                        <SchoolIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0a2240' }} />
+                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
+                                            Docencia
+                                        </Typography>
+                                    </Box>
+
+                                    {/* 3. Minería */}
+                                    <Box
+                                        onClick={() => handleCareerClick('mineria')}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '58%', sm: '60%' },
+                                            left: { xs: '51%', sm: '52%' },
+                                            transform: 'translateX(-50%)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(8px)',
+                                            borderRadius: 99,
+                                            py: 0.6,
+                                            px: { xs: 1.2, sm: 1.6 },
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.8,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
+                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
+                                            },
+                                        }}
+                                    >
+                                        <EngineeringIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
+                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
+                                            Minería
+                                        </Typography>
+                                    </Box>
+
+                                    {/* 4. Secretaria */}
+                                    <Box
+                                        onClick={() => handleCareerClick('administracion')}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '62%', sm: '64%' },
+                                            left: { xs: '65%', sm: '66%' },
+                                            transform: 'translateX(-50%)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(8px)',
+                                            borderRadius: 99,
+                                            py: 0.6,
+                                            px: { xs: 1.2, sm: 1.6 },
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.8,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
+                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
+                                            },
+                                        }}
+                                    >
+                                        <DescriptionIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
+                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
+                                            Secretaria
+                                        </Typography>
+                                    </Box>
+
+                                    {/* 5. Informática */}
+                                    <Box
+                                        onClick={() => handleCareerClick('computacion')}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: { xs: '71%', sm: '73%' },
+                                            left: { xs: '82%', sm: '83%' },
+                                            transform: 'translateX(-50%)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(8px)',
+                                            borderRadius: 99,
+                                            py: 0.6,
+                                            px: { xs: 1.2, sm: 1.6 },
+                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
+                                            border: '1px solid rgba(226, 232, 240, 0.8)',
+                                            zIndex: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.8,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
+                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
+                                            },
+                                        }}
+                                    >
+                                        <LaptopMacIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
+                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
+                                            Informática
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </Grid>
                         </Grid>
+
                     </Container>
                 </Box>
 
@@ -788,7 +1086,7 @@ export default function Welcome({
                         maxWidth: 1140,
                         width: 'calc(100% - 32px)',
                         mx: 'auto',
-                        mt: { xs: -4, md: -10 },
+                        mt: { xs: -3.5, md: -5 },
                         mb: { xs: 7, md: 10 },
                         px: { xs: 1.5, sm: 2.5 },
                         py: 1.4,
