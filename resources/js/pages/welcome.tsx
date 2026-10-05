@@ -611,290 +611,298 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 2. Hero Section - Réplica Exacta de la Composición Visual */}
+                {/* 2. Hero Section con Fachada Institucional CAPSUR como Fondo Elegante */}
                 <Box
                     id="inicio"
                     sx={{
                         position: 'relative',
-                        bgcolor: '#f8fbff',
-                        pt: { xs: 4, md: 6, lg: 7 },
-                        pb: { xs: 7, md: 9, lg: 10 },
+                        bgcolor: '#08142a',
+                        pt: { xs: 4, sm: 5, md: 6, lg: 7 },
+                        pb: { xs: 4, md: 0 },
                         px: { xs: 2, sm: 3, md: 5, lg: 6 },
                         scrollMarginTop: { xs: '65px', md: '75px' },
                         overflow: 'hidden',
                     }}
                 >
-                    <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+                    {/* Capa de Fondo (Wallpaper Completo): Fotografía Widescreen de la Fachada CAPSUR */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            zIndex: 0,
+                            pointerEvents: 'none',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {/* Imagen de la Fachada Institucional Widescreen en Alta Resolución */}
+                        <Box
+                            component="img"
+                            src="/images/fachada-capsur.jpeg"
+                            alt="Fachada Institucional Sede Central Grupo CAPSUR"
+                            sx={{
+                                position: 'absolute',
+                                top:0,
+                                right:0,
+                                width: '70%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                objectPosition: {
+                                    xs: 'center 15%',
+                                    sm: 'center 18%',
+                                    md: 'center 20%',
+                                    lg: 'center 20%',
+                                },
+                            }}
+                        />
+
+                        {/* Sombreado Direccional Idéntico al Diseño Objetivo:
+                            Oscuro a la izquierda para contraste tipográfico cristalino,
+                            translúcido y luminoso en el centro y derecha para apreciar la palmera, el edificio y el cielo */}
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: {
+                                    xs: 'linear-gradient(180deg, rgba(6, 17, 38, 0.90) 0%, rgba(6, 17, 38, 0.65) 45%, rgba(6, 17, 38, 0.15) 100%)',
+                                    md: 'linear-gradient(90deg, rgba(6, 17, 38, 0.92) 0%, rgba(6, 17, 38, 0.82) 30%, rgba(6, 17, 38, 0.35) 54%, transparent 72%)',
+                                },
+                            }}
+                        />
+                    </Box>
+
+                    <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 2, md: 3 }, pb: 5, px: { xs: 2, sm: 3 } }}>
                         {/* Contenido Hero: Textual (Izquierda) + Composición Visual de Profesionales (Derecha) */}
-                        <Grid container spacing={{ xs: 4, lg: 4 }} sx={{ alignItems: 'center' }}>
-                            {/* Columna Izquierda: Copywriting y CTAs */}
-                            <Grid size={{ xs: 12, md: 6, lg: 5.5 }}>
-                                <Box sx={{ maxWidth: 580 }}>
-                                    {/* Pill Badge Superior: TU FUTURO COMIENZA AQUÍ */}
-                                    <Box
-                                        sx={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 1.2,
-                                            px: 1.8,
-                                            py: 0.7,
-                                            borderRadius: 99,
-                                            bgcolor: '#ffffff',
-                                            border: '1px solid #dbeafe',
-                                            boxShadow: '0 2px 8px rgba(0, 86, 214, 0.06)',
-                                            mb: 3,
-                                        }}
-                                    >
+                        <Grid container spacing={{ xs: 4, lg: 5 }} sx={{ alignItems: { xs: 'center', md: 'flex-end' } }}>
+                            {/* Columna Izquierda: Información Institucional, Copywriting, CTAs */}
+                            <Grid size={{ xs: 12, md: 6, lg: 6 }}>
+                                <Box sx={{ maxWidth: 600, pb: { xs: 2, md: 5, lg: 6 } }}>
+                                    {/* Eyebrow / Distintivo Institucional Stately */}
+                                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.4, mb: 2.8, flexWrap: 'wrap' }}>
                                         <Box
                                             sx={{
-                                                width: 8,
-                                                height: 8,
-                                                borderRadius: 99,
-                                                bgcolor: '#0056d6',
-                                            }}
-                                        />
-                                        <Typography
-                                            sx={{
-                                                fontSize: { xs: '0.72rem', sm: '0.78rem' },
-                                                fontWeight: 800,
-                                                letterSpacing: '0.08em',
-                                                textTransform: 'uppercase',
-                                                color: '#1e293b',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                px: 1.8,
+                                                py: 0.65,
+                                                borderRadius: '6px',
+                                                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                                                backdropFilter: 'blur(12px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.18)',
                                             }}
                                         >
-                                            Tu futuro comienza aquí
+                                            <WorkspacePremiumIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '0.72rem',
+                                                    fontWeight: 700,
+                                                    letterSpacing: '0.12em',
+                                                    textTransform: 'uppercase',
+                                                    color: '#ffffff',
+                                                }}
+                                            >
+                                                Corporación Educativa CAPSUR
+                                            </Typography>
+                                        </Box>
+                                        <Typography
+                                            sx={{
+                                                fontSize: '0.74rem',
+                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                fontWeight: 500,
+                                                letterSpacing: '0.04em',
+                                                display: { xs: 'none', sm: 'inline-block' },
+                                            }}
+                                        >
+                                            • Sede Central Institucional
                                         </Typography>
                                     </Box>
 
-                                    {/* Título Principal */}
+                                    {/* Título Principal Ejecutivo Idéntico al Objetivo */}
                                     <Typography
                                         component="h1"
                                         sx={{
-                                            fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem', lg: '4.75rem' },
+                                            fontSize: { xs: '2.5rem', sm: '3.2rem', md: '3.8rem', lg: '4.2rem' },
                                             fontWeight: 800,
-                                            lineHeight: 1.05,
-                                            letterSpacing: '-0.035em',
-                                            color: '#09152a',
+                                            lineHeight: 1.1,
+                                            letterSpacing: '-0.025em',
+                                            color: '#ffffff',
                                             mb: 2.5,
+                                            textShadow: '0 2px 18px rgba(0, 0, 0, 0.6)',
                                         }}
                                     >
                                         Carreras que<br />
-                                        <Box component="span" sx={{ color: '#0056d6' }}>
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                color: '#38bdf8',
+                                                fontWeight: 800,
+                                            }}
+                                        >
                                             impulsan
                                         </Box>{' '}
                                         tu futuro
                                     </Typography>
 
-                                    {/* Bajada / Subtítulo */}
+                                    {/* Bajada / Subtítulo Institucional Articulado */}
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: '0.98rem', sm: '1.05rem', md: '1.1rem' },
-                                            color: '#64748b',
-                                            lineHeight: 1.6,
+                                            fontSize: { xs: '0.98rem', sm: '1.05rem', md: '1.08rem' },
+                                            color: 'rgba(255, 255, 255, 0.85)',
+                                            lineHeight: 1.7,
                                             fontWeight: 400,
-                                            maxWidth: 520,
+                                            maxWidth: 530,
                                             mb: 4,
+                                            textShadow: '0 1px 6px rgba(0, 0, 0, 0.5)',
                                         }}
                                     >
-                                        Formación práctica y actualizada para que desarrolles tu talento y te conviertas en un profesional preparado para el mundo real a través de nuestras prestigiosas instituciones.
+                                        Formación técnica y superior con enfoque práctico e inserción laboral inmediata. Desarrolla competencias para liderar en el mundo productivo a través de nuestras prestigiosas instituciones en el sur del país.
                                     </Typography>
 
-                                    {/* Grupo de Acciones / CTAs duales */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2.5 }}>
-                                        {/* Botón Principal Azul Oscuro con Píldora de Flecha Circular */}
+                                    {/* Grupo de Acciones / CTAs Ejecutivos */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                                        {/* Botón Principal Corporativo */}
                                         <Button
                                             variant="contained"
                                             onClick={() => handleNavClick('marcas')}
+                                            endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
                                             sx={{
-                                                bgcolor: '#0a2240',
+                                                bgcolor: '#0056d6',
                                                 color: '#ffffff',
-                                                pl: { xs: 3, sm: 3.5 },
-                                                pr: 1,
-                                                py: 0.9,
-                                                borderRadius: 99,
+                                                px: 3.5,
+                                                py: 1.3,
+                                                borderRadius: '8px',
                                                 fontWeight: 700,
-                                                fontSize: '0.94rem',
+                                                fontSize: '0.92rem',
+                                                letterSpacing: '0.01em',
                                                 textTransform: 'none',
-                                                boxShadow: '0 8px 24px rgba(10, 34, 64, 0.25)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1.8,
-                                                transition: 'all 0.22s ease',
+                                                boxShadow: '0 4px 18px rgba(0, 86, 214, 0.4)',
+                                                transition: 'all 0.2s ease',
                                                 '&:hover': {
-                                                    bgcolor: '#06162c',
+                                                    bgcolor: '#0043a8',
                                                     transform: 'translateY(-2px)',
-                                                    boxShadow: '0 12px 30px rgba(10, 34, 64, 0.35)',
+                                                    boxShadow: '0 8px 24px rgba(0, 86, 214, 0.55)',
                                                 },
                                             }}
                                         >
-                                            Conoce nuestras carreras
-                                            <Box
-                                                sx={{
-                                                    width: 38,
-                                                    height: 38,
-                                                    borderRadius: 99,
-                                                    bgcolor: '#ffffff',
-                                                    color: '#0a2240',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    transition: 'transform 0.2s ease',
-                                                    '&:hover': {
-                                                        transform: 'translateX(2px)',
-                                                    },
-                                                }}
-                                            >
-                                                <ArrowForwardIcon sx={{ fontSize: 18, color: '#0a2240' }} />
-                                            </Box>
+                                            Explorar Carreras
                                         </Button>
 
-                                        {/* Botón Secundario: Play circular + Conoce más sobre Grupo CAPSUR */}
-                                        <Box
-                                            component="button"
+                                        {/* Botón Secundario Outline Glassmorphism */}
+                                        <Button
+                                            variant="outlined"
                                             onClick={() => handleNavClick('nosotros')}
+                                            startIcon={<PlayArrowIcon sx={{ fontSize: 19 }} />}
                                             sx={{
-                                                background: 'none',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1.5,
-                                                p: 0.5,
-                                                transition: 'opacity 0.2s ease',
+                                                borderColor: 'rgba(255, 255, 255, 0.28)',
+                                                color: '#ffffff',
+                                                bgcolor: 'rgba(255, 255, 255, 0.06)',
+                                                backdropFilter: 'blur(10px)',
+                                                px: 2.8,
+                                                py: 1.3,
+                                                borderRadius: '8px',
+                                                fontWeight: 600,
+                                                fontSize: '0.92rem',
+                                                textTransform: 'none',
+                                                transition: 'all 0.2s ease',
                                                 '&:hover': {
-                                                    opacity: 0.85,
+                                                    borderColor: 'rgba(255, 255, 255, 0.6)',
+                                                    bgcolor: 'rgba(255, 255, 255, 0.12)',
+                                                    transform: 'translateY(-2px)',
                                                 },
                                             }}
                                         >
-                                            <Box
-                                                sx={{
-                                                    width: 48,
-                                                    height: 48,
-                                                    borderRadius: 99,
-                                                    bgcolor: '#ffffff',
-                                                    border: '1.5px solid #e2e8f0',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#0a2240',
-                                                    boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
-                                                    transition: 'all 0.2s ease',
-                                                }}
-                                            >
-                                                <PlayArrowIcon sx={{ fontSize: 22, color: '#0a2240', ml: '2px' }} />
-                                            </Box>
-                                            <Box sx={{ textAlign: 'left' }}>
-                                                <Typography sx={{ fontSize: '0.86rem', fontWeight: 600, color: '#334155', lineHeight: 1.25 }}>
-                                                    Conoce más sobre<br />
-                                                    <Box component="span" sx={{ fontWeight: 800, color: '#09152a' }}>Grupo CAPSUR</Box>
-                                                </Typography>
-                                            </Box>
-                                        </Box>
+                                            Conoce Grupo CAPSUR
+                                        </Button>
                                     </Box>
                                 </Box>
                             </Grid>
 
-                            {/* Columna Derecha: Montaje de los 5 Profesionales con Formas Orgánicas y Etiquetas Flotantes */}
-                            <Grid size={{ xs: 12, md: 6, lg: 6.5 }}>
+                            {/* Columna Derecha: Profesionales Asentados en la Base del Carrusel */}
+                            <Grid
+                                size={{ xs: 12, md: 6, lg: 6 }}
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'flex-end',
+                                    alignSelf: 'flex-end',
+                                    mt: { xs: 2, md: 0 },
+                                }}
+                            >
                                 <Box
                                     sx={{
                                         position: 'relative',
                                         width: '100%',
-                                        maxWidth: { xs: 460, sm: 540, md: 640 },
+                                        maxWidth: { xs: 460, sm: 540, md: 620, lg: 660 },
                                         mx: 'auto',
                                         display: 'flex',
-                                        justifyContent: 'center',
+                                        flexDirection: 'column',
+                                        justifyContent: 'flex-end',
                                         alignItems: 'center',
+                                        mb: 0,
                                     }}
                                 >
-                                    {/* Contenedor con Forma Orgánica Azul Hielo de Fondo */}
+                                    {/* Badge Flotante "Educación Superior" (Diseño Objetivo) */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            top: { xs: '6%', md: '4%' },
-                                            left: { xs: '2%', md: '6%' },
-                                            right: { xs: '2%', md: '0%' },
-                                            bottom: { xs: '4%', md: '2%' },
-                                            bgcolor: '#dbeafe',
-                                            borderRadius: { xs: '36px', sm: '50px', md: '56px 64px 64px 120px' },
-                                            overflow: 'hidden',
-                                            zIndex: 0,
-                                        }}
-                                    >
-                                        {/* Imagen arquitectónica del campus sutilmente difuminada en el fondo */}
-                                        <Box
-                                            component="img"
-                                            src="/images/campus-backdrop.jpg"
-                                            alt="Campus universitario"
-                                            sx={{
-                                                position: 'absolute',
-                                                inset: 0,
-                                                width: '100%',
-                                                height: '100%',
-                                                objectFit: 'cover',
-                                                opacity: 0.35,
-                                                filter: 'saturate(0.9)',
-                                            }}
-                                        />
-                                        {/* Gradiente suave sobre el fondo */}
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                inset: 0,
-                                                background: 'linear-gradient(135deg, rgba(219, 234, 254, 0.75) 0%, rgba(240, 247, 255, 0.4) 100%)',
-                                            }}
-                                        />
-                                    </Box>
-
-                                    {/* Tarjeta Flotante Superior Derecha: "Profesionales para un mundo sin límites" */}
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '2%', md: '4%' },
-                                            right: { xs: '0%', md: '-2%' },
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(10px)',
-                                            borderRadius: '16px',
-                                            py: 1.2,
-                                            px: 1.6,
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 4,
-                                            display: 'flex',
+                                            top: { xs: -8, sm: -14, md: -20, lg: -28 },
+                                            right: { xs: 0, md: 8, lg: 16 },
+                                            zIndex: 5,
+                                            display: { xs: 'none', sm: 'flex' },
                                             alignItems: 'center',
                                             gap: 1.4,
-                                            maxWidth: { xs: 200, sm: 220 },
+                                            px: 2,
+                                            py: 1.1,
+                                            borderRadius: '12px',
+                                            bgcolor: 'rgba(8, 24, 52, 0.88)',
+                                            backdropFilter: 'blur(12px)',
+                                            border: '1px solid rgba(255, 255, 255, 0.16)',
+                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
                                         }}
                                     >
-                                        <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: '#09152a', lineHeight: 1.2 }}>
-                                                Profesionales
-                                            </Typography>
-                                            <Typography sx={{ fontSize: '0.7rem', color: '#64748b', lineHeight: 1.2 }}>
-                                                para un mundo sin límites
-                                            </Typography>
-                                        </Box>
                                         <Box
                                             sx={{
-                                                width: 28,
-                                                height: 28,
-                                                borderRadius: 99,
-                                                bgcolor: '#e0f2fe',
-                                                color: '#0284c7',
+                                                width: 36,
+                                                height: 36,
+                                                borderRadius: '8px',
+                                                bgcolor: '#0056d6',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
+                                                color: '#ffffff',
                                                 flexShrink: 0,
                                             }}
                                         >
-                                            <NorthEastIcon sx={{ fontSize: 16 }} />
+                                            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography
+                                                sx={{
+                                                    color: '#ffffff',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.86rem',
+                                                    lineHeight: 1.2,
+                                                }}
+                                            >
+                                                Educación Superior
+                                            </Typography>
+                                            <Typography
+                                                sx={{
+                                                    color: 'rgba(255, 255, 255, 0.72)',
+                                                    fontSize: '0.72rem',
+                                                    lineHeight: 1.2,
+                                                    mt: 0.3,
+                                                }}
+                                            >
+                                                Validez oficial y alta demanda laboral
+                                            </Typography>
                                         </Box>
                                     </Box>
 
-                                    {/* Fotografía Central de los 5 Profesionales */}
+                                    {/* Fotografía Central de los 3 Profesionales asentada firmemente sobre el carrusel */}
                                     <Box
                                         component="img"
-                                        src="./hero-capsur.png"
+                                        src="/images/profesionales.png"
                                         alt="Profesionales y técnicos de Grupo CAPSUR"
                                         sx={{
                                             position: 'relative',
@@ -902,175 +910,10 @@ export default function Welcome({
                                             width: '100%',
                                             height: 'auto',
                                             display: 'block',
-                                            filter: 'drop-shadow(0 14px 28px rgba(0, 40, 120, 0.16))',
+                                            verticalAlign: 'bottom',
+                                            filter: 'drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45))',
                                         }}
                                     />
-
-                                    {/* Etiquetas Flotantes en Cada Profesional */}
-                                    {/* 1. Turismo */}
-                                    <Box
-                                        onClick={() => handleCareerClick('turismo')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '52%', sm: '54%' },
-                                            left: { xs: '20%', sm: '21%' },
-                                            transform: 'translateX(-50%)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(8px)',
-                                            borderRadius: 99,
-                                            py: 0.6,
-                                            px: { xs: 1.2, sm: 1.6 },
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 3,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.8,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
-                                            },
-                                        }}
-                                    >
-                                        <FlightIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
-                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
-                                            Turismo
-                                        </Typography>
-                                    </Box>
-
-                                    {/* 2. Docencia */}
-                                    <Box
-                                        onClick={() => handleCareerClick('educacion')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '42%', sm: '44%' },
-                                            left: { xs: '36%', sm: '37%' },
-                                            transform: 'translateX(-50%)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(8px)',
-                                            borderRadius: 99,
-                                            py: 0.6,
-                                            px: { xs: 1.2, sm: 1.6 },
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 3,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.8,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
-                                            },
-                                        }}
-                                    >
-                                        <SchoolIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0a2240' }} />
-                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
-                                            Docencia
-                                        </Typography>
-                                    </Box>
-
-                                    {/* 3. Minería */}
-                                    <Box
-                                        onClick={() => handleCareerClick('mineria')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '58%', sm: '60%' },
-                                            left: { xs: '51%', sm: '48%' },
-                                            transform: 'translateX(-50%)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(8px)',
-                                            borderRadius: 99,
-                                            py: 0.6,
-                                            px: { xs: 1.2, sm: 1.6 },
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 3,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.8,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
-                                            },
-                                        }}
-                                    >
-                                        <EngineeringIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
-                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
-                                            Minería
-                                        </Typography>
-                                    </Box>
-
-                                    {/* 4. Secretaria */}
-                                    <Box
-                                        onClick={() => handleCareerClick('administracion')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '62%', sm: '64%' },
-                                            left: { xs: '65%', sm: '66%' },
-                                            transform: 'translateX(-50%)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(8px)',
-                                            borderRadius: 99,
-                                            py: 0.6,
-                                            px: { xs: 1.2, sm: 1.6 },
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 3,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.8,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
-                                            },
-                                        }}
-                                    >
-                                        <DescriptionIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
-                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
-                                            Secretaria
-                                        </Typography>
-                                    </Box>
-
-                                    {/* 5. Informática */}
-                                    <Box
-                                        onClick={() => handleCareerClick('computacion')}
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: '71%', sm: '73%' },
-                                            left: { xs: '82%', sm: '83%' },
-                                            transform: 'translateX(-50%)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(8px)',
-                                            borderRadius: 99,
-                                            py: 0.6,
-                                            px: { xs: 1.2, sm: 1.6 },
-                                            boxShadow: '0 8px 24px rgba(10, 30, 80, 0.12)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            zIndex: 3,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.8,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateX(-50%) translateY(-2px) scale(1.04)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.2)',
-                                            },
-                                        }}
-                                    >
-                                        <LaptopMacIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: '#0056d6' }} />
-                                        <Typography sx={{ fontSize: { xs: '0.74rem', sm: '0.84rem' }, fontWeight: 700, color: '#09152a' }}>
-                                            Informática
-                                        </Typography>
-                                    </Box>
                                 </Box>
                             </Grid>
                         </Grid>
@@ -1087,7 +930,7 @@ export default function Welcome({
                         width: 'calc(100% - 32px)',
                         mx: 'auto',
                         mt: { xs: -3.5, md: -5 },
-                        mb: { xs: 7, md: 10 },
+                        mb: { xs: 1.5, md: 2 },
                         px: { xs: 1.5, sm: 2.5 },
                         py: 1.4,
                         bgcolor: '#ffffff',
@@ -1223,16 +1066,16 @@ export default function Welcome({
                 <Box
                     id="marcas"
                     sx={{
-                        py: { xs: 6, md: 9 },
+                        pt: { xs: 1.5, md: 2 },
+                        pb: { xs: 6, md: 9 },
                         bgcolor: '#fafcff',
-                        borderTop: '1px solid #eef2f6',
                         borderBottom: '1px solid #eef2f6',
                         scrollMarginTop: { xs: '65px', md: '75px' },
                     }}
                 >
                     <Container maxWidth="xl">
                         {/* Cabecera de la sección */}
-                        <Box sx={{ textAlign: 'center', maxWidth: 750, mx: 'auto', mb: { xs: 4, md: 6 } }}>
+                        <Box sx={{ textAlign: 'center', maxWidth: 750, mx: 'auto', mb: { xs: 2.5, md: 3.5 } }}>
                             <Chip
                                 label="PORTAFOLIO OFICIAL"
                                 size="small"
