@@ -894,7 +894,7 @@ export default function Welcome({
                                     {/* Fotografía Central de los 5 Profesionales */}
                                     <Box
                                         component="img"
-                                        src="/images/hero-capsur.png"
+                                        src="./hero-capsur.png"
                                         alt="Profesionales y técnicos de Grupo CAPSUR"
                                         sx={{
                                             position: 'relative',
@@ -979,7 +979,7 @@ export default function Welcome({
                                         sx={{
                                             position: 'absolute',
                                             top: { xs: '58%', sm: '60%' },
-                                            left: { xs: '51%', sm: '52%' },
+                                            left: { xs: '51%', sm: '48%' },
                                             transform: 'translateX(-50%)',
                                             bgcolor: 'rgba(255, 255, 255, 0.95)',
                                             backdropFilter: 'blur(8px)',

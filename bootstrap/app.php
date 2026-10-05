@@ -29,8 +29,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->create();
-    
 
-$app->useEnvironmentPath('/home/corporacioncapsu/environment');
+    $app->useEnvironmentPath('/home/corporacioncapsu/environment');
 
 return $app;
