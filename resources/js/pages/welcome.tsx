@@ -1,10 +1,13 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import BusinessIcon from '@mui/icons-material/Business';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ClearIcon from '@mui/icons-material/Clear';
 import DescriptionIcon from '@mui/icons-material/Description';
+import DirectionsIcon from '@mui/icons-material/Directions';
+import EmailIcon from '@mui/icons-material/Email';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import FlightIcon from '@mui/icons-material/Flight';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
@@ -12,13 +15,16 @@ import LanguageIcon from '@mui/icons-material/Language';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import PhoneIcon from '@mui/icons-material/Phone';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import {
     Avatar,
@@ -123,6 +129,79 @@ const NAV_ITEMS = [
     { id: 'beneficios', label: 'Beneficios' },
     { id: 'contacto', label: 'Contacto' },
 ];
+
+
+// Encabezado institucional unificado para todas las secciones de contenido.
+// El hero mantiene su propio lenguaje visual y no utiliza este componente.
+const SectionHeader = ({
+    eyebrow,
+    title,
+    description,
+}: {
+    eyebrow: string;
+    title: string;
+    description: string;
+}) => (
+    <Box
+        sx={{
+            textAlign: 'center',
+            maxWidth: 900,
+            mx: 'auto',
+            mb: { xs: 4.5, md: 6 },
+        }}
+    >
+        <Box
+            sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1.25,
+                mb: 1.75,
+                color: '#0056d6',
+            }}
+        >
+            <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+            <Typography
+                component="span"
+                sx={{
+                    fontSize: { xs: '0.68rem', md: '0.72rem' },
+                    fontWeight: 800,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: '#0056d6',
+                    lineHeight: 1,
+                }}
+            >
+                {eyebrow}
+            </Typography>
+            <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+        </Box>
+        <Typography
+            component="h2"
+            sx={{
+                fontSize: { xs: '2rem', sm: '2.45rem', md: '3rem' },
+                fontWeight: 850,
+                color: '#09152a',
+                letterSpacing: '-0.035em',
+                lineHeight: 1.08,
+                mb: 1.6,
+            }}
+        >
+            {title}
+        </Typography>
+        <Typography
+            sx={{
+                color: '#64748b',
+                fontSize: { xs: '0.98rem', md: '1.06rem' },
+                lineHeight: 1.65,
+                maxWidth: 820,
+                mx: 'auto',
+            }}
+        >
+            {description}
+        </Typography>
+    </Box>
+);
 
 export default function Welcome({
     grupos = [],
@@ -634,37 +713,55 @@ export default function Welcome({
                             overflow: 'hidden',
                         }}
                     >
-                        {/* Imagen de la Fachada Institucional Widescreen en Alta Resolución */}
+                        {/* Contenedor de la Imagen con Difuminado Progresivo */}
                         <Box
-                            component="img"
-                            src="/images/fachada-capsur.jpeg"
-                            alt="Fachada Institucional Sede Central Grupo CAPSUR"
                             sx={{
                                 position: 'absolute',
-                                top:0,
-                                right:0,
-                                width: '70%',
+                                top: 0,
+                                right: 0,
+                                width: { xs: '100%', md: '75%', lg: '70%' },
                                 height: '100%',
-                                objectFit: 'cover',
-                                objectPosition: {
-                                    xs: 'center 15%',
-                                    sm: 'center 18%',
-                                    md: 'center 20%',
-                                    lg: 'center 20%',
-                                },
                             }}
-                        />
+                        >
+                            <Box
+                                component="img"
+                                src="/images/fachada-capsur.jpeg"
+                                alt="Fachada Institucional Sede Central Grupo CAPSUR"
+                                sx={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    objectPosition: {
+                                        xs: 'center 15%',
+                                        sm: 'center 18%',
+                                        md: 'center 20%',
+                                        lg: 'center 20%',
+                                    },
+                                }}
+                            />
 
-                        {/* Sombreado Direccional Idéntico al Diseño Objetivo:
-                            Oscuro a la izquierda para contraste tipográfico cristalino,
-                            translúcido y luminoso en el centro y derecha para apreciar la palmera, el edificio y el cielo */}
+                            {/* Difuminado directo sobre el borde izquierdo de la foto:
+                                Inicia en #08142a 100% sólido para fundirse de forma invisible con el fondo */}
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    background: {
+                                        xs: 'none',
+                                        md: 'linear-gradient(to right, #08142a 0%, rgba(8, 20, 42, 0.92) 8%, rgba(8, 20, 42, 0.62) 20%, rgba(8, 20, 42, 0.28) 36%, rgba(8, 20, 42, 0.08) 50%, transparent 64%)',
+                                    },
+                                }}
+                            />
+                        </Box>
+
+                        {/* Sombreado Direccional General: Asegura contraste legible para textos y botones */}
                         <Box
                             sx={{
                                 position: 'absolute',
                                 inset: 0,
                                 background: {
-                                    xs: 'linear-gradient(180deg, rgba(6, 17, 38, 0.90) 0%, rgba(6, 17, 38, 0.65) 45%, rgba(6, 17, 38, 0.15) 100%)',
-                                    md: 'linear-gradient(90deg, rgba(6, 17, 38, 0.92) 0%, rgba(6, 17, 38, 0.82) 30%, rgba(6, 17, 38, 0.35) 54%, transparent 72%)',
+                                    xs: 'linear-gradient(180deg, rgba(8, 20, 42, 0.95) 0%, rgba(8, 20, 42, 0.75) 45%, rgba(8, 20, 42, 0.20) 100%)',
+                                    md: 'linear-gradient(90deg, #08142a 0%, #08142a 18%, rgba(8, 20, 42, 0.90) 28%, rgba(8, 20, 42, 0.62) 38%, rgba(8, 20, 42, 0.28) 49%, rgba(8, 20, 42, 0.08) 60%, transparent 72%)',
                                 },
                             }}
                         />
@@ -841,64 +938,7 @@ export default function Welcome({
                                         mb: 0,
                                     }}
                                 >
-                                    {/* Badge Flotante "Educación Superior" (Diseño Objetivo) */}
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            top: { xs: -8, sm: -14, md: -20, lg: -28 },
-                                            right: { xs: 0, md: 8, lg: 16 },
-                                            zIndex: 5,
-                                            display: { xs: 'none', sm: 'flex' },
-                                            alignItems: 'center',
-                                            gap: 1.4,
-                                            px: 2,
-                                            py: 1.1,
-                                            borderRadius: '12px',
-                                            bgcolor: 'rgba(8, 24, 52, 0.88)',
-                                            backdropFilter: 'blur(12px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.16)',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
-                                        }}
-                                    >
-                                        <Box
-                                            sx={{
-                                                width: 36,
-                                                height: 36,
-                                                borderRadius: '8px',
-                                                bgcolor: '#0056d6',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: '#ffffff',
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
-                                        </Box>
-                                        <Box>
-                                            <Typography
-                                                sx={{
-                                                    color: '#ffffff',
-                                                    fontWeight: 700,
-                                                    fontSize: '0.86rem',
-                                                    lineHeight: 1.2,
-                                                }}
-                                            >
-                                                Educación Superior
-                                            </Typography>
-                                            <Typography
-                                                sx={{
-                                                    color: 'rgba(255, 255, 255, 0.72)',
-                                                    fontSize: '0.72rem',
-                                                    lineHeight: 1.2,
-                                                    mt: 0.3,
-                                                }}
-                                            >
-                                                Validez oficial y alta demanda laboral
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-
+                                    
                                     {/* Fotografía Central de los 3 Profesionales asentada firmemente sobre el carrusel */}
                                     <Box
                                         component="img"
@@ -1073,39 +1113,12 @@ export default function Welcome({
                         scrollMarginTop: { xs: '65px', md: '75px' },
                     }}
                 >
-                    <Container maxWidth="xl">
-                        {/* Cabecera de la sección */}
-                        <Box sx={{ textAlign: 'center', maxWidth: 750, mx: 'auto', mb: { xs: 2.5, md: 3.5 } }}>
-                            <Chip
-                                label="PORTAFOLIO OFICIAL"
-                                size="small"
-                                sx={{
-                                    bgcolor: 'rgba(0, 86, 214, 0.08)',
-                                    color: '#0056d6',
-                                    fontWeight: 800,
-                                    fontSize: '0.72rem',
-                                    letterSpacing: '0.08em',
-                                    borderRadius: 99,
-                                    mb: 1.5,
-                                }}
-                            />
-                            <Typography
-                                variant="h3"
-                                component="h2"
-                                sx={{
-                                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                                    fontWeight: 900,
-                                    color: '#09152a',
-                                    letterSpacing: '-0.025em',
-                                    mb: 1.5,
-                                }}
-                            >
-                                Nuestras Marcas e Instituciones
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.05rem', lineHeight: 1.6 }}>
-                                Explora cada una de nuestras instituciones acreditadas, resoluciones oficiales MINEDU, carreras profesionales y plataformas de formación.
-                            </Typography>
-                        </Box>
+                    <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
+                        <SectionHeader
+                            eyebrow="Portafolio oficial"
+                            title="Nuestras Marcas e Instituciones"
+                            description="Explora cada una de nuestras instituciones acreditadas, resoluciones oficiales MINEDU, carreras profesionales y plataformas de formación."
+                        />
 
                         {/* Barra de Búsqueda y Filtros de Grupo */}
                         <Box
@@ -1480,35 +1493,14 @@ export default function Welcome({
 
                 {/* 5. Sección: Sobre Grupo CAPSUR y Capacitaciones Drive */}
                 <Box id="nosotros" sx={{ py: { xs: 7, md: 10 }, bgcolor: '#ffffff', scrollMarginTop: { xs: '65px', md: '75px' } }}>
-                    <Container maxWidth="xl">
+                    <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
+                        <SectionHeader
+                            eyebrow="Sobre nosotros"
+                            title="Impulsando el talento con excelencia y cobertura nacional"
+                            description="Una sólida red de instituciones y programas de formación orientados al desarrollo profesional y a las necesidades del mundo laboral."
+                        />
                         <Grid container spacing={5} sx={{ alignItems: 'center' }}>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <Chip
-                                    label="SOBRE NOSOTROS"
-                                    size="small"
-                                    sx={{
-                                        bgcolor: 'rgba(0, 86, 214, 0.08)',
-                                        color: '#0056d6',
-                                        fontWeight: 800,
-                                        fontSize: '0.72rem',
-                                        letterSpacing: '0.08em',
-                                        borderRadius: 99,
-                                        mb: 1.5,
-                                    }}
-                                />
-                                <Typography
-                                    variant="h3"
-                                    sx={{
-                                        fontSize: { xs: '2rem', md: '2.8rem' },
-                                        fontWeight: 900,
-                                        color: '#09152a',
-                                        letterSpacing: '-0.025em',
-                                        lineHeight: 1.15,
-                                        mb: 2.5,
-                                    }}
-                                >
-                                    Impulsando el talento con excelencia y cobertura nacional
-                                </Typography>
                                 <Typography sx={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 3 }}>
                                     Grupo CAPSUR es una corporación dedicada a transformar el futuro de jóvenes y profesionales a través de una sólida red de institutos superiores, centros de capacitación continua y programas especializados adaptados a la demanda del mercado real.
                                 </Typography>
@@ -1644,37 +1636,12 @@ export default function Welcome({
 
                 {/* 6. Sección: Beneficios de Formarse en Grupo CAPSUR */}
                 <Box id="beneficios" sx={{ py: { xs: 7, md: 10 }, bgcolor: '#f8fbff', borderTop: '1px solid #eef2f6', scrollMarginTop: { xs: '65px', md: '75px' } }}>
-                    <Container maxWidth="xl">
-                        <Box sx={{ textAlign: 'center', maxWidth: 700, mx: 'auto', mb: { xs: 5, md: 7 } }}>
-                            <Chip
-                                label="VENTAJAS Y GARANTÍAS"
-                                size="small"
-                                sx={{
-                                    bgcolor: 'rgba(0, 86, 214, 0.08)',
-                                    color: '#0056d6',
-                                    fontWeight: 800,
-                                    fontSize: '0.72rem',
-                                    letterSpacing: '0.08em',
-                                    borderRadius: 99,
-                                    mb: 1.5,
-                                }}
-                            />
-                            <Typography
-                                variant="h3"
-                                sx={{
-                                    fontSize: { xs: '2rem', md: '2.8rem' },
-                                    fontWeight: 900,
-                                    color: '#09152a',
-                                    letterSpacing: '-0.025em',
-                                    mb: 1.5,
-                                }}
-                            >
-                                Beneficios que potencian tu carrera
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.05rem', lineHeight: 1.6 }}>
-                                Diseñamos cada experiencia formativa combinando legalidad, práctica profesional e innovación tecnológica.
-                            </Typography>
-                        </Box>
+                    <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
+                        <SectionHeader
+                            eyebrow="Ventajas y garantías"
+                            title="Beneficios que potencian tu carrera"
+                            description="Diseñamos cada experiencia formativa combinando respaldo institucional, práctica profesional e innovación tecnológica."
+                        />
 
                         <Grid container spacing={3.5}>
                             {[
@@ -1730,8 +1697,331 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 7. Sección Contacto & Footer */}
-                <Box id="contacto" sx={{ py: 6, bgcolor: '#09152a', color: '#ffffff', mt: 'auto', scrollMarginTop: { xs: '65px', md: '75px' } }}>
+               
+                {/* 7. Sección Contacto - Diseño editorial institucional */}
+                <Box
+                    id="contacto"
+                    sx={{
+                        py: { xs: 7, md: 10 },
+                        bgcolor: '#f7f9fc',
+                        borderTop: '1px solid #e6ebf2',
+                        scrollMarginTop: { xs: '65px', md: '75px' },
+                    }}
+                >
+                    <Container
+                        maxWidth={false}
+                        sx={{
+                            width: '100%',
+                            px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 },
+                        }}
+                    >
+                        {/* Cabecera compacta de contacto */}
+                        <Box sx={{ mb: { xs: 4, md: 5 }, maxWidth: 760 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
+                                <Box sx={{ width: 34, height: 2, bgcolor: '#0056d6' }} />
+                                <Typography
+                                    sx={{
+                                        color: '#0056d6',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 800,
+                                        letterSpacing: '0.16em',
+                                        textTransform: 'uppercase',
+                                    }}
+                                >
+                                    Contacto institucional
+                                </Typography>
+                            </Box>
+                            <Typography
+                                component="h2"
+                                sx={{
+                                    color: '#09152a',
+                                    fontSize: { xs: '2rem', sm: '2.6rem', md: '3.15rem' },
+                                    fontWeight: 850,
+                                    letterSpacing: '-0.035em',
+                                    lineHeight: 1.08,
+                                    mb: 1.4,
+                                }}
+                            >
+                                Estamos aquí para atenderte
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    color: '#64748b',
+                                    fontSize: { xs: '0.98rem', md: '1.05rem' },
+                                    lineHeight: 1.7,
+                                    maxWidth: 700,
+                                }}
+                            >
+                                Encuentra nuestra sede central y nuestros canales oficiales para recibir orientación sobre admisiones, programas académicos, certificaciones y servicios corporativos.
+                            </Typography>
+                        </Box>
+
+                        {/* Composición principal: imagen izquierda + información derecha */}
+                        <Grid container spacing={{ xs: 3, md: 4 }} sx={{ alignItems: 'stretch', mb: { xs: 4, md: 5 } }}>
+                            <Grid size={{ xs: 12, lg: 6 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        position: 'relative',
+                                        height: { xs: 300, sm: 380, lg: 470 },
+                                        overflow: 'hidden',
+                                        borderRadius: '2px',
+                                        bgcolor: '#0b4fae',
+                                        border: '1px solid #dbe4ef',
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src="/images/fachada-capsur.jpeg"
+                                        alt="Sede central Grupo CAPSUR"
+                                        sx={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            objectPosition: 'center',
+                                            display: 'block',
+                                            filter: 'saturate(0.92) contrast(1.02)',
+                                        }}
+                                    />
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            background: 'linear-gradient(135deg, rgba(0, 45, 105, 0.82) 0%, rgba(0, 86, 214, 0.25) 48%, rgba(0, 25, 65, 0.05) 100%)',
+                                        }}
+                                    />
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            left: { xs: 24, md: 36 },
+                                            bottom: { xs: 24, md: 32 },
+                                            color: '#fff',
+                                            maxWidth: 420,
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                fontSize: '0.7rem',
+                                                fontWeight: 800,
+                                                letterSpacing: '0.16em',
+                                                textTransform: 'uppercase',
+                                                opacity: 0.78,
+                                                mb: 1,
+                                            }}
+                                        >
+                                            Grupo CAPSUR
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontSize: { xs: '1.5rem', md: '2rem' },
+                                                fontWeight: 800,
+                                                lineHeight: 1.15,
+                                                letterSpacing: '-0.025em',
+                                            }}
+                                        >
+                                            Sede Central Institucional
+                                        </Typography>
+                                        <Box sx={{ width: 46, height: 3, bgcolor: '#38bdf8', mt: 2 }} />
+                                    </Box>
+                                </Paper>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, lg: 6 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        height: '100%',
+                                        minHeight: { xs: 300, sm: 380, lg: 470 },
+                                        bgcolor: '#ffffff',
+                                        border: '1px solid #dbe4ef',
+                                        borderRadius: '2px',
+                                        p: { xs: 3, sm: 4, md: 5 },
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            color: '#0056d6',
+                                            fontSize: '0.72rem',
+                                            fontWeight: 800,
+                                            letterSpacing: '0.14em',
+                                            textTransform: 'uppercase',
+                                            mb: 1.5,
+                                        }}
+                                    >
+                                        Canales oficiales
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
+                                            color: '#09152a',
+                                            fontSize: { xs: '1.6rem', md: '2.1rem' },
+                                            fontWeight: 800,
+                                            letterSpacing: '-0.025em',
+                                            lineHeight: 1.15,
+                                            mb: 3.5,
+                                        }}
+                                    >
+                                        Conecta con Grupo CAPSUR
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Box sx={{ pb: 2.4, borderBottom: '1px solid #e8edf3' }}>
+                                            <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
+                                                Sede central
+                                            </Typography>
+                                            <Typography sx={{ color: '#0f172a', fontWeight: 750, fontSize: '1rem', lineHeight: 1.4 }}>
+                                                Av. Coronel Justo Arias Aragüez N° 1111
+                                            </Typography>
+                                            <Typography sx={{ color: '#64748b', fontSize: '0.86rem', mt: 0.35 }}>
+                                                Tacna, Perú — Edificio Corporativo Grupo CAPSUR
+                                            </Typography>
+                                        </Box>
+
+                                        <Box sx={{ py: 2.4, borderBottom: '1px solid #e8edf3' }}>
+                                            <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
+                                                Atención e informes
+                                            </Typography>
+                                            <Typography sx={{ color: '#0f172a', fontWeight: 800, fontSize: '1.05rem' }}>
+                                                +51 963 147 270
+                                            </Typography>
+                                            <Typography sx={{ color: '#64748b', fontSize: '0.86rem', mt: 0.35 }}>
+                                                Matrículas, carreras y certificaciones técnicas
+                                            </Typography>
+                                        </Box>
+
+                                        <Grid container spacing={3} sx={{ pt: 2.4 }}>
+                                            <Grid size={{ xs: 12, sm: 7 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
+                                                    Correo institucional
+                                                </Typography>
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.9rem' }}>
+                                                    contacto@grupocapsur.edu.pe
+                                                </Typography>
+                                            </Grid>
+                                            <Grid size={{ xs: 12, sm: 5 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
+                                                    Horario
+                                                </Typography>
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.9rem' }}>
+                                                    Lun - Sáb · 8:00 AM – 7:00 PM
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 3.5 }}>
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<WhatsAppIcon sx={{ fontSize: 18 }} />}
+                                            href="https://wa.me/51963147270?text=Hola,%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20programas%20de%20Grupo%20CAPSUR"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            sx={{
+                                                bgcolor: '#0056d6',
+                                                color: '#fff',
+                                                px: 2.5,
+                                                py: 1.05,
+                                                borderRadius: '2px',
+                                                textTransform: 'none',
+                                                fontWeight: 750,
+                                                boxShadow: 'none',
+                                                '&:hover': { bgcolor: '#0043a8', boxShadow: 'none' },
+                                            }}
+                                        >
+                                            Escribir por WhatsApp
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            startIcon={<DirectionsIcon sx={{ fontSize: 18 }} />}
+                                            href="https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            sx={{
+                                                borderColor: '#cbd5e1',
+                                                color: '#0f172a',
+                                                px: 2.5,
+                                                py: 1.05,
+                                                borderRadius: '2px',
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                '&:hover': { borderColor: '#0056d6', bgcolor: '#f8fbff' },
+                                            }}
+                                        >
+                                            Cómo llegar
+                                        </Button>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        </Grid>
+
+                        {/* Mapa a ancho completo debajo de la composición principal */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                border: '1px solid #dbe4ef',
+                                borderRadius: '2px',
+                                overflow: 'hidden',
+                                bgcolor: '#ffffff',
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    px: { xs: 2.5, md: 3.5 },
+                                    py: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: 2,
+                                    flexWrap: 'wrap',
+                                    borderBottom: '1px solid #e8edf3',
+                                }}
+                            >
+                                <Box>
+                                    <Typography sx={{ color: '#09152a', fontWeight: 800, fontSize: '1rem' }}>
+                                        Ubicación de la sede central
+                                    </Typography>
+                                    <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.2 }}>
+                                        Av. Coronel Justo Arias Aragüez N° 1111, Tacna
+                                    </Typography>
+                                </Box>
+                                <Button
+                                    size="small"
+                                    endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
+                                    href="https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    sx={{
+                                        color: '#0056d6',
+                                        textTransform: 'none',
+                                        fontWeight: 750,
+                                    }}
+                                >
+                                    Abrir en Google Maps
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ position: 'relative', width: '100%', height: { xs: 300, sm: 380, md: 460 } }}>
+                                <iframe
+                                    title="Ubicación en Google Maps de Grupo CAPSUR"
+                                    src="https://maps.google.com/maps?q=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                />
+                            </Box>
+                        </Paper>
+                    </Container>
+                </Box>
+
+
+                {/* 8. Footer Corporativo */}
+                <Box sx={{ py: 6, bgcolor: '#08142a', color: '#ffffff', mt: 'auto', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                     <Container maxWidth="xl">
                         <Grid container spacing={4} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
                             <Grid size={{ xs: 12, md: 6 }}>
@@ -1744,7 +2034,7 @@ export default function Welcome({
                                     />
                                 </Box>
                                 <Typography variant="body2" sx={{ color: '#94a3b8', maxWidth: 480, lineHeight: 1.6 }}>
-                                    Corporación educativa e institucional comprometida con la formación de excelencia técnica, universitaria y profesional en el Perú.
+                                    Corporación educativa e institucional comprometida con la formación de excelencia técnica, superior y profesional en el sur del Perú.
                                 </Typography>
                             </Grid>
 
@@ -1762,7 +2052,7 @@ export default function Welcome({
                         </Grid>
                     </Container>
                 </Box>
-                            
+
                 {/* Ficha Modal de Consulta Detallada de Comercio */}
                 <ComercioDetailModal
                     open={detailModalOpen}
