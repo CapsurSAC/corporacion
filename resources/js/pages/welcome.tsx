@@ -239,64 +239,34 @@ export default function Welcome({
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGrupoId, setSelectedGrupoId] = useState<number | 'all'>('all');
 
-    // Bandera para evitar conflictos entre el scroll manual y el scroll spy
-    const isManualScrollingRef = useRef(false);
-    const scrollRafRef = useRef<number | null>(null);
-
-
-    // Cancelar animación de desplazamiento si el usuario interactúa manualmente con la rueda o pantalla
+    // Detección automática y de alto rendimiento de la sección activa mediante IntersectionObserver (cero reflows, 60/120 FPS)
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        const cancelProgrammedScroll = () => {
-            if (isManualScrollingRef.current && scrollRafRef.current) {
-                cancelAnimationFrame(scrollRafRef.current);
-                scrollRafRef.current = null;
-                isManualScrollingRef.current = false;
+        const sectionIds = ['inicio', 'marcas', 'directorio-marcas', 'nosotros', 'beneficios', 'contacto'];
+        const elements = sectionIds
+            .map((id) => document.getElementById(id))
+            .filter((el): el is HTMLElement => el !== null);
+
+        if (elements.length === 0) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const intersecting = entries.filter((e) => e.isIntersecting);
+                if (intersecting.length > 0) {
+                    const topSection = intersecting.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+                    const id = topSection.target.id;
+                    setActiveNav(id === 'directorio-marcas' ? 'marcas' : id);
+                }
+            },
+            {
+                rootMargin: '-15% 0px -50% 0px',
+                threshold: [0, 0.25, 0.5],
             }
-        };
+        );
 
-        window.addEventListener('wheel', cancelProgrammedScroll, { passive: true });
-        window.addEventListener('touchmove', cancelProgrammedScroll, { passive: true });
-        return () => {
-            window.removeEventListener('wheel', cancelProgrammedScroll);
-            window.removeEventListener('touchmove', cancelProgrammedScroll);
-        };
-    }, []);
-
-    // Detección automática de sección activa durante el scroll del usuario
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        let ticking = false;
-        const handleScroll = () => {
-            if (isManualScrollingRef.current) return;
-
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const scrollPos = (window.pageYOffset || document.documentElement.scrollTop) + 120;
-                    // Lista ordenada según la aparición en la página
-                    const sectionIds = ['inicio', 'marcas', 'directorio-marcas', 'nosotros', 'beneficios', 'contacto'];
-
-                    for (let i = sectionIds.length - 1; i >= 0; i--) {
-                        const id = sectionIds[i];
-                        const el = document.getElementById(id);
-                        if (el) {
-                            const top = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
-                            if (scrollPos >= top - 20) {
-                                setActiveNav(id === 'directorio-marcas' ? 'marcas' : id);
-                                break;
-                            }
-                        }
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
+        elements.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
     }, []);
 
     // Detección automática de ?login=1
@@ -399,69 +369,26 @@ export default function Welcome({
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
-    // Desplazamiento animado veloz y ultra fluido con desaceleración cinematográfica (ease-out cuártico)
-    const smoothScrollTo = (targetPosition: number, duration = 360) => {
-        if (typeof window === 'undefined') return;
-
-        // Cancelar animación anterior si el usuario hace clics rápidos consecutivos
-        if (scrollRafRef.current) {
-            cancelAnimationFrame(scrollRafRef.current);
-            scrollRafRef.current = null;
-        }
-
-        const startPosition = window.pageYOffset || document.documentElement.scrollTop;
-        const distance = targetPosition - startPosition;
-        if (Math.abs(distance) < 2) return;
-
-        isManualScrollingRef.current = true;
-        let startTime: number | null = null;
-
-        // Curva reactiva instantánea: acelera en el primer frame y desacelera suavemente como seda
-        const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
-
-        const step = (currentTime: number) => {
-            if (startTime === null) startTime = currentTime;
-            const timeElapsed = currentTime - startTime;
-            const progress = Math.min(timeElapsed / duration, 1);
-            const ease = easeOutQuart(progress);
-
-            window.scrollTo(0, Math.round(startPosition + distance * ease));
-
-            if (timeElapsed < duration) {
-                scrollRafRef.current = requestAnimationFrame(step);
-            } else {
-                scrollRafRef.current = null;
-                window.scrollTo(0, targetPosition);
-                setTimeout(() => {
-                    isManualScrollingRef.current = false;
-                }, 50);
-            }
-        };
-
-        scrollRafRef.current = requestAnimationFrame(step);
-    };
-
-    // Navegar y desplazarse suavemente a una sección
+    // Navegar y desplazarse suavemente a una sección (acelerado por hardware, no bloqueante)
     const handleNavClick = (sectionId: string) => {
-        setActiveNav(sectionId);
+        setActiveNav(sectionId === 'directorio-marcas' ? 'marcas' : sectionId);
 
         if (sectionId === 'inicio') {
-            smoothScrollTo(0, 300);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
         const element = document.getElementById(sectionId);
         if (element) {
             const header = document.querySelector('header');
-            const headerHeight = header ? header.offsetHeight : 70;
-            const elementTop = element.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
-            const targetOffset = Math.max(0, elementTop - headerHeight - 10);
+            const headerHeight = header ? header.offsetHeight : 65;
+            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+            const targetOffset = Math.max(0, Math.round(elementTop - headerHeight));
 
-            const distance = Math.abs(targetOffset - (window.pageYOffset || 0));
-            // Cálculo cinemático por raíz cuadrada: respuesta entre 260ms y 450ms según distancia
-            const duration = Math.min(450, Math.max(260, Math.round(Math.sqrt(distance) * 8.2)));
-
-            smoothScrollTo(targetOffset, duration);
+            window.scrollTo({
+                top: targetOffset,
+                behavior: 'smooth',
+            });
         }
     };
 
@@ -669,39 +596,36 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 2. Hero Section con Fachada Institucional CAPSUR como Fondo Elegante */}
+                {/* 2. Hero Section - Propuesta visual institucional CAPSUR */}
                 <Box
                     id="inicio"
                     sx={{
                         position: 'relative',
                         bgcolor: '#08142a',
                         minHeight: { xs: 'calc(100dvh - 65px)', md: 'calc(100dvh - 70px)' },
+                        height: { xs: 'auto', md: 'calc(100dvh - 70px)' },
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        px: { xs: 2, sm: 3, md: 5, lg: 6 },
-                        height:'100vh',
-                        scrollMarginTop: { xs: '65px', md: '75px' },
+                        alignItems: 'stretch',
                         overflow: 'hidden',
+                        scrollMarginTop: { xs: '65px', md: '75px' },
                     }}
                 >
-                    {/* Capa de Fondo (Wallpaper Completo): Fotografía Widescreen de la Fachada CAPSUR */}
+                    {/* Fachada institucional: conserva el tamaño actual y desplaza visualmente el degradado hacia la izquierda */}
                     <Box
                         sx={{
                             position: 'absolute',
                             inset: 0,
                             zIndex: 0,
-                            pointerEvents: 'none',
                             overflow: 'hidden',
+                            pointerEvents: 'none',
                         }}
                     >
-                        {/* Contenedor de la Imagen con Difuminado Progresivo */}
                         <Box
                             sx={{
                                 position: 'absolute',
                                 top: 0,
                                 right: 0,
-                                width: { xs: '100%', md: '75%', lg: '70%' },
+                                width: { xs: '100%', md: '76%', lg: '72%' },
                                 height: '100%',
                             }}
                         >
@@ -713,216 +637,332 @@ export default function Welcome({
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover',
-                                    objectPosition: {
-                                        xs: 'center 15%',
-                                        sm: 'center 18%',
-                                        md: 'center 20%',
-                                        lg: 'center 20%',
-                                    },
+                                    objectPosition: { xs: 'center 18%', md: 'center 20%' },
+                                    display: 'block',
                                 }}
                             />
 
-                            {/* Difuminado directo sobre el borde izquierdo de la foto:
-                                Inicia en #08142a 100% sólido para fundirse de forma invisible con el fondo */}
+                            {/* Transición suave entre el navy y la fotografía */}
                             <Box
                                 sx={{
                                     position: 'absolute',
                                     inset: 0,
                                     background: {
-                                        xs: 'none',
-                                        md: 'linear-gradient(to right, #08142a 0%, rgba(8, 20, 42, 0.92) 8%, rgba(8, 20, 42, 0.62) 20%, rgba(8, 20, 42, 0.28) 36%, rgba(8, 20, 42, 0.08) 50%, transparent 64%)',
+                                        xs: 'linear-gradient(180deg, rgba(8,20,42,0.78) 0%, rgba(8,20,42,0.28) 48%, rgba(8,20,42,0.05) 100%)',
+                                        md: 'linear-gradient(90deg, #08142a 0%, rgba(8,20,42,0.92) 10%, rgba(8,20,42,0.58) 22%, rgba(8,20,42,0.22) 36%, rgba(8,20,42,0.04) 50%, transparent 62%)',
                                     },
                                 }}
                             />
                         </Box>
 
-                        {/* Sombreado Direccional General: Asegura contraste legible para textos y botones */}
+                        {/* Mancha navy lateral para mantener la lectura del contenido */}
                         <Box
                             sx={{
                                 position: 'absolute',
                                 inset: 0,
                                 background: {
-                                    xs: 'linear-gradient(180deg, rgba(8, 20, 42, 0.95) 0%, rgba(8, 20, 42, 0.75) 45%, rgba(8, 20, 42, 0.20) 100%)',
-                                    md: 'linear-gradient(90deg, #08142a 0%, #08142a 18%, rgba(8, 20, 42, 0.90) 28%, rgba(8, 20, 42, 0.62) 38%, rgba(8, 20, 42, 0.28) 49%, rgba(8, 20, 42, 0.08) 60%, transparent 72%)',
+                                    xs: 'linear-gradient(180deg, rgba(8,20,42,0.92) 0%, rgba(8,20,42,0.62) 42%, rgba(8,20,42,0.12) 100%)',
+                                    md: 'linear-gradient(90deg, #08142a 0%, #08142a 17%, rgba(8,20,42,0.86) 28%, rgba(8,20,42,0.42) 39%, rgba(8,20,42,0.10) 51%, transparent 66%)',
                                 },
+                            }}
+                        />
+
+                        {/* Arcos decorativos muy sutiles inspirados en la referencia */}
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                width: { xs: 320, md: 760 },
+                                height: { xs: 320, md: 760 },
+                                border: '1px solid rgba(56, 189, 248, 0.16)',
+                                borderRadius: '50%',
+                                left: { xs: '-45%', md: '31%' },
+                                top: { xs: '35%', md: '-58%' },
+                                transform: 'rotate(-18deg)',
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                width: { xs: 260, md: 600 },
+                                height: { xs: 260, md: 600 },
+                                border: '1px solid rgba(56, 189, 248, 0.10)',
+                                borderRadius: '50%',
+                                left: { xs: '-34%', md: '35%' },
+                                top: { xs: '42%', md: '-49%' },
+                                transform: 'rotate(-18deg)',
                             }}
                         />
                     </Box>
 
-                    <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, width: '100%', py: { xs: 2, md: 0 }, px: { xs: 2, sm: 3 } }}>
-                        {/* Contenido Hero: Textual (Izquierda) + Composición Visual de Profesionales (Derecha) */}
-                        <Grid container spacing={{ xs: 4, lg: 5 }} sx={{ alignItems: 'center' }}>
-                            {/* Columna Izquierda: Información Institucional, Copywriting, CTAs */}
-                            <Grid size={{ xs: 12, md: 6, lg: 6 }}>
-                                <Box sx={{ maxWidth: 600 }}>
-                                    {/* Eyebrow / Distintivo Institucional Stately */}
-                                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.4, mb: 2.8, flexWrap: 'wrap' }}>
-                                        <Box
-                                            sx={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: 1,
-                                                px: 1.8,
-                                                py: 0.65,
-                                                borderRadius: '6px',
-                                                bgcolor: 'rgba(255, 255, 255, 0.08)',
-                                                backdropFilter: 'blur(12px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.18)',
-                                            }}
-                                        >
-                                            <WorkspacePremiumIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
+                    <Container
+                        maxWidth="xl"
+                        sx={{
+                            position: 'relative',
+                            zIndex: 2,
+                            width: '100%',
+                            height: { xs: 'auto', md: '100%' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                            px: { xs: 2, sm: 4, md: 5, lg: 6 },
+                            pb: 0,
+                        }}
+                    >
+                        <Grid
+                            container
+                            columnSpacing={{ xs: 3, md: 3, lg: 4 }}
+                            rowSpacing={0}
+                            sx={{
+                                alignItems: 'flex-end',
+                                justifyContent: 'space-between',
+                                width: '100%',
+                                height: { xs: 'auto', md: '100%' },
+                                mb: 0,
+                                pb: 0,
+                            }}
+                        >
+                            {/* Contenido institucional */}
+                            <Grid
+                                size={{ xs: 12, md: 6, lg: 6 }}
+                                sx={{
+                                    alignSelf: 'center',
+                                    py: { xs: 4, md: 3 },
+                                }}
+                            >
+                                <Box sx={{ maxWidth: 650, position: 'relative', zIndex: 5 }}>
+                                    <Box
+                                        sx={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 1.2,
+                                            px: 1.7,
+                                            py: 0.75,
+                                            mb: { xs: 2.2, md: 2.6 },
+                                            border: '1px solid rgba(255,255,255,0.22)',
+                                            borderRadius: '7px',
+                                            bgcolor: 'rgba(8,20,42,0.48)',
+                                            backdropFilter: 'blur(10px)',
+                                        }}
+                                    >
+                                        <WorkspacePremiumIcon sx={{ fontSize: 17, color: '#f5b400' }} />
+                                        <Box>
                                             <Typography
                                                 sx={{
-                                                    fontSize: '0.72rem',
-                                                    fontWeight: 700,
+                                                    color: '#fff',
+                                                    fontSize: { xs: '0.67rem', md: '0.72rem' },
+                                                    fontWeight: 800,
                                                     letterSpacing: '0.12em',
+                                                    lineHeight: 1.1,
                                                     textTransform: 'uppercase',
-                                                    color: '#ffffff',
                                                 }}
                                             >
                                                 Corporación Educativa CAPSUR
                                             </Typography>
+                                            <Typography sx={{ color: 'rgba(255,255,255,0.62)', fontSize: '0.69rem', mt: 0.25 }}>
+                                                Sede Central Institucional
+                                            </Typography>
                                         </Box>
-                                        <Typography
-                                            sx={{
-                                                fontSize: '0.74rem',
-                                                color: 'rgba(255, 255, 255, 0.7)',
-                                                fontWeight: 500,
-                                                letterSpacing: '0.04em',
-                                                display: { xs: 'none', sm: 'inline-block' },
-                                            }}
-                                        >
-                                            • Sede Central Institucional
-                                        </Typography>
                                     </Box>
 
-                                    {/* Título Principal Ejecutivo Idéntico al Objetivo */}
                                     <Typography
                                         component="h1"
                                         sx={{
-                                            fontSize: { xs: '2.5rem', sm: '3.2rem', md: '3.8rem', lg: '4.2rem' },
-                                            fontWeight: 800,
-                                            lineHeight: 1.1,
-                                            letterSpacing: '-0.025em',
-                                            color: '#ffffff',
-                                            mb: 2.5,
-                                            textShadow: '0 2px 18px rgba(0, 0, 0, 0.6)',
+                                            color: '#fff',
+                                            fontSize: { xs: '2.7rem', sm: '3.5rem', md: '4rem', lg: '4.55rem' },
+                                            fontWeight: 850,
+                                            lineHeight: 0.98,
+                                            letterSpacing: '-0.045em',
+                                            mb: 2.4,
+                                            textShadow: '0 4px 24px rgba(0,0,0,0.34)',
                                         }}
                                     >
-                                        Carreras que<br />
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                color: '#38bdf8',
-                                                fontWeight: 800,
-                                            }}
-                                        >
-                                            impulsan
-                                        </Box>{' '}
-                                        tu futuro
+                                        Formación que
+                                        <Box component="span" sx={{ display: 'block', color: '#20b9f5' }}>
+                                            impulsa tu futuro
+                                        </Box>
                                     </Typography>
 
-                                    {/* Bajada / Subtítulo Institucional Articulado */}
+                                    <Box sx={{ width: { xs: 105, md: 135 }, height: 5, bgcolor: '#20b9f5', borderRadius: 99, mb: 2.7 }} />
+
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: '0.98rem', sm: '1.05rem', md: '1.08rem' },
-                                            color: 'rgba(255, 255, 255, 0.85)',
-                                            lineHeight: 1.7,
-                                            fontWeight: 400,
-                                            maxWidth: 530,
-                                            mb: 4,
-                                            textShadow: '0 1px 6px rgba(0, 0, 0, 0.5)',
+                                            color: 'rgba(255,255,255,0.88)',
+                                            fontSize: { xs: '0.98rem', sm: '1.04rem', md: '1.08rem' },
+                                            lineHeight: 1.65,
+                                            maxWidth: 610,
+                                            mb: 3.5,
+                                            textShadow: '0 2px 10px rgba(0,0,0,0.35)',
                                         }}
                                     >
-                                        Formación técnica y superior con enfoque práctico e inserción laboral inmediata. Desarrolla competencias para liderar en el mundo productivo a través de nuestras prestigiosas instituciones en el sur del país.
+                                        Carreras técnicas y superiores, capacitaciones e idiomas, con enfoque práctico, respaldo institucional y orientación al mundo laboral.
                                     </Typography>
 
-                                    {/* Grupo de Acciones / CTAs Ejecutivos */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                                        {/* Botón Principal Corporativo */}
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: { xs: 4, md: 4.5 } }}>
                                         <Button
                                             variant="contained"
                                             onClick={() => handleNavClick('marcas')}
-                                            endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
+                                            endIcon={<ArrowForwardIcon />}
                                             sx={{
-                                                bgcolor: '#0056d6',
-                                                color: '#ffffff',
-                                                px: 3.5,
-                                                py: 1.3,
-                                                borderRadius: '8px',
-                                                fontWeight: 700,
-                                                fontSize: '0.92rem',
-                                                letterSpacing: '0.01em',
+                                                bgcolor: '#0869ee',
+                                                color: '#fff',
+                                                px: { xs: 2.6, md: 3.2 },
+                                                py: 1.25,
+                                                borderRadius: '7px',
                                                 textTransform: 'none',
-                                                boxShadow: '0 4px 18px rgba(0, 86, 214, 0.4)',
-                                                transition: 'all 0.2s ease',
-                                                '&:hover': {
-                                                    bgcolor: '#0043a8',
-                                                    transform: 'translateY(-2px)',
-                                                    boxShadow: '0 8px 24px rgba(0, 86, 214, 0.55)',
-                                                },
+                                                fontWeight: 800,
+                                                fontSize: '0.9rem',
+                                                boxShadow: '0 8px 24px rgba(0,105,238,0.30)',
+                                                '&:hover': { bgcolor: '#0758c8', transform: 'translateY(-1px)' },
                                             }}
                                         >
-                                            Explorar Carreras
+                                            Explorar nuestras carreras
                                         </Button>
-
-                                        {/* Botón Secundario Outline Glassmorphism */}
                                         <Button
                                             variant="outlined"
                                             onClick={() => handleNavClick('nosotros')}
-                                            startIcon={<PlayArrowIcon sx={{ fontSize: 19 }} />}
+                                            startIcon={<PlayArrowIcon />}
                                             sx={{
-                                                borderColor: 'rgba(255, 255, 255, 0.28)',
-                                                color: '#ffffff',
-                                                bgcolor: 'rgba(255, 255, 255, 0.06)',
-                                                backdropFilter: 'blur(10px)',
-                                                px: 2.8,
-                                                py: 1.3,
-                                                borderRadius: '8px',
-                                                fontWeight: 600,
-                                                fontSize: '0.92rem',
+                                                borderColor: 'rgba(255,255,255,0.35)',
+                                                color: '#fff',
+                                                bgcolor: 'rgba(255,255,255,0.04)',
+                                                backdropFilter: 'blur(8px)',
+                                                px: { xs: 2.4, md: 2.8 },
+                                                py: 1.25,
+                                                borderRadius: '7px',
                                                 textTransform: 'none',
-                                                transition: 'all 0.2s ease',
-                                                '&:hover': {
-                                                    borderColor: 'rgba(255, 255, 255, 0.6)',
-                                                    bgcolor: 'rgba(255, 255, 255, 0.12)',
-                                                    transform: 'translateY(-2px)',
-                                                },
+                                                fontWeight: 700,
+                                                fontSize: '0.9rem',
+                                                '&:hover': { borderColor: 'rgba(255,255,255,0.65)', bgcolor: 'rgba(255,255,255,0.08)' },
                                             }}
                                         >
                                             Conoce Grupo CAPSUR
                                         </Button>
                                     </Box>
+
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'stretch',
+                                            width: '100%',
+                                            maxWidth: 590,
+                                            pt: 2.1,
+                                            borderTop: '1px solid rgba(255,255,255,0.18)',
+                                        }}
+                                    >
+                                        {[
+                                            { icon: <SchoolIcon />, value: '+7', label: 'instituciones' },
+                                            { icon: <DescriptionIcon />, value: '+70', label: 'programas' },
+                                            { icon: <WorkspacePremiumIcon />, value: 'Formación', label: 'especializada' },
+                                        ].map((item, index) => (
+                                            <Box
+                                                key={item.label}
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1.1,
+                                                    flex: 1,
+                                                    minWidth: 0,
+                                                    px: index === 0 ? 0 : { xs: 1.5, md: 2.5 },
+                                                    borderLeft: index === 0 ? 'none' : '1px solid rgba(255,255,255,0.15)',
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 38,
+                                                        height: 38,
+                                                        borderRadius: '50%',
+                                                        bgcolor: 'rgba(0,105,238,0.34)',
+                                                        border: '1px solid rgba(56,189,248,0.22)',
+                                                        color: '#fff',
+                                                        display: 'grid',
+                                                        placeItems: 'center',
+                                                        flexShrink: 0,
+                                                        '& svg': { fontSize: 20 },
+                                                    }}
+                                                >
+                                                    {item.icon}
+                                                </Box>
+                                                <Box sx={{ minWidth: 0 }}>
+                                                    <Typography sx={{ color: '#fff', fontWeight: 800, fontSize: { xs: '0.92rem', md: '1rem' }, lineHeight: 1.1 }}>
+                                                        {item.value}
+                                                    </Typography>
+                                                    <Typography sx={{ color: 'rgba(255,255,255,0.68)', fontSize: '0.72rem', mt: 0.3 }}>
+                                                        {item.label}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                        ))}
+                                    </Box>
                                 </Box>
                             </Grid>
 
-                            {/* Columna Derecha: Profesionales */}
+                            {/* Composición visual derecha: fotografía de profesionales pegada a la base del hero */}
                             <Grid
                                 size={{ xs: 12, md: 6, lg: 6 }}
                                 sx={{
+                                    alignSelf: 'flex-end',
                                     display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    mt: { xs: 2, md: 0 },
+                                    justifyContent: { xs: 'center', md: 'flex-end' },
+                                    alignItems: 'flex-end',
+                                    height: { xs: 'auto', md: '100%' },
+                                    lineHeight: 0,
+                                    m: 0,
+                                    pt: 0,
+                                    pb: '0 !important',
                                 }}
                             >
                                 <Box
                                     sx={{
                                         position: 'relative',
                                         width: '100%',
-                                        maxWidth: { xs: 460, sm: 540, md: 620, lg: 660 },
-                                        mx: 'auto',
+                                        maxWidth: { xs: 480, sm: 540, md: 640, lg: 760 },
                                         display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
+                                        justifyContent: { xs: 'center', md: 'flex-end' },
+                                        alignItems: 'flex-end',
+                                        lineHeight: 0,
+                                        m: 0,
+                                        p: 0,
                                     }}
                                 >
-                                 
+                                    {/* Halo de contraste sutil detrás de los profesionales */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            width: { xs: 300, md: 540 },
+                                            height: { xs: 300, md: 540 },
+                                            borderRadius: '50%',
+                                            right: { xs: '5%', md: '2%' },
+                                            bottom: 0,
+                                            background: 'radial-gradient(circle, rgba(0,119,255,0.28) 0%, rgba(0,119,255,0.06) 50%, transparent 70%)',
+                                            pointerEvents: 'none',
+                                            zIndex: 1,
+                                        }}
+                                    />
+
+                                    {/* Fotografía de los profesionales pegada a la base */}
+                                    <Box
+                                        component="img"
+                                        src="/images/profesionales.png"
+                                        alt="Profesionales y estudiantes de Grupo CAPSUR"
+                                        sx={{
+                                            position: 'relative',
+                                            zIndex: 2,
+                                            display: 'block',
+                                            verticalAlign: 'bottom',
+                                            width: 'auto',
+                                            maxWidth: '100%',
+                                            maxHeight: { xs: 380, sm: 460, md: 'calc(100dvh - 85px)', lg: 'calc(100dvh - 80px)' },
+                                            height: 'auto',
+                                            objectFit: 'contain',
+                                            filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.40))',
+                                            lineHeight: 0,
+                                            m: 0,
+                                            p: 0,
+                                        }}
+                                    />
                                 </Box>
                             </Grid>
                         </Grid>
-
                     </Container>
                 </Box>
 
@@ -1558,11 +1598,22 @@ export default function Welcome({
                                         position: 'relative',
                                         height: { xs: 340, sm: 400, md: 500 },
                                         overflow: 'hidden',
-                                        background: 'radial-gradient(ellipse at 85% 20%, #1754b5 0%, #0c43a3 50%, #051d4d 100%)',
+                                        background: 'radial-gradient(circle at 75% 35%, #1d5ec9 0%, #0d409d 42%, #082d70 80%, #051e4e 100%)',
                                         borderRadius: { xs: '4px', md: '4px 0 0 4px' },
                                     }}
                                 >
-                                    {/* Fotografía de Atención / Secretaria Grupo CAPSUR */}
+                                    {/* Sutil sombra de respaldo en la esquina izquierda (detrás de la imagen) */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            zIndex: 1,
+                                            pointerEvents: 'none',
+                                            background: 'linear-gradient(90deg, rgba(5, 26, 68, 0.60) 0%, rgba(5, 26, 68, 0.28) 32%, transparent 60%)',
+                                        }}
+                                    />
+
+                                    {/* Fotografía nítida y luminosa de Atención / Secretaria Grupo CAPSUR */}
                                     <Box
                                         component="img"
                                         src="/images/secretaria-capsur.png"
@@ -1570,85 +1621,105 @@ export default function Welcome({
                                         sx={{
                                             position: 'absolute',
                                             bottom: 0,
-                                            right: { xs: '-6%', sm: '-2%', md: '0%' },
-                                            width: { xs: '100%', sm: '88%', md: '92%' },
-                                            maxHeight: { xs: '84%', sm: '86%', md: '90%' },
+                                            right: { xs: '-4%', sm: '-2%', md: '-1%', lg: '0%' },
+                                            width: 'auto',
+                                            maxWidth: { xs: '92%', sm: '86%', md: '88%' },
+                                            maxHeight: { xs: '88%', sm: '92%', md: '94%' },
                                             objectFit: 'contain',
                                             objectPosition: 'bottom right',
                                             display: 'block',
-                                            zIndex: 1,
-                                            filter: 'drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45))',
-                                            pointerEvents: 'none',
-                                        }}
-                                    />
-
-                                    {/* Scrim gradiente para garantizar legibilidad de textos */}
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            inset: 0,
                                             zIndex: 2,
+                                            filter: 'drop-shadow(0 10px 24px rgba(0, 15, 50, 0.35))',
                                             pointerEvents: 'none',
-                                            background: {
-                                                xs: 'linear-gradient(to bottom, rgba(5, 29, 77, 0.9) 0%, rgba(5, 29, 77, 0.4) 45%, rgba(5, 29, 77, 0.88) 100%)',
-                                                md: 'linear-gradient(105deg, rgba(5, 29, 77, 0.92) 0%, rgba(5, 29, 77, 0.65) 45%, rgba(5, 29, 77, 0.1) 75%)',
-                                            },
                                         }}
                                     />
 
-                                    {/* Textos destacados sobreimpresos */}
+                                    {/* Textos destacados sobreimpresos - Margen izquierdo acotado para no tapar el cabello */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            top: { xs: 28, md: 42 },
-                                            left: { xs: 28, md: 46 },
-                                            right: 28,
+                                            top: { xs: 24, md: 34 },
+                                            left: { xs: 24, md: 36 },
+                                            maxWidth: { xs: 180, sm: 210, md: 220 },
                                             color: '#fff',
                                             zIndex: 3,
                                         }}
                                     >
-                                        <Typography
+                                        {/* Badge institucional moderno */}
+                                        <Box
                                             sx={{
-                                                fontSize: '0.72rem',
-                                                fontWeight: 800,
-                                                letterSpacing: '0.18em',
-                                                textTransform: 'uppercase',
-                                                opacity: 0.9,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 0.8,
+                                                px: 1.2,
+                                                py: 0.45,
+                                                borderRadius: '6px',
+                                                bgcolor: 'rgba(255, 255, 255, 0.14)',
+                                                backdropFilter: 'blur(8px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.24)',
                                                 mb: 1.5,
                                             }}
                                         >
-                                            Grupo CAPSUR
-                                        </Typography>
-                                        <Box sx={{ width: 64, height: 2, bgcolor: '#38bdf8', mb: 2 }} />
+                                            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#38bdf8' }} />
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '0.68rem',
+                                                    fontWeight: 800,
+                                                    letterSpacing: '0.14em',
+                                                    textTransform: 'uppercase',
+                                                    color: '#fff',
+                                                    lineHeight: 1,
+                                                }}
+                                            >
+                                                Grupo CAPSUR
+                                            </Typography>
+                                        </Box>
+
                                         <Typography
                                             sx={{
-                                                fontSize: { xs: '1.65rem', md: '2.25rem' },
+                                                fontSize: { xs: '1.25rem', sm: '1.45rem', md: '1.6rem' },
                                                 fontWeight: 800,
-                                                lineHeight: 1.08,
-                                                letterSpacing: '-0.03em',
-                                                maxWidth: 390,
+                                                lineHeight: 1.15,
+                                                letterSpacing: '-0.025em',
+                                                textShadow: '0 2px 10px rgba(0, 18, 50, 0.5)',
+                                                color: '#fff',
                                             }}
                                         >
                                             {contact.bannerTitle}
                                         </Typography>
                                     </Box>
+
+                                    {/* Subtítulo institucional en píldora translúcida con icono */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            bottom: { xs: 24, md: 34 },
-                                            left: { xs: 28, md: 46 },
-                                            right: { xs: 28, md: 46 },
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'flex-end',
-                                            color: '#fff',
+                                            bottom: { xs: 18, md: 24 },
+                                            left: { xs: 20, md: 28 },
                                             zIndex: 3,
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 0.9,
+                                            px: 1.5,
+                                            py: 0.7,
+                                            borderRadius: '8px',
+                                            bgcolor: 'rgba(5, 23, 62, 0.68)',
+                                            backdropFilter: 'blur(10px)',
+                                            border: '1px solid rgba(255, 255, 255, 0.14)',
+                                            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.22)',
                                         }}
                                     >
-                                        <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, opacity: 0.85, maxWidth: 250, lineHeight: 1.5 }}>
+                                        <LocationOnIcon sx={{ fontSize: 15, color: '#38bdf8', flexShrink: 0 }} />
+                                        <Typography
+                                            sx={{
+                                                fontSize: { xs: '0.72rem', md: '0.76rem' },
+                                                fontWeight: 700,
+                                                color: '#ffffff',
+                                                letterSpacing: '0.01em',
+                                                lineHeight: 1.2,
+                                            }}
+                                        >
                                             {contact.bannerSubtitle}
                                         </Typography>
-                                        <Box sx={{ width: 52, height: 3, bgcolor: '#38bdf8' }} />
                                     </Box>
                                 </Box>
                             </Grid>

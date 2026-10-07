@@ -1,7 +1,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Container, IconButton, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface CoverflowBrandItem {
     id: string;
@@ -68,32 +68,51 @@ interface Props {
 }
 
 export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
-    // Inicializar con CECAVA (índice 2) como tarjeta activa central, tal como en el diseño de referencia
+    // Inicializar con CECAVA (índice 2) como tarjeta activa central
     const [activeIndex, setActiveIndex] = useState(2);
     const [isHovered, setIsHovered] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+    const sectionRef = useRef<HTMLDivElement>(null);
     const touchStartX = useRef<number | null>(null);
 
     const brands = DEFAULT_BRANDS;
     const total = brands.length;
 
-    const handlePrev = () => {
+    const handlePrev = useCallback(() => {
         setActiveIndex((prev) => (prev - 1 + total) % total);
-    };
+    }, [total]);
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         setActiveIndex((prev) => (prev + 1) % total);
-    };
+    }, [total]);
 
-    // Autoplay suave cada 5 segundos si el usuario no tiene el cursor encima
+    // Detección de visibilidad con IntersectionObserver (evita timers y renders innecesarios fuera de pantalla)
     useEffect(() => {
-        if (isHovered) return;
-        const interval = setInterval(() => {
-            setActiveIndex((prev) => (prev + 1) % total);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [isHovered, total]);
+        const el = sectionRef.current;
+        if (!el || typeof IntersectionObserver === 'undefined') {
+            setIsInView(true);
+            return;
+        }
 
-    // Soporte táctil para deslizar con el dedo
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+            },
+            { rootMargin: '100px' }
+        );
+
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    // Autoplay suave cada 5 segundos SOLO cuando la sección es visible y no tiene hover
+    useEffect(() => {
+        if (!isInView || isHovered) return;
+        const interval = setInterval(handleNext, 5000);
+        return () => clearInterval(interval);
+    }, [isInView, isHovered, handleNext]);
+
+    // Soporte táctil optimizado para deslizamiento (swipe)
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartX.current = e.touches[0].clientX;
         setIsHovered(true);
@@ -103,7 +122,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
         if (touchStartX.current === null) return;
         const touchEndX = e.changedTouches[0].clientX;
         const diff = touchEndX - touchStartX.current;
-        if (Math.abs(diff) > 40) {
+        if (Math.abs(diff) > 35) {
             if (diff > 0) {
                 handlePrev();
             } else {
@@ -114,17 +133,36 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
         setIsHovered(false);
     };
 
+    // Navegación rápida por teclado con flechas izquierda / derecha
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            handlePrev();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            handleNext();
+        }
+    };
+
     return (
         <Box
+            ref={sectionRef}
             component="section"
             id="marcas"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+            aria-label="Carrusel interactivo de marcas e instituciones"
             sx={{
                 position: 'relative',
-                pt: { xs: 8, sm: 9, md: 10 },
-                pb: { xs: 9, sm: 11, md: 13 },
+                pt: { xs: 6, sm: 8, md: 9 },
+                pb: { xs: 7, sm: 9, md: 10 },
                 bgcolor: '#ffffff',
                 overflow: 'hidden',
                 scrollMarginTop: { xs: '65px', md: '75px' },
+                outline: 'none',
+                // Optimización de renderizado para no afectar el scroll general de la página
+                contentVisibility: 'auto',
+                containIntrinsicSize: '650px',
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -136,7 +174,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                 aria-hidden="true"
                 sx={{
                     position: 'absolute',
-                    top: { xs: 30, sm: 40, md: 45 },
+                    top: { xs: 20, sm: 30, md: 35 },
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: '100%',
@@ -163,7 +201,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                         textAlign: 'center',
                         maxWidth: 780,
                         mx: 'auto',
-                        mb: { xs: 4, sm: 5, md: 6 },
+                        mb: { xs: 3.5, sm: 4.5, md: 5 },
                         px: 2,
                     }}
                 >
@@ -215,7 +253,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             fontWeight: 900,
                             letterSpacing: '-0.035em',
                             lineHeight: 1.15,
-                            mb: 1.6,
+                            mb: 1.4,
                             color: '#09152a',
                         }}
                     >
@@ -245,18 +283,19 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                     </Typography>
                 </Box>
 
-                {/* Escenario del Carrusel 3D Cover Flow */}
+                {/* Escenario del Carrusel 3D Cover Flow Acelerado por GPU */}
                 <Box
                     sx={{
                         position: 'relative',
                         width: '100%',
-                        height: { xs: 340, sm: 400, md: 470 },
+                        height: { xs: 330, sm: 380, md: 440 },
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        perspective: { xs: 800, md: 1100 },
-                        transformStyle: 'preserve-3d',
+                        perspective: 1000,
+                        contain: 'layout paint',
                         mt: { xs: 1, sm: 2 },
+                        userSelect: 'none',
                     }}
                 >
                     {/* Botón Flotante Anterior (Izquierda) */}
@@ -265,28 +304,43 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                         onClick={handlePrev}
                         sx={{
                             position: 'absolute',
-                            left: { xs: 4, sm: 16, md: 36, lg: 50 },
-                            top: '46%',
+                            left: { xs: 6, sm: 16, md: 28, lg: 40 },
+                            top: '50%',
                             transform: 'translateY(-50%)',
                             zIndex: 30,
                             bgcolor: '#ffffff',
                             color: '#0f172a',
                             border: '1px solid #e2e8f0',
-                            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.12)',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
                             width: { xs: 40, sm: 46 },
                             height: { xs: 40, sm: 46 },
-                            transition: 'all 0.22s ease',
+                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease',
                             '&:hover': {
                                 bgcolor: '#ffffff',
                                 color: '#0066ee',
                                 borderColor: '#0066ee',
                                 transform: 'translateY(-50%) scale(1.08)',
-                                boxShadow: '0 6px 22px rgba(0, 102, 238, 0.25)',
+                                boxShadow: '0 6px 20px rgba(0, 102, 238, 0.22)',
                             },
                         }}
                     >
                         <ChevronLeftIcon sx={{ fontSize: { xs: 22, sm: 26 } }} />
                     </IconButton>
+
+                    {/* Base de piso ambiental elegante (100% acelerada por hardware, sin costo en scroll) */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: { xs: 6, md: 10 },
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: { xs: '85%', sm: '75%', md: '65%' },
+                            height: { xs: 36, md: 54 },
+                            background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 102, 238, 0.14) 0%, rgba(0, 102, 238, 0.03) 60%, transparent 80%)',
+                            pointerEvents: 'none',
+                            zIndex: 1,
+                        }}
+                    />
 
                     {/* Pista de Tarjetas en Perspectiva */}
                     <Box
@@ -313,6 +367,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                 return null;
                             }
 
+                            // Cálculo cinemático de transformación rápida por GPU (translate3d)
                             return (
                                 <Box
                                     key={brand.id}
@@ -325,73 +380,68 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                     }}
                                     sx={{
                                         position: 'absolute',
-                                        width: { xs: 210, sm: 250, md: 290, lg: 310 },
+                                        width: { xs: 200, sm: 240, md: 280, lg: 300 },
                                         aspectRatio: '4 / 5',
                                         borderRadius: { xs: '14px', sm: '18px', md: '20px' },
                                         overflow: 'hidden',
                                         cursor: 'pointer',
                                         userSelect: 'none',
-                                        transition: 'all 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
-                                        transformStyle: 'preserve-3d',
+                                        // Transición rápida y fluida: solo anima transform y opacity en el compositor
+                                        transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease',
                                         willChange: 'transform, opacity',
-                                        // Efecto de reflejo en el suelo
-                                        WebkitBoxReflect:
-                                            'below 4px linear-gradient(to bottom, transparent 65%, rgba(0, 0, 0, 0.18) 100%)',
+                                        backfaceVisibility: 'hidden',
+                                        WebkitBackfaceVisibility: 'hidden',
 
                                         // Distribución espacial según offset
                                         ...(isCenter
                                             ? {
                                                   transform: {
-                                                      xs: 'translateX(0px) scale(1.1) translateZ(50px)',
-                                                      sm: 'translateX(0px) scale(1.15) translateZ(80px)',
-                                                      md: 'translateX(0px) scale(1.18) translateZ(100px)',
+                                                      xs: 'translate3d(0, 0, 40px) scale(1.1)',
+                                                      sm: 'translate3d(0, 0, 60px) scale(1.15)',
+                                                      md: 'translate3d(0, 0, 80px) scale(1.18)',
                                                   },
                                                   zIndex: 20,
                                                   opacity: 1,
                                                   boxShadow:
-                                                      '0 20px 40px -10px rgba(0, 40, 120, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.25) inset',
-                                                  filter: 'brightness(1.02)',
+                                                      '0 18px 38px -8px rgba(0, 40, 120, 0.38), 0 0 0 1px rgba(0, 102, 238, 0.22)',
                                               }
                                             : absOffset === 1
                                             ? {
                                                   transform: {
-                                                      xs: `translateX(${offset * 125}px) scale(0.9) perspective(700px) rotateY(${offset * -14}deg)`,
-                                                      sm: `translateX(${offset * 165}px) scale(0.92) perspective(900px) rotateY(${offset * -15}deg)`,
-                                                      md: `translateX(${offset * 210}px) scale(0.93) perspective(1100px) rotateY(${offset * -16}deg)`,
+                                                      xs: `translate3d(${offset * 125}px, 0, 0) scale(0.9) rotateY(${offset * -14}deg)`,
+                                                      sm: `translate3d(${offset * 165}px, 0, 0) scale(0.92) rotateY(${offset * -15}deg)`,
+                                                      md: `translate3d(${offset * 210}px, 0, 0) scale(0.93) rotateY(${offset * -16}deg)`,
                                                   },
                                                   zIndex: 14,
                                                   opacity: 0.94,
-                                                  boxShadow: '0 12px 28px -6px rgba(0, 20, 60, 0.28)',
-                                                  filter: 'brightness(0.93)',
+                                                  boxShadow: '0 8px 22px -6px rgba(0, 20, 60, 0.22)',
                                                   '&:hover': {
-                                                      filter: 'brightness(1)',
+                                                      opacity: 1,
                                                   },
                                               }
                                             : absOffset === 2
                                             ? {
                                                   transform: {
-                                                      xs: `translateX(${offset * 190}px) scale(0.76) perspective(700px) rotateY(${offset * -24}deg)`,
-                                                      sm: `translateX(${offset * 270}px) scale(0.8) perspective(900px) rotateY(${offset * -25}deg)`,
-                                                      md: `translateX(${offset * 350}px) scale(0.82) perspective(1100px) rotateY(${offset * -26}deg)`,
+                                                      xs: `translate3d(${offset * 190}px, 0, 0) scale(0.76) rotateY(${offset * -24}deg)`,
+                                                      sm: `translate3d(${offset * 270}px, 0, 0) scale(0.8) rotateY(${offset * -25}deg)`,
+                                                      md: `translate3d(${offset * 350}px, 0, 0) scale(0.82) rotateY(${offset * -26}deg)`,
                                                   },
                                                   zIndex: 8,
-                                                  opacity: 0.85,
-                                                  boxShadow: '0 8px 20px -4px rgba(0, 10, 40, 0.22)',
-                                                  filter: 'brightness(0.85)',
+                                                  opacity: 0.82,
+                                                  boxShadow: '0 4px 14px -4px rgba(0, 10, 40, 0.16)',
                                                   '&:hover': {
-                                                      filter: 'brightness(0.95)',
+                                                      opacity: 0.92,
                                                   },
                                               }
                                             : {
                                                   transform: {
-                                                      xs: `translateX(${offset * 230}px) scale(0.62) perspective(700px) rotateY(${offset * -32}deg)`,
-                                                      sm: `translateX(${offset * 340}px) scale(0.68) perspective(900px) rotateY(${offset * -32}deg)`,
-                                                      md: `translateX(${offset * 460}px) scale(0.72) perspective(1100px) rotateY(${offset * -32}deg)`,
+                                                      xs: `translate3d(${offset * 230}px, 0, 0) scale(0.62) rotateY(${offset * -32}deg)`,
+                                                      sm: `translate3d(${offset * 340}px, 0, 0) scale(0.68) rotateY(${offset * -32}deg)`,
+                                                      md: `translate3d(${offset * 460}px, 0, 0) scale(0.72) rotateY(${offset * -32}deg)`,
                                                   },
                                                   zIndex: 4,
-                                                  opacity: 0.6,
-                                                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
-                                                  filter: 'brightness(0.78)',
+                                                  opacity: 0.55,
+                                                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.12)',
                                               }),
                                     }}
                                 >
@@ -399,6 +449,8 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                         component="img"
                                         src={brand.image}
                                         alt={brand.alt}
+                                        loading="lazy"
+                                        decoding="async"
                                         sx={{
                                             width: '100%',
                                             height: '100%',
@@ -406,6 +458,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                             objectPosition: 'center',
                                             display: 'block',
                                             pointerEvents: 'none',
+                                            userSelect: 'none',
                                         }}
                                     />
                                 </Box>
@@ -419,23 +472,23 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                         onClick={handleNext}
                         sx={{
                             position: 'absolute',
-                            right: { xs: 4, sm: 16, md: 36, lg: 50 },
-                            top: '46%',
+                            right: { xs: 6, sm: 16, md: 28, lg: 40 },
+                            top: '50%',
                             transform: 'translateY(-50%)',
                             zIndex: 30,
                             bgcolor: '#ffffff',
                             color: '#0f172a',
                             border: '1px solid #e2e8f0',
-                            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.12)',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
                             width: { xs: 40, sm: 46 },
                             height: { xs: 40, sm: 46 },
-                            transition: 'all 0.22s ease',
+                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease',
                             '&:hover': {
                                 bgcolor: '#ffffff',
                                 color: '#0066ee',
                                 borderColor: '#0066ee',
                                 transform: 'translateY(-50%) scale(1.08)',
-                                boxShadow: '0 6px 22px rgba(0, 102, 238, 0.25)',
+                                boxShadow: '0 6px 20px rgba(0, 102, 238, 0.22)',
                             },
                         }}
                     >
@@ -450,7 +503,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 1.1,
-                        mt: { xs: 4, sm: 5, md: 6 },
+                        mt: { xs: 3.5, sm: 4.5, md: 5 },
                         position: 'relative',
                     }}
                 >
@@ -482,7 +535,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                     width: isActive ? 28 : 8,
                                     borderRadius: 4,
                                     bgcolor: isActive ? '#0066ee' : '#cbd5e1',
-                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease',
                                     boxShadow: isActive ? '0 2px 8px rgba(0, 102, 238, 0.4)' : 'none',
                                     '&:hover': {
                                         bgcolor: isActive ? '#0066ee' : '#94a3b8',
