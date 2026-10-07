@@ -6,6 +6,7 @@ import {
     HardDrive,
     Image,
     LayoutGrid,
+    Phone,
     Store,
     Tags,
 } from 'lucide-react';
@@ -62,6 +63,11 @@ export function AppSidebar() {
             title: 'Logos',
             href: '/admin/logos',
             icon: Image,
+        },
+        {
+            title: 'Contacto',
+            href: '/admin/contacto',
+            icon: Phone,
         },
     ];
 

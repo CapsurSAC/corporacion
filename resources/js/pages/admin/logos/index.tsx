@@ -179,38 +179,50 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                         gap: 2,
                     }}
                 >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                        <Avatar
                             sx={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: 2,
                                 bgcolor: 'primary.main',
                                 color: '#ffffff',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(12, 67, 163, 0.25)',
+                                width: 42,
+                                height: 42,
+                                borderRadius: 1,
+                                boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
                             }}
                         >
-                            <ImageIcon sx={{ fontSize: 28 }} />
-                        </Box>
+                            <ImageIcon fontSize="small" />
+                        </Avatar>
                         <Box>
-                            <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
-                                Logos Institucionales
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em' }}>
+                                    Logos Institucionales
+                                </Typography>
+                                <Chip
+                                    label={`${comercios.length} MARCAS REGISTRADAS`}
+                                    size="small"
+                                    sx={{
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? 'rgba(12, 67, 163, 0.25)'
+                                                : 'rgba(12, 67, 163, 0.08)',
+                                        color: 'primary.main',
+                                        fontWeight: 800,
+                                        fontSize: '0.68rem',
+                                        height: 20,
+                                        borderRadius: 1,
+                                        border: '1px solid',
+                                        borderColor: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? 'rgba(12, 67, 163, 0.4)'
+                                                : 'rgba(12, 67, 163, 0.2)',
+                                    }}
+                                />
+                            </Box>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2, fontSize: '0.82rem' }}>
                                 Administra los logotipos de cada marca para el modo claro (fondos blancos) y modo oscuro (fondos oscuros).
                             </Typography>
                         </Box>
                     </Box>
-
-                    <Chip
-                        icon={<CheckCircleIcon color="success" />}
-                        label={`${comercios.length} Marcas Registradas`}
-                        variant="outlined"
-                        sx={{ fontWeight: 700 }}
-                    />
                 </Paper>
 
                 {/* Barra de Filtros y Búsqueda */}

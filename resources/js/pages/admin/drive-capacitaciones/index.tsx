@@ -91,21 +91,18 @@ export default function DriveCapacitacionesIndex({
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box
+                        <Avatar
                             sx={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: 2,
                                 bgcolor: 'primary.main',
                                 color: '#ffffff',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(12, 67, 163, 0.25)',
+                                width: 42,
+                                height: 42,
+                                borderRadius: 1,
+                                boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
                             }}
                         >
-                            <CloudDoneIcon sx={{ fontSize: 28 }} />
-                        </Box>
+                            <CloudDoneIcon fontSize="small" />
+                        </Avatar>
                         <Box>
                             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
                                 Drive Capacitaciones
@@ -138,15 +135,16 @@ export default function DriveCapacitacionesIndex({
                                     height: '100%',
                                     position: 'relative',
                                     overflow: 'hidden',
-                                    borderTop: '5px solid #1d4ed8',
+                                    borderTop: '4px solid',
+                                    borderColor: 'primary.main',
                                 }}
                             >
                                 <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#1d4ed8' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
                                             1. Botón Capacitación ESCIFOR
                                         </Typography>
-                                        <CheckCircleIcon sx={{ color: '#1d4ed8', fontSize: 22 }} />
+                                        <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 22 }} />
                                     </Box>
 
                                     <Typography variant="body2" color="text.secondary">
@@ -163,14 +161,27 @@ export default function DriveCapacitacionesIndex({
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: 1.5,
-                                            borderTop: '4px solid #1d4ed8',
+                                            borderTop: '4px solid',
+                                            borderColor: 'primary.main',
                                         }}
                                     >
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Avatar sx={{ width: 36, height: 36, bgcolor: '#1d4ed8', color: '#fff' }}>
+                                            <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', color: '#fff' }}>
                                                 <FolderSharedIcon sx={{ fontSize: 20 }} />
                                             </Avatar>
-                                            <Chip label="DIVISIÓN ESCIFOR" size="small" sx={{ fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(29, 78, 216, 0.12)', color: '#1d4ed8' }} />
+                                            <Chip
+                                                label="DIVISIÓN ESCIFOR"
+                                                size="small"
+                                                sx={{
+                                                    fontSize: '0.68rem',
+                                                    fontWeight: 800,
+                                                    bgcolor: (theme) =>
+                                                        theme.palette.mode === 'dark'
+                                                            ? 'rgba(12, 67, 163, 0.25)'
+                                                            : 'rgba(12, 67, 163, 0.1)',
+                                                    color: 'primary.main',
+                                                }}
+                                            />
                                         </Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary', lineHeight: 1.2 }}>
                                             CAPACITACIÓN ESCIFOR
@@ -180,10 +191,10 @@ export default function DriveCapacitacionesIndex({
                                         </Typography>
                                         <Button
                                             variant="contained"
+                                            color="primary"
                                             size="small"
                                             endIcon={<LaunchIcon fontSize="small" />}
                                             sx={{
-                                                background: 'linear-gradient(135deg, #1d4ed8 0%, #0c43a3 100%)',
                                                 fontWeight: 800,
                                                 fontSize: '0.82rem',
                                                 py: 0.8,
@@ -207,7 +218,7 @@ export default function DriveCapacitacionesIndex({
                                             input: {
                                                 startAdornment: (
                                                     <InputAdornment position="start">
-                                                        <LinkIcon fontSize="small" sx={{ color: '#1d4ed8' }} />
+                                                        <LinkIcon fontSize="small" sx={{ color: 'primary.main' }} />
                                                     </InputAdornment>
                                                 ),
                                             },
@@ -216,6 +227,7 @@ export default function DriveCapacitacionesIndex({
 
                                     <Button
                                         variant="outlined"
+                                        color="primary"
                                         size="small"
                                         startIcon={<LaunchIcon fontSize="small" />}
                                         onClick={() => handleTestUrl(data.drive_escifor)}

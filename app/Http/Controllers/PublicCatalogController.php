@@ -56,6 +56,7 @@ class PublicCatalogController extends Controller
             'grupos' => $grupos,
             'stats' => $stats,
             'driveLinks' => $driveLinks,
+            'contactInfo' => $this->getContactInfo(),
         ]);
     }
 
@@ -113,6 +114,30 @@ class PublicCatalogController extends Controller
             'initialComercio' => $comercio,
             'stats' => $stats,
             'driveLinks' => $driveLinks,
+            'contactInfo' => $this->getContactInfo(),
         ]);
+    }
+
+    /**
+     * Retrieve institutional contact information settings.
+     */
+    private function getContactInfo(): array
+    {
+        return [
+            'address' => Setting::get('contact_address') ?: 'Av. Coronel Justo Arias Aragüez N° 1111',
+            'addressDetail' => Setting::get('contact_address_detail') ?: 'Tacna, Perú — Edificio Corporativo Grupo CAPSUR',
+            'phone' => Setting::get('contact_phone') ?: '+51 963 147 270',
+            'phoneDetail' => Setting::get('contact_phone_detail') ?: 'Matrículas, carreras y certificaciones técnicas',
+            'whatsapp' => Setting::get('contact_whatsapp') ?: '+51 963 147 270',
+            'whatsappMessage' => Setting::get('contact_whatsapp_message') ?: 'Hola, deseo más información sobre los programas de Grupo CAPSUR',
+            'email' => Setting::get('contact_email') ?: 'contacto@grupocapsur.edu.pe',
+            'emailDetail' => Setting::get('contact_email_detail') ?: 'Consultas corporativas',
+            'schedule' => Setting::get('contact_schedule') ?: 'Lun - Sáb · 8:00 AM – 7:00 PM',
+            'scheduleDetail' => Setting::get('contact_schedule_detail') ?: 'Atención continua',
+            'mapsUrl' => Setting::get('contact_maps_url') ?: 'https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA',
+            'mapsEmbedUrl' => Setting::get('contact_maps_embed_url') ?: 'https://maps.google.com/maps?q=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA&t=&z=16&ie=UTF8&iwloc=&output=embed',
+            'bannerTitle' => Setting::get('contact_banner_title') ?: 'Educación que genera oportunidades',
+            'bannerSubtitle' => Setting::get('contact_banner_subtitle') ?: 'Sede Central Institucional · Tacna, Perú',
+        ];
     }
 }

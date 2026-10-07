@@ -16,6 +16,8 @@ import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MapIcon from '@mui/icons-material/Map';
+import CloseIcon from '@mui/icons-material/Close';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -34,6 +36,10 @@ import {
     CardContent,
     Chip,
     Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Divider,
     Grid,
     IconButton,
@@ -46,10 +52,11 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import AppLogo from '@/components/app-logo';
+import BrandsCoverflowCarousel, { CoverflowBrandItem } from '@/components/catalog/brands-coverflow-carousel';
 import ComercioDetailModal from '@/components/catalog/comercio-detail-modal';
 import LoginPopover from '@/components/login-popover';
 import { useNotification } from '@/hooks/use-notification';
-import type { Comercio, Grupo } from '@/types';
+import type { Comercio, ContactInfo, Grupo } from '@/types';
 
 interface WelcomeProps {
     grupos?: Grupo[];
@@ -66,61 +73,8 @@ interface WelcomeProps {
         escifor?: string;
         multimarca?: string;
     };
+    contactInfo?: ContactInfo;
 }
-
-// Lista oficial de marcas del Grupo CAPSUR para el carrusel flotante
-const SHOWCASE_BRANDS = [
-    {
-        name: 'SIS Instituto Sistemas del Sur',
-        sigla: 'SIS',
-        logo: '/logos-comercios/sis-para-fondo-blanco.png',
-        matchTerm: 'SIS',
-    },
-    {
-        name: 'AVANTI Instituto de Turismo y Hostelería',
-        sigla: 'AVANTI',
-        logo: '/logos-comercios/avanti-para-fondo-blanco.png',
-        matchTerm: 'AVANTI',
-    },
-    {
-        name: 'CECAVA Capacitaciones Especializadas',
-        sigla: 'CECAVA',
-        logo: '/logos-comercios/cecava-para-fondo-blanco.png',
-        matchTerm: 'CECAVA',
-    },
-    {
-        name: 'CECAVA MIN',
-        sigla: 'CECAVA MIN',
-        logo: '/logos-comercios/cecava-min-para-fondo-blanco.png',
-        matchTerm: 'CECAVA MIN',
-    },
-    {
-        name: 'MATPEL Materiales Peligrosos',
-        sigla: 'MATPEL',
-        logo: '/logos-comercios/matpel-para-fondo-blanco.png',
-        matchTerm: 'MATPEL',
-    },
-    {
-        name: 'Next Online Idiomas',
-        sigla: 'Next Online',
-        logo: '/logos-comercios/next-online-para-fondo-blanco.png',
-        matchTerm: 'Next Online',
-    },
-    {
-        name: 'Globalex Instituto Superior',
-        sigla: 'Globalex',
-        logo: '/logos-comercios/globalex-para-fondo-blanco.png',
-        matchTerm: 'Globalex',
-    },
-];
-
-// Lista cuadruplicada para garantizar un bucle continuo e infinito perfecto sin saltos
-const INFINITE_BRANDS = [
-    ...SHOWCASE_BRANDS,
-    ...SHOWCASE_BRANDS,
-    ...SHOWCASE_BRANDS,
-    ...SHOWCASE_BRANDS,
-];
 
 const NAV_ITEMS = [
     { id: 'inicio', label: 'Inicio' },
@@ -218,6 +172,7 @@ export default function Welcome({
         escifor: '',
         multimarca: '',
     },
+    contactInfo,
 }: WelcomeProps) {
     const page = usePage();
     const theme = useTheme();
@@ -225,6 +180,46 @@ export default function Welcome({
     const { notify } = useNotification();
     const auth = (page.props.auth || {}) as { user?: any };
     const dashboardUrl = auth.user ? '/dashboard' : '/';
+
+    // Información institucional de contacto oficial
+    const contact = useMemo(() => {
+        const address = contactInfo?.address || 'Av. Coronel Justo Arias Aragüez N° 1111';
+        const addressDetail = contactInfo?.addressDetail || 'Tacna, Perú — Edificio Corporativo Grupo CAPSUR';
+        const phone = contactInfo?.phone || '+51 963 147 270';
+        const phoneDetail = contactInfo?.phoneDetail || 'Matrículas, carreras y certificaciones técnicas';
+        const whatsapp = contactInfo?.whatsapp || phone;
+        const whatsappMessage = contactInfo?.whatsappMessage || 'Hola, deseo más información sobre los programas de Grupo CAPSUR';
+        const email = contactInfo?.email || 'contacto@grupocapsur.edu.pe';
+        const emailDetail = contactInfo?.emailDetail || 'Consultas corporativas';
+        const schedule = contactInfo?.schedule || 'Lun - Sáb · 8:00 AM – 7:00 PM';
+        const scheduleDetail = contactInfo?.scheduleDetail || 'Atención continua';
+        const mapsUrl = contactInfo?.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA';
+        const mapsEmbedUrl = contactInfo?.mapsEmbedUrl || 'https://maps.google.com/maps?q=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA&t=&z=16&ie=UTF8&iwloc=&output=embed';
+        const bannerTitle = contactInfo?.bannerTitle || 'Educación que genera oportunidades';
+        const bannerSubtitle = contactInfo?.bannerSubtitle || 'Sede Central Institucional · Tacna, Perú';
+
+        const rawWa = (whatsapp || '').replace(/\D+/g, '');
+        const cleanWa = rawWa.length === 9 && rawWa.startsWith('9') ? `51${rawWa}` : rawWa;
+        const whatsappHref = cleanWa ? `https://wa.me/${cleanWa}?text=${encodeURIComponent(whatsappMessage)}` : '#';
+
+        return {
+            address,
+            addressDetail,
+            phone,
+            phoneDetail,
+            whatsapp,
+            whatsappMessage,
+            whatsappHref,
+            email,
+            emailDetail,
+            schedule,
+            scheduleDetail,
+            mapsUrl,
+            mapsEmbedUrl,
+            bannerTitle,
+            bannerSubtitle,
+        };
+    }, [contactInfo]);
 
     // Navegación activa en la barra superior
     const [activeNav, setActiveNav] = useState('inicio');
@@ -236,18 +231,13 @@ export default function Welcome({
     const [selectedComercio, setSelectedComercio] = useState<Comercio | null>(initialComercio);
     const [detailModalOpen, setDetailModalOpen] = useState<boolean>(Boolean(initialComercio));
 
+    // Modal para visualizar mapa interactivo de ubicación
+    const [mapModalOpen, setMapModalOpen] = useState<boolean>(false);
+
 
     // Filtros del directorio de marcas
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGrupoId, setSelectedGrupoId] = useState<number | 'all'>('all');
-
-    // Referencia para el carrusel de logos
-    const carouselTrackRef = useRef<HTMLDivElement>(null);
-
-    // Control de animación del carrusel infinito de logos
-    const [marqueeDirection, setMarqueeDirection] = useState<'normal' | 'reverse'>('normal');
-    const [isMarqueeFast, setIsMarqueeFast] = useState(false);
-    const [isMarqueeHovered, setIsMarqueeHovered] = useState(false);
 
     // Bandera para evitar conflictos entre el scroll manual y el scroll spy
     const isManualScrollingRef = useRef(false);
@@ -286,7 +276,7 @@ export default function Welcome({
                 window.requestAnimationFrame(() => {
                     const scrollPos = (window.pageYOffset || document.documentElement.scrollTop) + 120;
                     // Lista ordenada según la aparición en la página
-                    const sectionIds = ['inicio', 'marcas', 'nosotros', 'beneficios', 'contacto'];
+                    const sectionIds = ['inicio', 'marcas', 'directorio-marcas', 'nosotros', 'beneficios', 'contacto'];
 
                     for (let i = sectionIds.length - 1; i >= 0; i--) {
                         const id = sectionIds[i];
@@ -294,7 +284,7 @@ export default function Welcome({
                         if (el) {
                             const top = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
                             if (scrollPos >= top - 20) {
-                                setActiveNav(id);
+                                setActiveNav(id === 'directorio-marcas' ? 'marcas' : id);
                                 break;
                             }
                         }
@@ -475,31 +465,20 @@ export default function Welcome({
         }
     };
 
-    // Control de flechas del carrusel de logos (invierte o acelera momentáneamente el flujo)
-    const handleScrollBrands = (direction: 'left' | 'right') => {
-        if (direction === 'left') {
-            setMarqueeDirection('reverse');
-        } else {
-            setMarqueeDirection('normal');
-        }
-        setIsMarqueeFast(true);
-        setTimeout(() => {
-            setIsMarqueeFast(false);
-        }, 1800);
-    };
-
-    // Buscar si una marca del carrusel corresponde a un comercio en DB
-    const handleShowcaseBrandClick = (brand: typeof SHOWCASE_BRANDS[0]) => {
+    // Manejar interacción y selección de marca desde el carrusel 3D Cover Flow
+    const handleCoverflowBrandSelect = (brand: CoverflowBrandItem) => {
+        const queryTerm = brand.sigla || brand.name;
         const found = allComercios.find(
             (c) =>
-                c.nombre.toLowerCase().includes(brand.matchTerm.toLowerCase()) ||
-                (c.sigla && c.sigla.toLowerCase().includes(brand.matchTerm.toLowerCase()))
+                c.nombre.toLowerCase().includes(queryTerm.toLowerCase()) ||
+                (c.sigla && c.sigla.toLowerCase().includes(queryTerm.toLowerCase()))
         );
 
         if (found) {
             handleOpenComercioDetail(found);
         } else {
-            handleNavClick('marcas');
+            setSearchQuery(brand.sigla);
+            handleNavClick('directorio-marcas');
         }
     };
 
@@ -696,9 +675,12 @@ export default function Welcome({
                     sx={{
                         position: 'relative',
                         bgcolor: '#08142a',
-                        pt: { xs: 4, sm: 5, md: 6, lg: 7 },
-                        pb: { xs: 4, md: 0 },
+                        minHeight: { xs: 'calc(100dvh - 65px)', md: 'calc(100dvh - 70px)' },
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         px: { xs: 2, sm: 3, md: 5, lg: 6 },
+                        height:'100vh',
                         scrollMarginTop: { xs: '65px', md: '75px' },
                         overflow: 'hidden',
                     }}
@@ -767,12 +749,12 @@ export default function Welcome({
                         />
                     </Box>
 
-                    <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 2, md: 3 }, pb: 5, px: { xs: 2, sm: 3 } }}>
+                    <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, width: '100%', py: { xs: 2, md: 0 }, px: { xs: 2, sm: 3 } }}>
                         {/* Contenido Hero: Textual (Izquierda) + Composición Visual de Profesionales (Derecha) */}
-                        <Grid container spacing={{ xs: 4, lg: 5 }} sx={{ alignItems: { xs: 'center', md: 'flex-end' } }}>
+                        <Grid container spacing={{ xs: 4, lg: 5 }} sx={{ alignItems: 'center' }}>
                             {/* Columna Izquierda: Información Institucional, Copywriting, CTAs */}
                             <Grid size={{ xs: 12, md: 6, lg: 6 }}>
-                                <Box sx={{ maxWidth: 600, pb: { xs: 2, md: 5, lg: 6 } }}>
+                                <Box sx={{ maxWidth: 600 }}>
                                     {/* Eyebrow / Distintivo Institucional Stately */}
                                     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.4, mb: 2.8, flexWrap: 'wrap' }}>
                                         <Box
@@ -914,14 +896,13 @@ export default function Welcome({
                                 </Box>
                             </Grid>
 
-                            {/* Columna Derecha: Profesionales Asentados en la Base del Carrusel */}
+                            {/* Columna Derecha: Profesionales */}
                             <Grid
                                 size={{ xs: 12, md: 6, lg: 6 }}
                                 sx={{
                                     display: 'flex',
                                     justifyContent: 'center',
-                                    alignItems: 'flex-end',
-                                    alignSelf: 'flex-end',
+                                    alignItems: 'center',
                                     mt: { xs: 2, md: 0 },
                                 }}
                             >
@@ -933,27 +914,11 @@ export default function Welcome({
                                         mx: 'auto',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        justifyContent: 'flex-end',
+                                        justifyContent: 'center',
                                         alignItems: 'center',
-                                        mb: 0,
                                     }}
                                 >
-                                    
-                                    {/* Fotografía Central de los 3 Profesionales asentada firmemente sobre el carrusel */}
-                                    <Box
-                                        component="img"
-                                        src="/images/profesionales.png"
-                                        alt="Profesionales y técnicos de Grupo CAPSUR"
-                                        sx={{
-                                            position: 'relative',
-                                            zIndex: 2,
-                                            width: '100%',
-                                            height: 'auto',
-                                            display: 'block',
-                                            verticalAlign: 'bottom',
-                                            filter: 'drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45))',
-                                        }}
-                                    />
+                                 
                                 </Box>
                             </Grid>
                         </Grid>
@@ -961,152 +926,14 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 3. Carrusel Flotante en Cápsula (Pill Bar) al pie del Hero - Movimiento Infinito */}
-                <Box
-                    sx={{
-                        position: 'relative',
-                        zIndex: 10,
-                        maxWidth: 1140,
-                        width: 'calc(100% - 32px)',
-                        mx: 'auto',
-                        mt: { xs: -3.5, md: -5 },
-                        mb: { xs: 1.5, md: 2 },
-                        px: { xs: 1.5, sm: 2.5 },
-                        py: 1.4,
-                        bgcolor: '#ffffff',
-                        borderRadius: 99,
-                        boxShadow: '0 12px 36px rgba(0, 50, 150, 0.12)',
-                        border: '1px solid',
-                        borderColor: 'rgba(226, 232, 240, 0.9)',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}
-                >
-                    {/* Botón Flecha Izquierda */}
-                    <Tooltip title="Invertir dirección del carrusel" arrow>
-                        <IconButton
-                            size="small"
-                            onClick={() => handleScrollBrands('left')}
-                            sx={{
-                                border: '1px solid #e2e8f0',
-                                bgcolor: '#f8fafc',
-                                width: 36,
-                                height: 36,
-                                flexShrink: 0,
-                                color: '#475569',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    bgcolor: '#f1f5f9',
-                                    color: '#0056d6',
-                                    borderColor: '#cbd5e1',
-                                    transform: 'scale(1.08)',
-                                },
-                            }}
-                        >
-                            <ChevronLeftIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </Tooltip>
-
-                    {/* Pista de Logos con Movimiento Continuo e Infinito (Marquee) */}
-                    <Box
-                        sx={{
-                            overflow: 'hidden',
-                            flexGrow: 1,
-                            mx: { xs: 1.5, sm: 2.5 },
-                            position: 'relative',
-                            maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-                        }}
-                        onMouseEnter={() => setIsMarqueeHovered(true)}
-                        onMouseLeave={() => setIsMarqueeHovered(false)}
-                        onTouchStart={() => setIsMarqueeHovered(true)}
-                        onTouchEnd={() => setIsMarqueeHovered(false)}
-                    >
-                        <Box
-                            ref={carouselTrackRef}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: { xs: 5, sm: 6.5, md: 8 },
-                                width: 'max-content',
-                                animation: `infiniteMarquee ${isMarqueeFast ? 10 : 36}s linear infinite`,
-                                animationDirection: marqueeDirection,
-                                animationPlayState: isMarqueeHovered ? 'paused' : 'running',
-                                willChange: 'transform',
-                                '@keyframes infiniteMarquee': {
-                                    '0%': { transform: 'translate3d(0, 0, 0)' },
-                                    '100%': { transform: 'translate3d(-50%, 0, 0)' },
-                                },
-                            }}
-                        >
-                            {INFINITE_BRANDS.map((brand, idx) => (
-                                <Tooltip key={idx} title={`Explorar ${brand.name}`} arrow>
-                                    <Box
-                                        onClick={() => handleShowcaseBrandClick(brand)}
-                                        sx={{
-                                            cursor: 'pointer',
-                                            flexShrink: 0,
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            px: 1.5,
-                                            transition: 'transform 0.22s ease, opacity 0.22s ease',
-                                            opacity: 0.9,
-                                            '&:hover': {
-                                                opacity: 1,
-                                                transform: 'scale(1.08)',
-                                            },
-                                        }}
-                                    >
-                                        <Box
-                                            component="img"
-                                            src={brand.logo}
-                                            alt={brand.name}
-                                            sx={{
-                                                height: { xs: 30, sm: 34, md: 38 },
-                                                maxWidth: { xs: 110, sm: 130, md: 155 },
-                                                width: 'auto',
-                                                objectFit: 'contain',
-                                                userSelect: 'none',
-                                            }}
-                                        />
-                                    </Box>
-                                </Tooltip>
-                            ))}
-                        </Box>
-                    </Box>
-
-                    {/* Botón Flecha Derecha */}
-                    <Tooltip title="Acelerar carrusel hacia adelante" arrow>
-                        <IconButton
-                            size="small"
-                            onClick={() => handleScrollBrands('right')}
-                            sx={{
-                                border: '1px solid #e2e8f0',
-                                bgcolor: '#f8fafc',
-                                width: 36,
-                                height: 36,
-                                flexShrink: 0,
-                                color: '#475569',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    bgcolor: '#f1f5f9',
-                                    color: '#0056d6',
-                                    borderColor: '#cbd5e1',
-                                    transform: 'scale(1.08)',
-                                },
-                            }}
-                        >
-                            <ChevronRightIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </Tooltip>
-                </Box>
+                {/* 3. Nueva Sección: Carrusel de Marcas (3D Cover Flow) */}
+                <BrandsCoverflowCarousel onSelectBrand={handleCoverflowBrandSelect} />
 
                 {/* 4. Sección: Directorio de Nuestras Marcas e Instituciones */}
                 <Box
-                    id="marcas"
+                    id="directorio-marcas"
                     sx={{
-                        pt: { xs: 1.5, md: 2 },
+                        pt: { xs: 6, md: 8 },
                         pb: { xs: 6, md: 9 },
                         bgcolor: '#fafcff',
                         borderBottom: '1px solid #eef2f6',
@@ -1703,9 +1530,10 @@ export default function Welcome({
                     id="contacto"
                     sx={{
                         py: { xs: 7, md: 10 },
-                        bgcolor: '#f7f9fc',
-                        borderTop: '1px solid #e6ebf2',
+                        bgcolor: '#f8fbff',
+                        borderTop: '1px solid #e2e8f0',
                         scrollMarginTop: { xs: '65px', md: '75px' },
+                        overflow: 'hidden',
                     }}
                 >
                     <Container
@@ -1715,126 +1543,125 @@ export default function Welcome({
                             px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 },
                         }}
                     >
-                        {/* Cabecera compacta de contacto */}
-                        <Box sx={{ mb: { xs: 4, md: 5 }, maxWidth: 760 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
-                                <Box sx={{ width: 34, height: 2, bgcolor: '#0056d6' }} />
-                                <Typography
-                                    sx={{
-                                        color: '#0056d6',
-                                        fontSize: '0.72rem',
-                                        fontWeight: 800,
-                                        letterSpacing: '0.16em',
-                                        textTransform: 'uppercase',
-                                    }}
-                                >
-                                    Contacto institucional
-                                </Typography>
-                            </Box>
-                            <Typography
-                                component="h2"
-                                sx={{
-                                    color: '#09152a',
-                                    fontSize: { xs: '2rem', sm: '2.6rem', md: '3.15rem' },
-                                    fontWeight: 850,
-                                    letterSpacing: '-0.035em',
-                                    lineHeight: 1.08,
-                                    mb: 1.4,
-                                }}
-                            >
-                                Estamos aquí para atenderte
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: '#64748b',
-                                    fontSize: { xs: '0.98rem', md: '1.05rem' },
-                                    lineHeight: 1.7,
-                                    maxWidth: 700,
-                                }}
-                            >
-                                Encuentra nuestra sede central y nuestros canales oficiales para recibir orientación sobre admisiones, programas académicos, certificaciones y servicios corporativos.
-                            </Typography>
-                        </Box>
+                        <SectionHeader
+                            eyebrow="Contacto institucional"
+                            title="Estamos aquí para atenderte"
+                            description="Encuentra nuestra sede central y utiliza nuestros canales oficiales para recibir orientación sobre admisiones, programas académicos, certificaciones y servicios corporativos."
+                        />
 
-                        {/* Composición principal: imagen izquierda + información derecha */}
-                        <Grid container spacing={{ xs: 3, md: 4 }} sx={{ alignItems: 'stretch', mb: { xs: 4, md: 5 } }}>
-                            <Grid size={{ xs: 12, lg: 6 }}>
-                                <Paper
-                                    elevation={0}
+                        {/* Composición inspirada en una portada editorial: imagen + información */}
+                        <Grid container spacing={{ xs: 3, md: 0 }} sx={{ mb: { xs: 3, md: 4 } }}>
+                            {/* Imagen institucional */}
+                            <Grid size={{ xs: 12, md: 5.2 }}>
+                                <Box
                                     sx={{
                                         position: 'relative',
-                                        height: { xs: 300, sm: 380, lg: 470 },
+                                        height: { xs: 340, sm: 400, md: 500 },
                                         overflow: 'hidden',
-                                        borderRadius: '2px',
-                                        bgcolor: '#0b4fae',
-                                        border: '1px solid #dbe4ef',
+                                        background: 'radial-gradient(ellipse at 85% 20%, #1754b5 0%, #0c43a3 50%, #051d4d 100%)',
+                                        borderRadius: { xs: '4px', md: '4px 0 0 4px' },
                                     }}
                                 >
+                                    {/* Fotografía de Atención / Secretaria Grupo CAPSUR */}
                                     <Box
                                         component="img"
-                                        src="/images/fachada-capsur.jpeg"
-                                        alt="Sede central Grupo CAPSUR"
+                                        src="/images/secretaria-capsur.png"
+                                        alt="Atención al Cliente y Orientación - Grupo CAPSUR"
                                         sx={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover',
-                                            objectPosition: 'center',
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            right: { xs: '-6%', sm: '-2%', md: '0%' },
+                                            width: { xs: '100%', sm: '88%', md: '92%' },
+                                            maxHeight: { xs: '84%', sm: '86%', md: '90%' },
+                                            objectFit: 'contain',
+                                            objectPosition: 'bottom right',
                                             display: 'block',
-                                            filter: 'saturate(0.92) contrast(1.02)',
+                                            zIndex: 1,
+                                            filter: 'drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45))',
+                                            pointerEvents: 'none',
                                         }}
                                     />
+
+                                    {/* Scrim gradiente para garantizar legibilidad de textos */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
                                             inset: 0,
-                                            background: 'linear-gradient(135deg, rgba(0, 45, 105, 0.82) 0%, rgba(0, 86, 214, 0.25) 48%, rgba(0, 25, 65, 0.05) 100%)',
+                                            zIndex: 2,
+                                            pointerEvents: 'none',
+                                            background: {
+                                                xs: 'linear-gradient(to bottom, rgba(5, 29, 77, 0.9) 0%, rgba(5, 29, 77, 0.4) 45%, rgba(5, 29, 77, 0.88) 100%)',
+                                                md: 'linear-gradient(105deg, rgba(5, 29, 77, 0.92) 0%, rgba(5, 29, 77, 0.65) 45%, rgba(5, 29, 77, 0.1) 75%)',
+                                            },
                                         }}
                                     />
+
+                                    {/* Textos destacados sobreimpresos */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            left: { xs: 24, md: 36 },
-                                            bottom: { xs: 24, md: 32 },
+                                            top: { xs: 28, md: 42 },
+                                            left: { xs: 28, md: 46 },
+                                            right: 28,
                                             color: '#fff',
-                                            maxWidth: 420,
+                                            zIndex: 3,
                                         }}
                                     >
                                         <Typography
                                             sx={{
-                                                fontSize: '0.7rem',
+                                                fontSize: '0.72rem',
                                                 fontWeight: 800,
-                                                letterSpacing: '0.16em',
+                                                letterSpacing: '0.18em',
                                                 textTransform: 'uppercase',
-                                                opacity: 0.78,
-                                                mb: 1,
+                                                opacity: 0.9,
+                                                mb: 1.5,
                                             }}
                                         >
                                             Grupo CAPSUR
                                         </Typography>
+                                        <Box sx={{ width: 64, height: 2, bgcolor: '#38bdf8', mb: 2 }} />
                                         <Typography
                                             sx={{
-                                                fontSize: { xs: '1.5rem', md: '2rem' },
+                                                fontSize: { xs: '1.65rem', md: '2.25rem' },
                                                 fontWeight: 800,
-                                                lineHeight: 1.15,
-                                                letterSpacing: '-0.025em',
+                                                lineHeight: 1.08,
+                                                letterSpacing: '-0.03em',
+                                                maxWidth: 390,
                                             }}
                                         >
-                                            Sede Central Institucional
+                                            {contact.bannerTitle}
                                         </Typography>
-                                        <Box sx={{ width: 46, height: 3, bgcolor: '#38bdf8', mt: 2 }} />
                                     </Box>
-                                </Paper>
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            bottom: { xs: 24, md: 34 },
+                                            left: { xs: 28, md: 46 },
+                                            right: { xs: 28, md: 46 },
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-end',
+                                            color: '#fff',
+                                            zIndex: 3,
+                                        }}
+                                    >
+                                        <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, opacity: 0.85, maxWidth: 250, lineHeight: 1.5 }}>
+                                            {contact.bannerSubtitle}
+                                        </Typography>
+                                        <Box sx={{ width: 52, height: 3, bgcolor: '#38bdf8' }} />
+                                    </Box>
+                                </Box>
                             </Grid>
 
-                            <Grid size={{ xs: 12, lg: 6 }}>
-                                <Paper
-                                    elevation={0}
+                            {/* Información institucional */}
+                            <Grid size={{ xs: 12, md: 6.8 }}>
+                                <Box
                                     sx={{
-                                        height: '100%',
-                                        minHeight: { xs: 300, sm: 380, lg: 470 },
+                                        height: { md: 500 },
                                         bgcolor: '#ffffff',
                                         border: '1px solid #dbe4ef',
-                                        borderRadius: '2px',
+                                        borderLeft: { md: 'none' },
+                                        borderRadius: { xs: '4px', md: '0 4px 4px 0' },
                                         p: { xs: 3, sm: 4, md: 5 },
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -1846,179 +1673,271 @@ export default function Welcome({
                                             color: '#0056d6',
                                             fontSize: '0.72rem',
                                             fontWeight: 800,
-                                            letterSpacing: '0.14em',
+                                            letterSpacing: '0.16em',
                                             textTransform: 'uppercase',
-                                            mb: 1.5,
+                                            mb: 1.2,
                                         }}
                                     >
                                         Canales oficiales
                                     </Typography>
-
                                     <Typography
+                                        component="h3"
                                         sx={{
                                             color: '#09152a',
-                                            fontSize: { xs: '1.6rem', md: '2.1rem' },
+                                            fontSize: { xs: '1.65rem', md: '2.15rem' },
                                             fontWeight: 800,
-                                            letterSpacing: '-0.025em',
-                                            lineHeight: 1.15,
-                                            mb: 3.5,
+                                            letterSpacing: '-0.03em',
+                                            lineHeight: 1.12,
+                                            mb: 3.2,
                                         }}
                                     >
                                         Conecta con Grupo CAPSUR
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Box sx={{ pb: 2.4, borderBottom: '1px solid #e8edf3' }}>
-                                            <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
-                                                Sede central
-                                            </Typography>
-                                            <Typography sx={{ color: '#0f172a', fontWeight: 750, fontSize: '1rem', lineHeight: 1.4 }}>
-                                                Av. Coronel Justo Arias Aragüez N° 1111
-                                            </Typography>
-                                            <Typography sx={{ color: '#64748b', fontSize: '0.86rem', mt: 0.35 }}>
-                                                Tacna, Perú — Edificio Corporativo Grupo CAPSUR
-                                            </Typography>
-                                        </Box>
+                                    <Grid container spacing={{ xs: 2.5, md: 3.5 }}>
+                                        <Grid size={{ xs: 12, sm: 6 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: 'primary.main', pt: 1.5 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                                    Sede central
+                                                </Typography>
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 750, fontSize: '0.98rem', lineHeight: 1.45 }}>
+                                                    {contact.address}
+                                                </Typography>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
+                                                    {contact.addressDetail}
+                                                </Typography>
+                                                <Button
+                                                    size="small"
+                                                    startIcon={<LocationOnIcon sx={{ fontSize: 15 }} />}
+                                                    onClick={() => setMapModalOpen(true)}
+                                                    sx={{
+                                                        mt: 0.8,
+                                                        p: 0,
+                                                        textTransform: 'none',
+                                                        fontWeight: 750,
+                                                        fontSize: '0.78rem',
+                                                        color: 'primary.main',
+                                                        justifyContent: 'flex-start',
+                                                        minWidth: 0,
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+                                                    }}
+                                                >
+                                                    Ver ubicación en el mapa
+                                                </Button>
+                                            </Box>
+                                        </Grid>
 
-                                        <Box sx={{ py: 2.4, borderBottom: '1px solid #e8edf3' }}>
-                                            <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
-                                                Atención e informes
-                                            </Typography>
-                                            <Typography sx={{ color: '#0f172a', fontWeight: 800, fontSize: '1.05rem' }}>
-                                                +51 963 147 270
-                                            </Typography>
-                                            <Typography sx={{ color: '#64748b', fontSize: '0.86rem', mt: 0.35 }}>
-                                                Matrículas, carreras y certificaciones técnicas
-                                            </Typography>
-                                        </Box>
+                                        <Grid size={{ xs: 12, sm: 6 }}>
+                                            <Box sx={{ borderTop: '2px solid #0056d6', pt: 1.5 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                                    Atención e informes
+                                                </Typography>
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 800, fontSize: '1rem' }}>
+                                                    {contact.phone}
+                                                </Typography>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
+                                                    {contact.phoneDetail}
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
 
-                                        <Grid container spacing={3} sx={{ pt: 2.4 }}>
-                                            <Grid size={{ xs: 12, sm: 7 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
+                                        <Grid size={{ xs: 12, sm: 6 }}>
+                                            <Box sx={{ borderTop: '1px solid #e2e8f0', pt: 1.8 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Correo institucional
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.9rem' }}>
-                                                    contacto@grupocapsur.edu.pe
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
+                                                    {contact.email}
                                                 </Typography>
-                                            </Grid>
-                                            <Grid size={{ xs: 12, sm: 5 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', mb: 0.6 }}>
-                                                    Horario
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
+                                                    {contact.emailDetail}
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.9rem' }}>
-                                                    Lun - Sáb · 8:00 AM – 7:00 PM
-                                                </Typography>
-                                            </Grid>
+                                            </Box>
                                         </Grid>
-                                    </Box>
+
+                                        <Grid size={{ xs: 12, sm: 6 }}>
+                                            <Box sx={{ borderTop: '1px solid #e2e8f0', pt: 1.8 }}>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                                    Horario de atención
+                                                </Typography>
+                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
+                                                    {contact.schedule}
+                                                </Typography>
+                                                <Typography sx={{ color: '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
+                                                    {contact.scheduleDetail}
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
 
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 3.5 }}>
                                         <Button
                                             variant="contained"
-                                            startIcon={<WhatsAppIcon sx={{ fontSize: 18 }} />}
-                                            href="https://wa.me/51963147270?text=Hola,%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20programas%20de%20Grupo%20CAPSUR"
+                                            color="primary"
+                                            startIcon={<WhatsAppIcon sx={{ fontSize: 19 }} />}
+                                            endIcon={<ArrowForwardIcon sx={{ fontSize: 17 }} />}
+                                            href={contact.whatsappHref}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             sx={{
-                                                bgcolor: '#0056d6',
-                                                color: '#fff',
                                                 px: 2.5,
-                                                py: 1.05,
-                                                borderRadius: '2px',
+                                                py: 1.1,
+                                                borderRadius: 1,
                                                 textTransform: 'none',
                                                 fontWeight: 750,
                                                 boxShadow: 'none',
-                                                '&:hover': { bgcolor: '#0043a8', boxShadow: 'none' },
                                             }}
                                         >
-                                            Escribir por WhatsApp
+                                            Escribir a WhatsApp
                                         </Button>
                                         <Button
                                             variant="outlined"
-                                            startIcon={<DirectionsIcon sx={{ fontSize: 18 }} />}
-                                            href="https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                            color="primary"
+                                            startIcon={<MapIcon sx={{ fontSize: 18 }} />}
+                                            onClick={() => setMapModalOpen(true)}
                                             sx={{
-                                                borderColor: '#cbd5e1',
-                                                color: '#0f172a',
                                                 px: 2.5,
-                                                py: 1.05,
-                                                borderRadius: '2px',
+                                                py: 1.1,
+                                                borderRadius: 1,
                                                 textTransform: 'none',
                                                 fontWeight: 700,
-                                                '&:hover': { borderColor: '#0056d6', bgcolor: '#f8fbff' },
                                             }}
                                         >
-                                            Cómo llegar
+                                            Ver Mapa de Ubicación
                                         </Button>
                                     </Box>
-                                </Paper>
+                                </Box>
                             </Grid>
                         </Grid>
 
-                        {/* Mapa a ancho completo debajo de la composición principal */}
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                border: '1px solid #dbe4ef',
-                                borderRadius: '2px',
-                                overflow: 'hidden',
-                                bgcolor: '#ffffff',
+                        {/* Modal Interactivo con Mapa de Ubicación */}
+                        <Dialog
+                            open={mapModalOpen}
+                            onClose={() => setMapModalOpen(false)}
+                            maxWidth="md"
+                            fullWidth
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        borderRadius: 2.5,
+                                        overflow: 'hidden',
+                                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                                    },
+                                },
                             }}
                         >
-                            <Box
+                            <DialogTitle
                                 sx={{
-                                    px: { xs: 2.5, md: 3.5 },
-                                    py: 2,
+                                    m: 0,
+                                    p: { xs: 2, sm: 2.5 },
+                                    bgcolor: 'background.paper',
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    gap: 2,
-                                    flexWrap: 'wrap',
-                                    borderBottom: '1px solid #e8edf3',
+                                    gap: 1.5,
                                 }}
                             >
-                                <Box>
-                                    <Typography sx={{ color: '#09152a', fontWeight: 800, fontSize: '1rem' }}>
-                                        Ubicación de la sede central
-                                    </Typography>
-                                    <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.2 }}>
-                                        Av. Coronel Justo Arias Aragüez N° 1111, Tacna
-                                    </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: 'primary.main',
+                                            color: '#ffffff',
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: 1,
+                                            boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
+                                        }}
+                                    >
+                                        <LocationOnIcon fontSize="small" />
+                                    </Avatar>
+                                    <Box>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.1rem' }, lineHeight: 1.2 }}>
+                                            Ubicación de nuestra sede central
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mt: 0.2 }}>
+                                            {contact.address}{contact.addressDetail ? ` · ${contact.addressDetail}` : ''}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-                                <Button
+                                <IconButton
+                                    aria-label="Cerrar modal de mapa"
+                                    onClick={() => setMapModalOpen(false)}
                                     size="small"
-                                    endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
-                                    href="https://www.google.com/maps/search/?api=1&query=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                     sx={{
-                                        color: '#0056d6',
-                                        textTransform: 'none',
-                                        fontWeight: 750,
+                                        color: 'text.secondary',
+                                        '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
                                     }}
                                 >
-                                    Abrir en Google Maps
-                                </Button>
-                            </Box>
+                                    <CloseIcon fontSize="small" />
+                                </IconButton>
+                            </DialogTitle>
 
-                            <Box sx={{ position: 'relative', width: '100%', height: { xs: 300, sm: 380, md: 460 } }}>
-                                <iframe
-                                    title="Ubicación en Google Maps de Grupo CAPSUR"
-                                    src="https://maps.google.com/maps?q=Av.+Coronel+Justo+Arias+Arag%C3%BCez+1111,+Tacna,+Per%C3%BA&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-                                    allowFullScreen
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                />
-                            </Box>
-                        </Paper>
+                            <DialogContent
+                                sx={{
+                                    p: 0,
+                                    height: { xs: 350, sm: 440, md: 520 },
+                                    position: 'relative',
+                                    bgcolor: '#f1f5f9',
+                                }}
+                            >
+                                {contact.mapsEmbedUrl ? (
+                                    <iframe
+                                        title="Ubicación en Google Maps de Grupo CAPSUR"
+                                        src={contact.mapsEmbedUrl}
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                ) : (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', p: 3 }}>
+                                        <Typography color="text.secondary">No se ha configurado la URL del mapa interactivo.</Typography>
+                                    </Box>
+                                )}
+                            </DialogContent>
+
+                            <DialogActions
+                                sx={{
+                                    px: { xs: 2, sm: 2.5 },
+                                    py: 1.8,
+                                    borderTop: '1px solid',
+                                    borderColor: 'divider',
+                                    bgcolor: 'background.paper',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: 1.5,
+                                }}
+                            >
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    color="primary"
+                                    endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
+                                    href={contact.mapsUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 1 }}
+                                >
+                                    Abrir en la aplicación de Google Maps
+                                </Button>
+                                <Button
+                                    onClick={() => setMapModalOpen(false)}
+                                    color="inherit"
+                                    variant="text"
+                                    sx={{ textTransform: 'none', fontWeight: 700 }}
+                                >
+                                    Cerrar
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </Container>
                 </Box>
-
 
                 {/* 8. Footer Corporativo */}
                 <Box sx={{ py: 6, bgcolor: '#08142a', color: '#ffffff', mt: 'auto', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>

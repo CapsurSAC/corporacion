@@ -11,6 +11,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import AwardIcon from '@mui/icons-material/EmojiEvents';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import {
+    Avatar,
     Box,
     Button,
     Chip,
@@ -179,52 +180,49 @@ export default function RubrosIndex({
                             gap: 2,
                         }}
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                            <Avatar
                                 sx={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 1.2,
-                                    bgcolor: (theme) =>
-                                        theme.palette.mode === 'dark'
-                                            ? 'rgba(124, 58, 237, 0.2)'
-                                            : 'rgba(124, 58, 237, 0.1)',
-                                    color: '#7c3aed',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid',
-                                    borderColor: (theme) =>
-                                        theme.palette.mode === 'dark'
-                                            ? 'rgba(124, 58, 237, 0.4)'
-                                            : 'rgba(124, 58, 237, 0.2)',
-                                    flexShrink: 0,
+                                    bgcolor: 'primary.main',
+                                    color: '#ffffff',
+                                    width: 42,
+                                    height: 42,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
                                 }}
                             >
-                                <TagsIcon fontSize="medium" />
-                            </Box>
+                                <TagsIcon fontSize="small" />
+                            </Avatar>
                             <Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
-                                        Gestión de Rubros y Especialidades
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                        }}
+                                    >
+                                        Rubros y Especialidades
                                     </Typography>
                                     <Chip
                                         label={`${rubros.length} RUBROS`}
                                         size="small"
                                         sx={{
-                                            height: 20,
-                                            fontSize: '0.68rem',
-                                            fontWeight: 800,
                                             bgcolor: (theme) =>
                                                 theme.palette.mode === 'dark'
-                                                    ? 'rgba(124, 58, 237, 0.2)'
-                                                    : 'rgba(124, 58, 237, 0.1)',
-                                            color: '#7c3aed',
+                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                    : 'rgba(12, 67, 163, 0.08)',
+                                            color: 'primary.main',
+                                            fontWeight: 800,
+                                            fontSize: '0.68rem',
+                                            height: 20,
+                                            borderRadius: 1,
                                             border: '1px solid',
                                             borderColor: (theme) =>
                                                 theme.palette.mode === 'dark'
-                                                    ? 'rgba(124, 58, 237, 0.4)'
-                                                    : 'rgba(124, 58, 237, 0.2)',
+                                                    ? 'rgba(12, 67, 163, 0.4)'
+                                                    : 'rgba(12, 67, 163, 0.2)',
                                         }}
                                     />
                                 </Box>

@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import SchoolIcon from '@mui/icons-material/School';
 import {
+    Avatar,
     Box,
     Button,
     Chip,
@@ -166,52 +167,49 @@ export default function EstadosIndex({
                             gap: 2,
                         }}
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
+                            <Avatar
                                 sx={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 1.2,
-                                    bgcolor: (theme) =>
-                                        theme.palette.mode === 'dark'
-                                            ? 'rgba(22, 163, 74, 0.2)'
-                                            : 'rgba(22, 163, 74, 0.1)',
-                                    color: '#16a34a',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid',
-                                    borderColor: (theme) =>
-                                        theme.palette.mode === 'dark'
-                                            ? 'rgba(22, 163, 74, 0.4)'
-                                            : 'rgba(22, 163, 74, 0.2)',
-                                    flexShrink: 0,
+                                    bgcolor: 'primary.main',
+                                    color: '#ffffff',
+                                    width: 42,
+                                    height: 42,
+                                    borderRadius: 1,
+                                    boxShadow: '0 2px 8px rgba(12, 67, 163, 0.25)',
                                 }}
                             >
-                                <CheckCircleIcon fontSize="medium" />
-                            </Box>
+                                <CheckCircleIcon fontSize="small" />
+                            </Avatar>
                             <Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 800,
+                                            color: 'text.primary',
+                                            letterSpacing: '-0.02em',
+                                        }}
+                                    >
                                         Gestión de Estados
                                     </Typography>
                                     <Chip
                                         label={`${estados.length} ESTADOS`}
                                         size="small"
                                         sx={{
-                                            height: 20,
-                                            fontSize: '0.68rem',
-                                            fontWeight: 800,
                                             bgcolor: (theme) =>
                                                 theme.palette.mode === 'dark'
-                                                    ? 'rgba(22, 163, 74, 0.2)'
-                                                    : 'rgba(22, 163, 74, 0.1)',
-                                            color: '#16a34a',
+                                                    ? 'rgba(12, 67, 163, 0.25)'
+                                                    : 'rgba(12, 67, 163, 0.08)',
+                                            color: 'primary.main',
+                                            fontWeight: 800,
+                                            fontSize: '0.68rem',
+                                            height: 20,
+                                            borderRadius: 1,
                                             border: '1px solid',
                                             borderColor: (theme) =>
                                                 theme.palette.mode === 'dark'
-                                                    ? 'rgba(22, 163, 74, 0.4)'
-                                                    : 'rgba(22, 163, 74, 0.2)',
+                                                    ? 'rgba(12, 67, 163, 0.4)'
+                                                    : 'rgba(12, 67, 163, 0.2)',
                                         }}
                                     />
                                 </Box>

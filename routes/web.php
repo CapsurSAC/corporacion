@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CarreraController;
 use App\Http\Controllers\Admin\ComercioController;
+use App\Http\Controllers\Admin\ContactoController;
 use App\Http\Controllers\Admin\CursoController;
 use App\Http\Controllers\Admin\DiplomadoController;
 use App\Http\Controllers\Admin\DriveCapacitacionController;
@@ -79,6 +80,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Logos
         Route::get('logos', [LogoController::class, 'index'])->name('logos.index');
         Route::post('logos/{comercio}', [LogoController::class, 'update'])->name('logos.update');
+
+        // Contacto Institucional
+        Route::get('contacto', [ContactoController::class, 'edit'])->name('contacto.edit');
+        Route::put('contacto', [ContactoController::class, 'update'])->name('contacto.update');
     });
 });
 

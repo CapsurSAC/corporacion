@@ -221,4 +221,21 @@ export interface Rubro {
     updated_at?: string;
 }
 
+export interface ContactInfo {
+    address: string;
+    addressDetail: string;
+    phone: string;
+    phoneDetail: string;
+    whatsapp: string;
+    whatsappMessage: string;
+    email: string;
+    emailDetail: string;
+    schedule: string;
+    scheduleDetail: string;
+    mapsUrl: string;
+    mapsEmbedUrl: string;
+    bannerTitle: string;
+    bannerSubtitle: string;
+}
+
 
