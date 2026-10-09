@@ -1,16 +1,26 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import ApartmentIcon from '@mui/icons-material/Apartment';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import BusinessIcon from '@mui/icons-material/Business';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ClearIcon from '@mui/icons-material/Clear';
+import ConstructionIcon from '@mui/icons-material/Construction';
 import DescriptionIcon from '@mui/icons-material/Description';
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
+import LayersIcon from '@mui/icons-material/Layers';
+import ShieldIcon from '@mui/icons-material/Shield';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import EmailIcon from '@mui/icons-material/Email';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import FlightIcon from '@mui/icons-material/Flight';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
+import GridViewIcon from '@mui/icons-material/GridView';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LanguageIcon from '@mui/icons-material/Language';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 import LaunchIcon from '@mui/icons-material/Launch';
@@ -18,7 +28,9 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
+import PeopleIcon from '@mui/icons-material/People';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -26,6 +38,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import {
@@ -298,9 +311,25 @@ export default function Welcome({
         return list;
     }, [grupos]);
 
+    // Orden de visualización idéntico a la nueva referencia (Filas 1 y 2 según la foto, luego Fila 3)
+    const BRAND_SORT_ORDER: Record<string, number> = {
+        'istp-avanti': 1,
+        'avanti': 1,
+        'certifica-sis': 2,
+        'next-online': 3,
+        'next': 3,
+        'cecava': 4,
+        'matpel': 5,
+        'istp-globalex': 6,
+        'globalex': 6,
+        'istp-sis': 7,
+        'magister': 8,
+        'cecava-min': 9,
+    };
+
     // Filtrar comercios según grupo y término de búsqueda
     const filteredComercios = useMemo(() => {
-        return allComercios.filter((com) => {
+        const list = allComercios.filter((com) => {
             if (selectedGrupoId !== 'all' && com.grupo_id !== selectedGrupoId) {
                 return false;
             }
@@ -334,7 +363,248 @@ export default function Welcome({
 
             return true;
         });
+
+        return list.sort((a, b) => {
+            const orderA = BRAND_SORT_ORDER[a.slug?.toLowerCase() || ''] ?? 99;
+            const orderB = BRAND_SORT_ORDER[b.slug?.toLowerCase() || ''] ?? 99;
+            return orderA - orderB;
+        });
     }, [allComercios, selectedGrupoId, searchQuery]);
+
+    interface BrandCardFeature {
+        icon: React.ComponentType<any>;
+        text: string;
+    }
+
+    interface BrandCardTheme {
+        displayName: string;
+        tag: string;
+        description: string;
+        logoSrc: string;
+        isCustomLogoBadge?: boolean;
+        accent: string;
+        bgGradient: string;
+        border: string;
+        arrowBg: string;
+        glowBg: string;
+        shadowHover: string;
+        features: BrandCardFeature[];
+    }
+
+    // Configuración visual adaptada de cada marca al nuevo diseño
+    const getBrandCardConfig = (comercio: Comercio): BrandCardTheme => {
+        const slug = (comercio.slug || '').toLowerCase();
+        const sigla = (comercio.sigla || '').toLowerCase();
+        const nombre = (comercio.nombre || '').toLowerCase();
+
+        // 1. Avanti
+        if (slug.includes('avanti') || sigla.includes('avanti') || nombre.includes('avanti')) {
+            return {
+                displayName: 'AVANTI',
+                tag: 'INSTITUTO SUPERIOR',
+                description: 'Carreras técnicas con enfoque práctico y proyección laboral.',
+                logoSrc: '/logos-comercios/avanti-para-fondo-blanco.png',
+                accent: '#dc2626',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: SchoolIcon, text: '3 Carreras' },
+                    { icon: DescriptionIcon, text: '4 Especialidades' },
+                    { icon: PeopleIcon, text: '8 Diplomados' },
+                ],
+            };
+        }
+
+        // 2. CERTIFICA SIS
+        if (slug === 'certifica-sis' || (sigla === 'sis' && nombre.includes('certifica')) || nombre.includes('certifica sis')) {
+            return {
+                displayName: 'CERTIFICA SIS',
+                tag: 'INSTITUTO SUPERIOR',
+                description: 'Formación técnica de calidad con respaldo institucional.',
+                logoSrc: '/logos-comercios/sis-para-fondo-blanco.png',
+                accent: '#2563eb',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: SchoolIcon, text: '22 Especialidades' },
+                    { icon: DescriptionIcon, text: 'Programas técnicos' },
+                    { icon: WorkspacePremiumIcon, text: 'Certificación oficial' },
+                ],
+            };
+        }
+
+        // 3. Next Online
+        if (slug.includes('next') || sigla.includes('next') || nombre.includes('next')) {
+            return {
+                displayName: 'NEXT ONLINE',
+                tag: 'ESCUELA DE IDIOMAS',
+                description: 'Idiomas para un mundo sin límites.',
+                logoSrc: '/logos-comercios/next-online-para-fondo-blanco.png',
+                accent: '#eab308',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: LanguageIcon, text: '6 Idiomas' },
+                    { icon: BarChartIcon, text: '3 Niveles' },
+                    { icon: LaptopMacIcon, text: 'Clases 100% online' },
+                ],
+            };
+        }
+
+        // 4. CECAVA
+        if ((slug === 'cecava' || sigla === 'cecava') && !slug.includes('min') && !sigla.includes('min')) {
+            return {
+                displayName: 'CECAVA',
+                tag: 'ESCUELA DE CAPACITACIÓN',
+                description: 'Programas especializados para tu crecimiento profesional.',
+                logoSrc: '/logos-comercios/cecava-para-fondo-blanco.png',
+                accent: '#22c55e',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: MenuBookIcon, text: '7 Líneas de formación' },
+                    { icon: DescriptionIcon, text: 'Diplomados y cursos' },
+                    { icon: WorkspacePremiumIcon, text: 'Certificación laboral' },
+                ],
+            };
+        }
+
+        // 5. MATPEL
+        if (slug.includes('matpel') || sigla.includes('matpel') || nombre.includes('matpel')) {
+            return {
+                displayName: 'MATPEL',
+                tag: 'FORMACIÓN EN SEGURIDAD',
+                description: 'Capacitaciones para un trabajo más seguro.',
+                logoSrc: '/logos-comercios/matpel-para-fondo-blanco.png',
+                accent: '#ea580c',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: ShieldIcon, text: 'Niveles I, II y III' },
+                    { icon: DescriptionIcon, text: 'Diplomados' },
+                    { icon: EngineeringIcon, text: 'Normativa MTC' },
+                ],
+            };
+        }
+
+        // 6. GLOBALEX
+        if (slug.includes('globalex') || sigla.includes('globalex') || nombre.includes('globalex')) {
+            return {
+                displayName: 'GLOBALEX',
+                tag: 'PROGRAMAS ESPECIALIZADOS',
+                description: 'Especializaciones para nuevos desafíos.',
+                logoSrc: '/logos-comercios/globalex-para-fondo-blanco.png',
+                accent: '#7c3aed',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: LayersIcon, text: 'Carreras' },
+                    { icon: DescriptionIcon, text: 'Diplomados' },
+                    { icon: BarChartIcon, text: 'Programas corporativos' },
+                ],
+            };
+        }
+
+        // 7. ISTP SIS (CEI)
+        if (slug.includes('istp-sis') || sigla === 'cei' || nombre.includes('istp sis') || nombre.includes('sistemas del sur')) {
+            return {
+                displayName: 'ISTP SIS (CEI)',
+                tag: 'INSTITUTO SUPERIOR TECNOLÓGICO',
+                description: 'Carreras técnicas superiores acreditadas y tituladas por MINEDU.',
+                logoSrc: '/logos-comercios/sis-para-fondo-blanco.png',
+                accent: '#0284c7',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: SchoolIcon, text: '1 Carrera' },
+                    { icon: ApartmentIcon, text: '67 Especialidades' },
+                    { icon: VpnKeyIcon, text: 'Código ESCALE MINEDU' },
+                ],
+            };
+        }
+
+        // 8. MAGISTER
+        if (slug.includes('magister') || sigla.includes('mag') || nombre.includes('magister')) {
+            return {
+                displayName: 'MAGISTER',
+                tag: 'CENTRO DE ALTOS ESTUDIOS',
+                description: 'Diplomados y programas de alta especialización profesional.',
+                logoSrc: '/logos-comercios/magister-para-fondo-blanco.png',
+                accent: '#1e40af',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: MenuBookIcon, text: '18 Diplomados' },
+                    { icon: WorkspacePremiumIcon, text: 'Alta Especialización' },
+                    { icon: VerifiedUserIcon, text: 'Respaldo Institucional' },
+                ],
+            };
+        }
+
+        // 9. CECAVA-MIN
+        if (slug.includes('cecava-min') || sigla.includes('cecava-min') || nombre.includes('cecava-min') || nombre.includes('cecava min')) {
+            return {
+                displayName: 'CECAVA-MIN',
+                tag: 'ESCUELA DE CAPACITACIÓN MINERA',
+                description: 'Entrenamiento técnico y seguridad en operaciones mineras.',
+                logoSrc: '/logos-comercios/cecava-min-para-fondo-blanco.png',
+                accent: '#0d9488',
+                bgGradient: '#ffffff',
+                border: '#e2e8f0',
+                arrowBg: '#eff6ff',
+                glowBg: 'transparent',
+                shadowHover: 'rgba(15, 23, 42, 0.08)',
+                features: [
+                    { icon: EngineeringIcon, text: 'Seguridad Minera' },
+                    { icon: DescriptionIcon, text: 'Diplomados Técnicos' },
+                    { icon: WorkspacePremiumIcon, text: 'Certificación Oficial' },
+                ],
+            };
+        }
+
+        // Genérico por defecto
+        return {
+            displayName: comercio.nombre.toUpperCase(),
+            tag: comercio.grupo?.nombre ? `DIVISIÓN ${comercio.grupo.nombre.toUpperCase()}` : 'INSTITUCIÓN FORMATIVA',
+            description: comercio.descripcion || 'Institución formativa perteneciente a Grupo CAPSUR.',
+            logoSrc: comercio.logo_modo_claro || comercio.logo_modo_oscuro || '/logos-comercios/avanti-para-fondo-blanco.png',
+            accent: '#0056d6',
+            bgGradient: '#ffffff',
+            border: '#e2e8f0',
+            arrowBg: '#eff6ff',
+            glowBg: 'transparent',
+            shadowHover: 'rgba(15, 23, 42, 0.08)',
+            features: [
+                { icon: SchoolIcon, text: `${comercio.carreras?.length || 0} Carreras` },
+                { icon: DescriptionIcon, text: `${comercio.diplomados?.length || 0} Diplomados` },
+                { icon: WorkspacePremiumIcon, text: 'Certificación Oficial' },
+            ],
+        };
+    };
 
 
 
@@ -602,8 +872,7 @@ export default function Welcome({
                     sx={{
                         position: 'relative',
                         bgcolor: '#08142a',
-                        minHeight: { xs: 'calc(100dvh - 65px)', md: 'calc(100dvh - 70px)' },
-                        height: { xs: 'auto', md: 'calc(100dvh - 70px)' },
+                        height: { xs: 'auto', md: '100vh' },
                         display: 'flex',
                         alignItems: 'stretch',
                         overflow: 'hidden',
@@ -966,26 +1235,84 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 3. Nueva Sección: Carrusel de Marcas (3D Cover Flow) */}
-                <BrandsCoverflowCarousel onSelectBrand={handleCoverflowBrandSelect} />
-
-                {/* 4. Sección: Directorio de Nuestras Marcas e Instituciones */}
+                {/* 3. Sección: Nuestras Marcas e Instituciones */}
                 <Box
-                    id="directorio-marcas"
+                    id="marcas"
                     sx={{
+                        position: 'relative',
                         pt: { xs: 6, md: 8 },
-                        pb: { xs: 6, md: 9 },
-                        bgcolor: '#fafcff',
+                        pb: { xs: 8, md: 10 },
+                        bgcolor: '#f8faff',
+                        backgroundImage: `url('/images/fondo-marcas.svg')`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center top',
+                        backgroundSize: { xs: 'cover', md: '100% 100%' },
                         borderBottom: '1px solid #eef2f6',
                         scrollMarginTop: { xs: '65px', md: '75px' },
+                        overflow: 'hidden',
                     }}
                 >
-                    <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
-                        <SectionHeader
-                            eyebrow="Portafolio oficial"
-                            title="Nuestras Marcas e Instituciones"
-                            description="Explora cada una de nuestras instituciones acreditadas, resoluciones oficiales MINEDU, carreras profesionales y plataformas de formación."
-                        />
+                    {/* Ancla para enlaces que apunten a directorio-marcas */}
+                    <Box id="directorio-marcas" sx={{ position: 'relative', top: { xs: '-65px', md: '-75px' } }} />
+
+                    <Container maxWidth="xl" sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5 } }}>
+                        {/* Encabezado Principal según la foto de referencia */}
+                        <Box sx={{ textAlign: 'center', maxWidth: 880, mx: 'auto', mb: { xs: 3.5, md: 4.5 } }}>
+                            {/* Eyebrow: —— NUESTRAS MARCAS —— */}
+                            <Box
+                                sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 1.5,
+                                    mb: 1.75,
+                                }}
+                            >
+                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+                                <Typography
+                                    component="span"
+                                    sx={{
+                                        fontSize: { xs: '0.74rem', md: '0.8rem' },
+                                        fontWeight: 800,
+                                        letterSpacing: '0.14em',
+                                        textTransform: 'uppercase',
+                                        color: '#0056d6',
+                                        lineHeight: 1,
+                                    }}
+                                >
+                                    NUESTRAS MARCAS
+                                </Typography>
+                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+                            </Box>
+
+                            {/* Título de la sección */}
+                            <Typography
+                                component="h2"
+                                sx={{
+                                    fontSize: { xs: '1.95rem', sm: '2.45rem', md: '2.95rem' },
+                                    fontWeight: 900,
+                                    color: '#09152a',
+                                    letterSpacing: '-0.035em',
+                                    lineHeight: 1.15,
+                                    mb: 1.6,
+                                }}
+                            >
+                                Impulsando el talento con excelencia y cobertura nacional
+                            </Typography>
+
+                            {/* Subtítulo descriptivo */}
+                            <Typography
+                                sx={{
+                                    color: '#64748b',
+                                    fontSize: { xs: '0.94rem', md: '1.02rem' },
+                                    lineHeight: 1.6,
+                                    maxWidth: 760,
+                                    mx: 'auto',
+                                }}
+                            >
+                                Una sólida red de instituciones y programas de formación orientados al desarrollo profesional y a las necesidades del mundo laboral.
+                            </Typography>
+                        </Box>
 
                         {/* Barra de Búsqueda y Filtros de Grupo */}
                         <Box
@@ -995,89 +1322,132 @@ export default function Welcome({
                                 alignItems: { xs: 'stretch', md: 'center' },
                                 justifyContent: 'space-between',
                                 bgcolor: '#ffffff',
-                                p: 2,
-                                borderRadius: 3,
-                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+                                p: { xs: 1.25, md: 1.5 },
+                                borderRadius: 4,
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
                                 border: '1px solid #e2e8f0',
-                                mb: 4,
-                                gap: 2,
+                                mb: { xs: 3.5, md: 4.5 },
+                                gap: 1.5,
                             }}
                         >
                             {/* Buscador */}
                             <TextField
                                 size="small"
-                                placeholder="Buscar por marca, carrera o código ESCALE..."
+                                placeholder="Buscar por marca, programa o especialidad..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <SearchIcon sx={{ fontSize: 20, color: '#64748b' }} />
+                                                <SearchIcon sx={{ fontSize: 19, color: '#64748b' }} />
                                             </InputAdornment>
                                         ),
                                         endAdornment: searchQuery ? (
                                             <InputAdornment position="end">
                                                 <IconButton size="small" onClick={() => setSearchQuery('')}>
-                                                    <ClearIcon sx={{ fontSize: 16 }} />
+                                                    <ClearIcon sx={{ fontSize: 15 }} />
                                                 </IconButton>
                                             </InputAdornment>
                                         ) : null,
                                     },
                                 }}
                                 sx={{
-                                    width: { xs: '100%', md: 340 },
+                                    width: { xs: '100%', md: 360 },
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: 99,
                                         bgcolor: '#f8fafc',
-                                        fontSize: '0.88rem',
+                                        fontSize: '0.86rem',
+                                        '& fieldset': { borderColor: '#e2e8f0' },
+                                        '&:hover fieldset': { borderColor: '#cbd5e1' },
+                                        '&.Mui-focused fieldset': { borderColor: '#0056d6' },
                                     },
                                 }}
                             />
 
                             {/* Filtros de Grupos */}
-                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-                                <Chip
-                                    label={`Todos (${allComercios.length})`}
-                                    clickable
-                                    color={selectedGrupoId === 'all' ? 'primary' : 'default'}
+                            <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', alignItems: 'center' }}>
+                                <Box
+                                    component="button"
                                     onClick={() => setSelectedGrupoId('all')}
                                     sx={{
-                                        fontWeight: 700,
+                                        border: 'none',
+                                        outline: 'none',
+                                        cursor: 'pointer',
                                         borderRadius: 99,
+                                        px: 2,
+                                        py: 0.75,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 0.7,
+                                        fontWeight: 750,
+                                        fontSize: '0.82rem',
+                                        transition: 'all 0.2s ease',
                                         bgcolor: selectedGrupoId === 'all' ? '#0056d6' : '#f1f5f9',
+                                        color: selectedGrupoId === 'all' ? '#ffffff' : '#334155',
+                                        boxShadow: selectedGrupoId === 'all' ? '0 4px 12px rgba(0, 86, 214, 0.25)' : 'none',
+                                        '&:hover': {
+                                            bgcolor: selectedGrupoId === 'all' ? '#004ec2' : '#e2e8f0',
+                                        },
                                     }}
-                                />
-                                {grupos.map((grp) => (
-                                    <Chip
-                                        key={grp.id}
-                                        label={`${grp.nombre} (${grp.comercios?.length || 0})`}
-                                        clickable
-                                        color={selectedGrupoId === grp.id ? 'primary' : 'default'}
-                                        onClick={() => setSelectedGrupoId(grp.id)}
-                                        sx={{
-                                            fontWeight: 700,
-                                            borderRadius: 99,
-                                            bgcolor: selectedGrupoId === grp.id ? '#0056d6' : '#f1f5f9',
-                                        }}
-                                    />
-                                ))}
+                                >
+                                    <GridViewIcon sx={{ fontSize: 16 }} />
+                                    <span>Todos ({allComercios.length})</span>
+                                </Box>
+
+                                {grupos.map((grp) => {
+                                    const isSelected = selectedGrupoId === grp.id;
+                                    const nombreUpper = grp.nombre.toUpperCase();
+                                    let TabIcon = StorefrontIcon;
+                                    if (nombreUpper.includes('ESCIFOR')) TabIcon = AssignmentIcon;
+                                    else if (nombreUpper.includes('MULTIMARCA')) TabIcon = AccountTreeIcon;
+                                    else if (nombreUpper.includes('GLOBALEX') || nombreUpper.includes('IGE')) TabIcon = LanguageIcon;
+
+                                    return (
+                                        <Box
+                                            key={grp.id}
+                                            component="button"
+                                            onClick={() => setSelectedGrupoId(grp.id)}
+                                            sx={{
+                                                border: 'none',
+                                                outline: 'none',
+                                                cursor: 'pointer',
+                                                borderRadius: 99,
+                                                px: 1.8,
+                                                py: 0.75,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 0.7,
+                                                fontWeight: 750,
+                                                fontSize: '0.82rem',
+                                                transition: 'all 0.2s ease',
+                                                bgcolor: isSelected ? '#0056d6' : '#f1f5f9',
+                                                color: isSelected ? '#ffffff' : '#334155',
+                                                boxShadow: isSelected ? '0 4px 12px rgba(0, 86, 214, 0.25)' : 'none',
+                                                '&:hover': {
+                                                    bgcolor: isSelected ? '#004ec2' : '#e2e8f0',
+                                                },
+                                            }}
+                                        >
+                                            <TabIcon sx={{ fontSize: 16 }} />
+                                            <span>
+                                                {grp.nombre} ({grp.comercios?.filter((c) => c.activo !== false)?.length || 0})
+                                            </span>
+                                        </Box>
+                                    );
+                                })}
                             </Box>
                         </Box>
 
-                        {/* Cuadrícula de Comercios */}
+                        {/* Cuadrícula de Marcas Adaptada */}
                         {filteredComercios.length === 0 ? (
-                            <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 3, my: 4, bgcolor: '#ffffff' }}>
+                            <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 4, my: 4, bgcolor: '#ffffff' }}>
                                 <StorefrontIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 1.5 }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                                    {allComercios.length === 0
-                                        ? 'Catálogo en preparación'
-                                        : 'No se encontraron comercios ni marcas'}
+                                    No se encontraron marcas
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
-                                    {allComercios.length === 0
-                                        ? 'Aún no se han registrado marcas en el sistema.'
-                                        : 'Intenta borrar el término de búsqueda o selecciona otro grupo corporativo.'}
+                                    Intenta borrar el término de búsqueda o selecciona otro grupo corporativo.
                                 </Typography>
                                 {searchQuery && (
                                     <Button
@@ -1097,257 +1467,189 @@ export default function Welcome({
                         ) : (
                             <Grid container spacing={3}>
                                 {filteredComercios.map((comercio) => {
-                                    const brandColor = comercio.color_hex || '#0056d6';
-                                    const logoSrc = comercio.logo_modo_claro || comercio.logo_modo_oscuro;
-
+                                    const cfg = getBrandCardConfig(comercio);
                                     return (
-                                        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={comercio.id}>
+                                        <Grid size={{ xs: 12, md: 6, lg: 4 }} key={comercio.id}>
                                             <Card
-                                                variant="outlined"
+                                                onClick={() => handleOpenComercioDetail(comercio)}
+                                                elevation={0}
                                                 sx={{
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    borderRadius: 3.5,
-                                                    transition: 'all 0.25s ease',
-                                                    borderTop: 4,
-                                                    borderTopColor: brandColor,
+                                                    justifyContent: 'space-between',
+                                                    borderRadius: 4,
+                                                    border: '1px solid #e2e8f0',
                                                     bgcolor: '#ffffff',
+                                                    p: { xs: 2.25, sm: 2.75 },
+                                                    pl: { xs: 2.75, sm: 3.25 },
+                                                    position: 'relative',
+                                                    overflow: 'hidden',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
                                                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)',
+                                                    // Barra vertical gruesa en el borde izquierdo
+                                                    '&::before': {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        bottom: 0,
+                                                        width: 6,
+                                                        bgcolor: cfg.accent,
+                                                        zIndex: 2,
+                                                    },
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
-                                                        boxShadow: `0 12px 28px ${brandColor}18`,
-                                                        borderColor: brandColor,
+                                                        boxShadow: '0 14px 30px rgba(15, 23, 42, 0.08)',
+                                                        borderColor: '#cbd5e1',
+                                                        '& .brand-card-arrow': {
+                                                            bgcolor: '#2563eb',
+                                                            color: '#ffffff',
+                                                            transform: 'scale(1.08)',
+                                                            '& svg': {
+                                                                transform: 'translateX(2px)',
+                                                            },
+                                                        },
                                                     },
                                                 }}
                                             >
-                                                <CardContent sx={{ p: 2.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                                    {/* Cabecera de la Tarjeta */}
-                                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
-                                                        {logoSrc ? (
-                                                            <Box
-                                                                component="img"
-                                                                src={logoSrc}
-                                                                alt={comercio.nombre}
-                                                                sx={{
-                                                                    width: 48,
-                                                                    height: 48,
-                                                                    objectFit: 'contain',
-                                                                    borderRadius: 1.5,
-                                                                    border: '1px solid #e2e8f0',
-                                                                    p: 0.5,
-                                                                    bgcolor: '#ffffff',
-                                                                    flexShrink: 0,
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <Avatar
-                                                                sx={{
-                                                                    width: 48,
-                                                                    height: 48,
-                                                                    bgcolor: brandColor,
-                                                                    color: '#fff',
-                                                                    fontWeight: 800,
-                                                                    fontSize: '1rem',
-                                                                    flexShrink: 0,
-                                                                }}
-                                                            >
-                                                                {(comercio.sigla || comercio.nombre).substring(0, 3).toUpperCase()}
-                                                            </Avatar>
-                                                        )}
-
-                                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                            <Typography
-                                                                variant="subtitle1"
-                                                                sx={{
-                                                                    fontWeight: 800,
-                                                                    lineHeight: 1.25,
-                                                                    overflow: 'hidden',
-                                                                    textOverflow: 'ellipsis',
-                                                                    whiteSpace: 'nowrap',
-                                                                    color: '#0f172a',
-                                                                }}
-                                                                title={comercio.nombre}
-                                                            >
-                                                                {comercio.nombre}
-                                                            </Typography>
-                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
-                                                                {comercio.grupo?.nombre ? `División ${comercio.grupo.nombre}` : 'Corporación'}
-                                                            </Typography>
-                                                        </Box>
-
-                                                        {comercio.escale_minedu && (
-                                                            <Chip
-                                                                label={comercio.escale_minedu}
-                                                                size="small"
-                                                                sx={{
-                                                                    fontWeight: 800,
-                                                                    fontSize: '0.65rem',
-                                                                    height: 20,
-                                                                    bgcolor: '#f1f5f9',
-                                                                    color: '#475569',
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </Box>
-
-                                                    {/* Descripción */}
-                                                    <Typography
-                                                        variant="body2"
-                                                        color="text.secondary"
+                                                {/* Sección Superior: Logo (Izquierda) + Datos y Botón (Derecha) */}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.2, mb: 1.5 }}>
+                                                    {/* Columna Izquierda: Logo de la Marca con divisor vertical */}
+                                                    <Box
                                                         sx={{
-                                                            mb: 2,
-                                                            display: '-webkit-box',
-                                                            WebkitLineClamp: 2,
-                                                            WebkitBoxOrient: 'vertical',
-                                                            overflow: 'hidden',
-                                                            lineHeight: 1.5,
-                                                            fontSize: '0.82rem',
-                                                            flexGrow: 1,
+                                                            width: { xs: 95, sm: 118 },
+                                                            height: { xs: 68, sm: 76 },
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexShrink: 0,
+                                                            pr: { xs: 1.5, sm: 2 },
+                                                            borderRight: '1px solid #f1f5f9',
                                                         }}
                                                     >
-                                                        {comercio.descripcion ||
-                                                            'Institución formativa perteneciente a Grupo Capsur con certificación técnica y académica.'}
-                                                    </Typography>
-
-                                                    {/* Promoción si existe */}
-                                                    {comercio.promocion_vigente && (
                                                         <Box
+                                                            component="img"
+                                                            src={cfg.logoSrc}
+                                                            alt={cfg.displayName}
                                                             sx={{
-                                                                p: 1.2,
-                                                                borderRadius: 1.5,
-                                                                bgcolor: '#fffbeb',
-                                                                border: '1px dashed #f59e0b',
-                                                                mb: 2,
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'space-between',
-                                                                gap: 1,
+                                                                maxWidth: '100%',
+                                                                maxHeight: '100%',
+                                                                objectFit: 'contain',
                                                             }}
-                                                        >
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
-                                                                <LocalOfferIcon sx={{ fontSize: 15, color: '#d97706', flexShrink: 0 }} />
+                                                        />
+                                                    </Box>
+
+                                                    {/* Columna Derecha: Título, Línea de acento, Descripción y Botón */}
+                                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+                                                            <Box sx={{ minWidth: 0 }}>
                                                                 <Typography
-                                                                    variant="caption"
                                                                     sx={{
-                                                                        fontWeight: 700,
-                                                                        color: '#b45309',
+                                                                        fontWeight: 900,
+                                                                        color: '#09152a',
+                                                                        fontSize: { xs: '0.95rem', sm: '1.05rem' },
+                                                                        letterSpacing: '0.04em',
+                                                                        textTransform: 'uppercase',
+                                                                        lineHeight: 1.2,
+                                                                        whiteSpace: 'nowrap',
                                                                         overflow: 'hidden',
                                                                         textOverflow: 'ellipsis',
-                                                                        whiteSpace: 'nowrap',
                                                                     }}
+                                                                    title={cfg.displayName}
                                                                 >
-                                                                    {comercio.promocion_vigente}
+                                                                    {cfg.displayName}
                                                                 </Typography>
+                                                                {/* Línea horizontal de acento en el color de la marca */}
+                                                                <Box
+                                                                    sx={{
+                                                                        width: 26,
+                                                                        height: 2.5,
+                                                                        bgcolor: cfg.accent,
+                                                                        borderRadius: 1,
+                                                                        mt: 0.6,
+                                                                        mb: 0.8,
+                                                                    }}
+                                                                />
+                                                            </Box>
+
+                                                            {/* Botón Circular con Flecha */}
+                                                            <Box
+                                                                className="brand-card-arrow"
+                                                                sx={{
+                                                                    width: 36,
+                                                                    height: 36,
+                                                                    borderRadius: '50%',
+                                                                    bgcolor: '#eff6ff',
+                                                                    color: '#2563eb',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    flexShrink: 0,
+                                                                    transition: 'all 0.25s ease',
+                                                                }}
+                                                            >
+                                                                <ArrowForwardIcon sx={{ fontSize: 16, transition: 'transform 0.25s ease' }} />
                                                             </Box>
                                                         </Box>
-                                                    )}
 
-                                                    {/* Desglose de Programas Académicos */}
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, mb: 2 }}>
-                                                        {comercio.carreras && comercio.carreras.length > 0 && (
-                                                            <Chip
-                                                                label={`${comercio.carreras.length} Carrera${comercio.carreras.length > 1 ? 's' : ''}`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                sx={{ fontSize: '0.68rem', fontWeight: 700, height: 22 }}
-                                                            />
-                                                        )}
-                                                        {comercio.especialidades && comercio.especialidades.length > 0 && (
-                                                            <Chip
-                                                                label={`${comercio.especialidades.length} Especialidad${comercio.especialidades.length > 1 ? 'es' : ''}`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                sx={{ fontSize: '0.68rem', fontWeight: 700, height: 22 }}
-                                                            />
-                                                        )}
-                                                        {comercio.diplomados && comercio.diplomados.length > 0 && (
-                                                            <Chip
-                                                                label={`${comercio.diplomados.length} Diplomado${comercio.diplomados.length > 1 ? 's' : ''}`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                sx={{ fontSize: '0.68rem', fontWeight: 700, height: 22 }}
-                                                            />
-                                                        )}
-                                                        {comercio.cursos && comercio.cursos.length > 0 && (
-                                                            <Chip
-                                                                label={`${comercio.cursos.length} Curso${comercio.cursos.length > 1 ? 's' : ''}`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                sx={{ fontSize: '0.68rem', fontWeight: 700, height: 22 }}
-                                                            />
-                                                        )}
+                                                        {/* Descripción de la Marca */}
+                                                        <Typography
+                                                            sx={{
+                                                                color: '#64748b',
+                                                                fontSize: '0.8rem',
+                                                                lineHeight: 1.45,
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                overflow: 'hidden',
+                                                                minHeight: 35,
+                                                            }}
+                                                        >
+                                                            {cfg.description}
+                                                        </Typography>
                                                     </Box>
-                                                </CardContent>
+                                                </Box>
 
-                                                <Divider />
-
-                                                {/* Acciones */}
+                                                {/* Fila Inferior: Divider + 3 Badges de Características */}
                                                 <Box
                                                     sx={{
-                                                        p: 1.5,
-                                                        px: 2,
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'space-between',
-                                                        bgcolor: '#fafafa',
+                                                        flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                                                        gap: 1.2,
+                                                        pt: 1.5,
+                                                        borderTop: '1px solid #f1f5f9',
                                                     }}
                                                 >
-                                                    <Button
-                                                        size="small"
-                                                        variant="contained"
-                                                        endIcon={<ArrowForwardIcon sx={{ fontSize: 14 }} />}
-                                                        onClick={() => handleOpenComercioDetail(comercio)}
-                                                        sx={{
-                                                            bgcolor: brandColor,
-                                                            color: '#fff',
-                                                            textTransform: 'none',
-                                                            fontWeight: 800,
-                                                            fontSize: '0.78rem',
-                                                            px: 1.8,
-                                                            py: 0.6,
-                                                            borderRadius: 99,
-                                                            boxShadow: 'none',
-                                                            '&:hover': {
-                                                                bgcolor: brandColor,
-                                                                filter: 'brightness(0.92)',
-                                                                boxShadow: `0 4px 12px ${brandColor}40`,
-                                                            },
-                                                        }}
-                                                    >
-                                                        Ver Ficha
-                                                    </Button>
-
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        {comercio.plataforma_carrera && (
-                                                            <Tooltip title="Aula Virtual / Plataforma Educativa" arrow>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    component="a"
-                                                                    href={comercio.plataforma_carrera}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    sx={{ color: '#64748b', '&:hover': { color: brandColor } }}
+                                                    {cfg.features.map((feat, idx) => {
+                                                        const FeatIcon = feat.icon;
+                                                        return (
+                                                            <Box
+                                                                key={idx}
+                                                                sx={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: 0.65,
+                                                                    minWidth: 0,
+                                                                }}
+                                                            >
+                                                                <FeatIcon sx={{ fontSize: 16, color: '#334155', flexShrink: 0 }} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontSize: { xs: '0.72rem', sm: '0.76rem' },
+                                                                        fontWeight: 650,
+                                                                        color: '#334155',
+                                                                        whiteSpace: 'nowrap',
+                                                                    }}
                                                                 >
-                                                                    <SchoolIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        )}
-                                                        {comercio.pagina_web && (
-                                                            <Tooltip title="Página Web Oficial" arrow>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    component="a"
-                                                                    href={comercio.pagina_web}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    sx={{ color: '#64748b', '&:hover': { color: brandColor } }}
-                                                                >
-                                                                    <LanguageIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        )}
-                                                    </Box>
+                                                                    {feat.text}
+                                                                </Typography>
+                                                            </Box>
+                                                        );
+                                                    })}
                                                 </Box>
                                             </Card>
                                         </Grid>
@@ -1363,8 +1665,8 @@ export default function Welcome({
                     <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
                         <SectionHeader
                             eyebrow="Sobre nosotros"
-                            title="Impulsando el talento con excelencia y cobertura nacional"
-                            description="Una sólida red de instituciones y programas de formación orientados al desarrollo profesional y a las necesidades del mundo laboral."
+                            title="Formación con propósito y visión de futuro"
+                            description="Más de una década brindando educación de vanguardia, acreditada por MINEDU y orientada a la inserción laboral efectiva."
                         />
                         <Grid container spacing={5} sx={{ alignItems: 'center' }}>
                             <Grid size={{ xs: 12, md: 6 }}>
