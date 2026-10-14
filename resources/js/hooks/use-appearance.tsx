@@ -50,6 +50,7 @@ const applyTheme = (appearance: Appearance): void => {
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-mui-color-scheme', isDark ? 'dark' : 'light');
 };
 
 const subscribe = (callback: () => void) => {
@@ -103,16 +104,21 @@ export function useAppearance(): UseAppearanceReturn {
         : 'light';
 
     const updateAppearance = (mode: Appearance): void => {
+        if (mode === currentAppearance) {
+            return;
+        }
+
         currentAppearance = mode;
-
-        // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
-
-        // Store in cookie for SSR...
-        setCookie('appearance', mode);
-
         applyTheme(mode);
         notify();
+
+        // Non-blocking storage persistence
+        try {
+            localStorage.setItem('appearance', mode);
+            setCookie('appearance', mode);
+        } catch {
+            // ignore storage errors
+        }
     };
 
     return { appearance, resolvedAppearance, updateAppearance } as const;

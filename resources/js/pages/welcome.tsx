@@ -10,6 +10,8 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ClearIcon from '@mui/icons-material/Clear';
 import ConstructionIcon from '@mui/icons-material/Construction';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import LayersIcon from '@mui/icons-material/Layers';
@@ -62,12 +64,12 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import AppLogo from '@/components/app-logo';
 import BrandsCoverflowCarousel, { CoverflowBrandItem } from '@/components/catalog/brands-coverflow-carousel';
 import ComercioDetailModal from '@/components/catalog/comercio-detail-modal';
 import LoginPopover from '@/components/login-popover';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useNotification } from '@/hooks/use-notification';
 import type { Comercio, ContactInfo, Grupo } from '@/types';
 
@@ -108,67 +110,72 @@ const SectionHeader = ({
     eyebrow: string;
     title: string;
     description: string;
-}) => (
-    <Box
-        sx={{
-            textAlign: 'center',
-            maxWidth: 900,
-            mx: 'auto',
-            mb: { xs: 4.5, md: 6 },
-        }}
-    >
+}) => {
+    const { resolvedAppearance } = useAppearance();
+    const isDark = resolvedAppearance === 'dark';
+
+    return (
         <Box
             sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1.25,
-                mb: 1.75,
-                color: '#0056d6',
+                textAlign: 'center',
+                maxWidth: 900,
+                mx: 'auto',
+                mb: { xs: 4.5, md: 6 },
             }}
         >
-            <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
-            <Typography
-                component="span"
+            <Box
                 sx={{
-                    fontSize: { xs: '0.68rem', md: '0.72rem' },
-                    fontWeight: 800,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color: '#0056d6',
-                    lineHeight: 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1.25,
+                    mb: 1.75,
+                    color: isDark ? '#38bdf8' : '#0056d6',
                 }}
             >
-                {eyebrow}
+                <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: isDark ? '#38bdf8' : '#0056d6', borderRadius: 1 }} />
+                <Typography
+                    component="span"
+                    sx={{
+                        fontSize: { xs: '0.68rem', md: '0.72rem' },
+                        fontWeight: 800,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        color: isDark ? '#38bdf8' : '#0056d6',
+                        lineHeight: 1,
+                    }}
+                >
+                    {eyebrow}
+                </Typography>
+                <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: isDark ? '#38bdf8' : '#0056d6', borderRadius: 1 }} />
+            </Box>
+            <Typography
+                component="h2"
+                sx={{
+                    fontSize: { xs: '2rem', sm: '2.45rem', md: '3rem' },
+                    fontWeight: 850,
+                    color: isDark ? '#f8fafc' : '#09152a',
+                    letterSpacing: '-0.035em',
+                    lineHeight: 1.08,
+                    mb: 1.6,
+                }}
+            >
+                {title}
             </Typography>
-            <Box sx={{ width: { xs: 24, md: 34 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+            <Typography
+                sx={{
+                    color: isDark ? '#94a3b8' : '#64748b',
+                    fontSize: { xs: '0.98rem', md: '1.06rem' },
+                    lineHeight: 1.65,
+                    maxWidth: 820,
+                    mx: 'auto',
+                }}
+            >
+                {description}
+            </Typography>
         </Box>
-        <Typography
-            component="h2"
-            sx={{
-                fontSize: { xs: '2rem', sm: '2.45rem', md: '3rem' },
-                fontWeight: 850,
-                color: '#09152a',
-                letterSpacing: '-0.035em',
-                lineHeight: 1.08,
-                mb: 1.6,
-            }}
-        >
-            {title}
-        </Typography>
-        <Typography
-            sx={{
-                color: '#64748b',
-                fontSize: { xs: '0.98rem', md: '1.06rem' },
-                lineHeight: 1.65,
-                maxWidth: 820,
-                mx: 'auto',
-            }}
-        >
-            {description}
-        </Typography>
-    </Box>
-);
+    );
+};
 
 export default function Welcome({
     grupos = [],
@@ -188,8 +195,9 @@ export default function Welcome({
     contactInfo,
 }: WelcomeProps) {
     const page = usePage();
-    const theme = useTheme();
-    const isDark = theme.palette.mode === 'dark';
+    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+    const isDark = resolvedAppearance === 'dark';
+    const heroThemeMode: 'dia' | 'noche' = isDark ? 'noche' : 'dia';
     const { notify } = useNotification();
     const auth = (page.props.auth || {}) as { user?: any };
     const dashboardUrl = auth.user ? '/dashboard' : '/';
@@ -689,19 +697,29 @@ export default function Welcome({
         <>
             <Head title="Grupo CAPSUR | Formación que impulsa tu futuro profesional" />
 
-            <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', color: '#0f172a', display: 'flex', flexDirection: 'column' }}>
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    bgcolor: isDark ? '#060f1e' : '#ffffff',
+                    color: isDark ? '#f8fafc' : '#0f172a',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'background-color 0.15s ease, color 0.15s ease',
+                }}
+            >
                 <Box
                     component="header"
                     sx={{
                         position: 'sticky',
                         top: 0,
                         zIndex: 1200,
-                        bgcolor: 'rgba(255, 255, 255, 0.95)',
+                        bgcolor: isDark ? 'rgba(6, 15, 30, 0.92)' : 'rgba(255, 255, 255, 0.95)',
                         backdropFilter: 'blur(10px)',
                         borderBottom: '1px solid',
-                        borderColor: 'rgba(226, 232, 240, 0.8)',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)',
                         py: 1.2,
                         px: { xs: 2, sm: 4, lg: 6 },
+                        transition: 'background-color 0.15s ease, border-color 0.15s ease',
                     }}
                 >
                     <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -721,7 +739,7 @@ export default function Welcome({
                         >
                             <Box
                                 component="img"
-                                src="/images/logo-light.png"
+                                src={isDark ? '/images/logo-dark.png' : '/images/logo-light.png'}
                                 alt="Grupo CAPSUR"
                                 sx={{
                                     height: { xs: 34, md: 40 },
@@ -757,7 +775,7 @@ export default function Welcome({
                                             position: 'relative',
                                             transition: 'background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.12s ease',
                                             '&:hover': {
-                                                bgcolor: 'rgba(0, 86, 214, 0.05)',
+                                                bgcolor: isDark ? 'rgba(56, 189, 248, 0.08)' : 'rgba(0, 86, 214, 0.05)',
                                             },
                                             '&:active': {
                                                 transform: 'scale(0.96)',
@@ -768,11 +786,13 @@ export default function Welcome({
                                             sx={{
                                                 fontSize: '0.94rem',
                                                 fontWeight: isActive ? 700 : 500,
-                                                color: isActive ? '#0056d6' : '#334155',
+                                                color: isActive
+                                                    ? (isDark ? '#38bdf8' : '#0056d6')
+                                                    : (isDark ? '#cbd5e1' : '#334155'),
                                                 letterSpacing: '-0.01em',
                                                 transition: 'color 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
                                                 '&:hover': {
-                                                    color: '#0056d6',
+                                                    color: isDark ? '#38bdf8' : '#0056d6',
                                                 },
                                             }}
                                         >
@@ -784,9 +804,11 @@ export default function Welcome({
                                                 bottom: 0,
                                                 width: isActive ? 28 : 0,
                                                 height: 3,
-                                                bgcolor: '#0056d6',
+                                                bgcolor: isDark ? '#38bdf8' : '#0056d6',
                                                 borderRadius: 99,
-                                                boxShadow: isActive ? '0 2px 8px rgba(0, 86, 214, 0.35)' : 'none',
+                                                boxShadow: isActive
+                                                    ? (isDark ? '0 2px 8px rgba(56, 189, 248, 0.45)' : '0 2px 8px rgba(0, 86, 214, 0.35)')
+                                                    : 'none',
                                                 transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
                                                 opacity: isActive ? 1 : 0,
                                                 transform: isActive ? 'scaleX(1)' : 'scaleX(0.3)',
@@ -799,19 +821,57 @@ export default function Welcome({
                         </Box>
 
                         {/* Botón Ingresar / Panel Derecho */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
+                            {/* Botón selector de tema (Modo Claro / Modo Oscuro) */}
+                            <IconButton
+                                onClick={() => updateAppearance(isDark ? 'light' : 'dark')}
+                                aria-label={isDark ? 'Cambiar a modo Día' : 'Cambiar a modo Noche'}
+                                title={isDark ? 'Cambiar a modo Día' : 'Cambiar a modo Noche'}
+                                size="small"
+                                sx={{
+                                    width: 38,
+                                    height: 38,
+                                    borderRadius: '50%',
+                                    color: isDark ? '#f59e0b' : '#334155',
+                                    bgcolor: isDark ? 'rgba(245, 158, 11, 0.1)' : 'rgba(15, 23, 42, 0.04)',
+                                    border: '1.5px solid',
+                                    borderColor: isDark ? 'rgba(245, 158, 11, 0.35)' : 'rgba(203, 213, 225, 0.85)',
+                                    transition: 'all 0.15s ease',
+                                    '&:hover': {
+                                        bgcolor: isDark ? 'rgba(245, 158, 11, 0.2)' : 'rgba(15, 23, 42, 0.08)',
+                                        borderColor: isDark ? '#f59e0b' : '#94a3b8',
+                                        color: isDark ? '#fbbf24' : '#0f172a',
+                                        transform: 'scale(1.05)',
+                                    },
+                                    '&:active': {
+                                        transform: 'scale(0.95)',
+                                    },
+                                }}
+                            >
+                                {isDark ? (
+                                    <LightModeIcon sx={{ fontSize: 20 }} />
+                                ) : (
+                                    <DarkModeIcon sx={{ fontSize: 20 }} />
+                                )}
+                            </IconButton>
+
                             {auth.user ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <Chip
                                         avatar={
-                                            <Avatar sx={{ bgcolor: '#0056d6', color: '#fff', width: 28, height: 28, fontSize: '0.8rem', fontWeight: 800 }}>
+                                            <Avatar sx={{ bgcolor: isDark ? '#0284c7' : '#0056d6', color: '#fff', width: 28, height: 28, fontSize: '0.8rem', fontWeight: 800 }}>
                                                 {(auth.user.name || 'A').substring(0, 1).toUpperCase()}
                                             </Avatar>
                                         }
                                         label={auth.user.name || 'Administrador'}
                                         size="medium"
                                         variant="outlined"
-                                        sx={{ fontWeight: 700, display: { xs: 'none', sm: 'inline-flex' } }}
+                                        sx={{
+                                            fontWeight: 700,
+                                            display: { xs: 'none', sm: 'inline-flex' },
+                                            color: isDark ? '#f8fafc' : '#0f172a',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#e2e8f0',
+                                        }}
                                     />
                                     <Link href={dashboardUrl} style={{ textDecoration: 'none' }}>
                                         <Button
@@ -866,17 +926,18 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 2. Hero Section - Propuesta visual institucional CAPSUR */}
+                {/* 2. Hero Section - Propuesta visual institucional CAPSUR con modo Día / Noche */}
                 <Box
                     id="inicio"
                     sx={{
                         position: 'relative',
-                        bgcolor: '#08142a',
-                        height: { xs: 'auto', md: '100vh' },
+                        bgcolor: heroThemeMode === 'noche' ? '#040d1c' : '#08142a',
+                        height: { xs: 'auto', md: '90vh' },
                         display: 'flex',
                         alignItems: 'stretch',
                         overflow: 'hidden',
                         scrollMarginTop: { xs: '65px', md: '75px' },
+                        transition: 'background-color 0.15s ease',
                     }}
                 >
                     {/* Fachada institucional: conserva el tamaño actual y desplaza visualmente el degradado hacia la izquierda */}
@@ -898,27 +959,72 @@ export default function Welcome({
                                 height: '100%',
                             }}
                         >
+                            {/* Wallpaper Modo Día */}
                             <Box
                                 component="img"
-                                src="/images/fachada-capsur.jpeg"
-                                alt="Fachada Institucional Sede Central Grupo CAPSUR"
+                                src="/images/capsur-de-dia.jpeg"
+                                alt="Fachada Institucional Sede Central Grupo CAPSUR - Día"
+                                loading="eager"
+                                decoding="async"
                                 sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover',
                                     objectPosition: { xs: 'center 18%', md: 'center 20%' },
                                     display: 'block',
+                                    opacity: heroThemeMode === 'dia' ? 1 : 0,
+                                    transition: 'opacity 0.15s ease',
                                 }}
                             />
 
-                            {/* Transición suave entre el navy y la fotografía */}
+                            {/* Wallpaper Modo Noche */}
+                            <Box
+                                component="img"
+                                src="/images/capsur-de-noche.jpeg"
+                                alt="Fachada Institucional Sede Central Grupo CAPSUR - Noche"
+                                loading="eager"
+                                decoding="async"
+                                sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    objectPosition: { xs: 'center 18%', md: 'center 20%' },
+                                    display: 'block',
+                                    opacity: heroThemeMode === 'noche' ? 1 : 0,
+                                    transition: 'opacity 0.15s ease',
+                                }}
+                            />
+
+                            {/* Transición suave entre el fondo navy y la fotografía (Modo Día) */}
                             <Box
                                 sx={{
                                     position: 'absolute',
                                     inset: 0,
+                                    opacity: heroThemeMode === 'dia' ? 1 : 0,
+                                    transition: 'opacity 0.18s ease',
                                     background: {
                                         xs: 'linear-gradient(180deg, rgba(8,20,42,0.78) 0%, rgba(8,20,42,0.28) 48%, rgba(8,20,42,0.05) 100%)',
                                         md: 'linear-gradient(90deg, #08142a 0%, rgba(8,20,42,0.92) 10%, rgba(8,20,42,0.58) 22%, rgba(8,20,42,0.22) 36%, rgba(8,20,42,0.04) 50%, transparent 62%)',
+                                    },
+                                }}
+                            />
+
+                            {/* Transición suave entre el fondo navy y la fotografía (Modo Noche) */}
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    opacity: heroThemeMode === 'noche' ? 1 : 0,
+                                    transition: 'opacity 0.18s ease',
+                                    background: {
+                                        xs: 'linear-gradient(180deg, rgba(4,13,28,0.85) 0%, rgba(4,13,28,0.30) 48%, rgba(4,13,28,0.04) 100%)',
+                                        md: 'linear-gradient(90deg, #040d1c 0%, rgba(4,13,28,0.94) 10%, rgba(4,13,28,0.62) 22%, rgba(4,13,28,0.20) 36%, rgba(4,13,28,0.02) 50%, transparent 62%)',
                                     },
                                 }}
                             />
@@ -930,9 +1036,14 @@ export default function Welcome({
                                 position: 'absolute',
                                 inset: 0,
                                 background: {
-                                    xs: 'linear-gradient(180deg, rgba(8,20,42,0.92) 0%, rgba(8,20,42,0.62) 42%, rgba(8,20,42,0.12) 100%)',
-                                    md: 'linear-gradient(90deg, #08142a 0%, #08142a 17%, rgba(8,20,42,0.86) 28%, rgba(8,20,42,0.42) 39%, rgba(8,20,42,0.10) 51%, transparent 66%)',
+                                    xs: heroThemeMode === 'noche'
+                                        ? 'linear-gradient(180deg, rgba(4,13,28,0.94) 0%, rgba(4,13,28,0.65) 42%, rgba(4,13,28,0.15) 100%)'
+                                        : 'linear-gradient(180deg, rgba(8,20,42,0.92) 0%, rgba(8,20,42,0.62) 42%, rgba(8,20,42,0.12) 100%)',
+                                    md: heroThemeMode === 'noche'
+                                        ? 'linear-gradient(90deg, #040d1c 0%, #040d1c 17%, rgba(4,13,28,0.88) 28%, rgba(4,13,28,0.44) 39%, rgba(4,13,28,0.10) 51%, transparent 66%)'
+                                        : 'linear-gradient(90deg, #08142a 0%, #08142a 17%, rgba(8,20,42,0.86) 28%, rgba(8,20,42,0.42) 39%, rgba(8,20,42,0.10) 51%, transparent 66%)',
                                 },
+                                transition: 'background 0.15s ease',
                             }}
                         />
 
@@ -999,37 +1110,40 @@ export default function Welcome({
                                 }}
                             >
                                 <Box sx={{ maxWidth: 650, position: 'relative', zIndex: 5 }}>
-                                    <Box
-                                        sx={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 1.2,
-                                            px: 1.7,
-                                            py: 0.75,
-                                            mb: { xs: 2.2, md: 2.6 },
-                                            border: '1px solid rgba(255,255,255,0.22)',
-                                            borderRadius: '7px',
-                                            bgcolor: 'rgba(8,20,42,0.48)',
-                                            backdropFilter: 'blur(10px)',
-                                        }}
-                                    >
-                                        <WorkspacePremiumIcon sx={{ fontSize: 17, color: '#f5b400' }} />
-                                        <Box>
-                                            <Typography
-                                                sx={{
-                                                    color: '#fff',
-                                                    fontSize: { xs: '0.67rem', md: '0.72rem' },
-                                                    fontWeight: 800,
-                                                    letterSpacing: '0.12em',
-                                                    lineHeight: 1.1,
-                                                    textTransform: 'uppercase',
-                                                }}
-                                            >
-                                                Corporación Educativa CAPSUR
-                                            </Typography>
-                                            <Typography sx={{ color: 'rgba(255,255,255,0.62)', fontSize: '0.69rem', mt: 0.25 }}>
-                                                Sede Central Institucional
-                                            </Typography>
+                                    {/* Insignia institucional oficial */}
+                                    <Box sx={{ mb: { xs: 2.2, md: 2.6 } }}>
+                                        <Box
+                                            sx={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 1.2,
+                                                px: 1.7,
+                                                py: 0.75,
+                                                border: '1px solid rgba(255,255,255,0.22)',
+                                                borderRadius: '7px',
+                                                bgcolor: heroThemeMode === 'noche' ? 'rgba(4,12,28,0.65)' : 'rgba(8,20,42,0.48)',
+                                                backdropFilter: 'blur(10px)',
+                                                transition: 'background-color 0.15s ease',
+                                            }}
+                                        >
+                                            <WorkspacePremiumIcon sx={{ fontSize: 17, color: '#f5b400' }} />
+                                            <Box>
+                                                <Typography
+                                                    sx={{
+                                                        color: '#fff',
+                                                        fontSize: { xs: '0.67rem', md: '0.72rem' },
+                                                        fontWeight: 800,
+                                                        letterSpacing: '0.12em',
+                                                        lineHeight: 1.1,
+                                                        textTransform: 'uppercase',
+                                                    }}
+                                                >
+                                                    Corporación Educativa CAPSUR
+                                                </Typography>
+                                                <Typography sx={{ color: 'rgba(255,255,255,0.62)', fontSize: '0.69rem', mt: 0.25 }}>
+                                                    Sede Central Institucional
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </Box>
 
@@ -1202,7 +1316,10 @@ export default function Welcome({
                                             borderRadius: '50%',
                                             right: { xs: '5%', md: '2%' },
                                             bottom: 0,
-                                            background: 'radial-gradient(circle, rgba(0,119,255,0.28) 0%, rgba(0,119,255,0.06) 50%, transparent 70%)',
+                                            background: heroThemeMode === 'noche'
+                                                ? 'radial-gradient(circle, rgba(0,180,255,0.35) 0%, rgba(0,140,255,0.08) 50%, transparent 70%)'
+                                                : 'radial-gradient(circle, rgba(0,119,255,0.28) 0%, rgba(0,119,255,0.06) 50%, transparent 70%)',
+                                            transition: 'background 0.15s ease',
                                             pointerEvents: 'none',
                                             zIndex: 1,
                                         }}
@@ -1242,14 +1359,17 @@ export default function Welcome({
                         position: 'relative',
                         pt: { xs: 6, md: 8 },
                         pb: { xs: 8, md: 10 },
-                        bgcolor: '#f8faff',
-                        backgroundImage: `url('/images/fondo-marcas.svg')`,
+                        bgcolor: isDark ? '#040d1c' : '#f8faff',
+                        backgroundImage: isDark
+                            ? 'radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.12) 0%, rgba(12, 67, 163, 0.18) 35%, transparent 70%), linear-gradient(180deg, #040d1c 0%, #061021 100%)'
+                            : `url('/images/fondo-marcas.svg')`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center top',
-                        backgroundSize: { xs: 'cover', md: '100% 100%' },
-                        borderBottom: '1px solid #eef2f6',
+                        backgroundSize: isDark ? '100% 100%' : { xs: 'cover', md: '100% 100%' },
+                        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #eef2f6',
                         scrollMarginTop: { xs: '65px', md: '75px' },
                         overflow: 'hidden',
+                        transition: 'background-color 0.15s ease',
                     }}
                 >
                     {/* Ancla para enlaces que apunten a directorio-marcas */}
@@ -1268,7 +1388,7 @@ export default function Welcome({
                                     mb: 1.75,
                                 }}
                             >
-                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: isDark ? '#38bdf8' : '#0056d6', borderRadius: 1 }} />
                                 <Typography
                                     component="span"
                                     sx={{
@@ -1276,13 +1396,13 @@ export default function Welcome({
                                         fontWeight: 800,
                                         letterSpacing: '0.14em',
                                         textTransform: 'uppercase',
-                                        color: '#0056d6',
+                                        color: isDark ? '#38bdf8' : '#0056d6',
                                         lineHeight: 1,
                                     }}
                                 >
                                     NUESTRAS MARCAS
                                 </Typography>
-                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: '#0056d6', borderRadius: 1 }} />
+                                <Box sx={{ width: { xs: 26, md: 38 }, height: 2, bgcolor: isDark ? '#38bdf8' : '#0056d6', borderRadius: 1 }} />
                             </Box>
 
                             {/* Título de la sección */}
@@ -1291,7 +1411,7 @@ export default function Welcome({
                                 sx={{
                                     fontSize: { xs: '1.95rem', sm: '2.45rem', md: '2.95rem' },
                                     fontWeight: 900,
-                                    color: '#09152a',
+                                    color: isDark ? '#f8fafc' : '#09152a',
                                     letterSpacing: '-0.035em',
                                     lineHeight: 1.15,
                                     mb: 1.6,
@@ -1303,7 +1423,7 @@ export default function Welcome({
                             {/* Subtítulo descriptivo */}
                             <Typography
                                 sx={{
-                                    color: '#64748b',
+                                    color: isDark ? '#94a3b8' : '#64748b',
                                     fontSize: { xs: '0.94rem', md: '1.02rem' },
                                     lineHeight: 1.6,
                                     maxWidth: 760,
@@ -1321,11 +1441,11 @@ export default function Welcome({
                                 flexDirection: { xs: 'column', md: 'row' },
                                 alignItems: { xs: 'stretch', md: 'center' },
                                 justifyContent: 'space-between',
-                                bgcolor: '#ffffff',
+                                bgcolor: isDark ? '#0f1f38' : '#ffffff',
                                 p: { xs: 1.25, md: 1.5 },
                                 borderRadius: 4,
-                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
-                                border: '1px solid #e2e8f0',
+                                boxShadow: isDark ? '0 4px 20px rgba(0, 0, 0, 0.35)' : '0 4px 20px rgba(0, 0, 0, 0.03)',
+                                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
                                 mb: { xs: 3.5, md: 4.5 },
                                 gap: 1.5,
                             }}
@@ -1340,7 +1460,7 @@ export default function Welcome({
                                     input: {
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <SearchIcon sx={{ fontSize: 19, color: '#64748b' }} />
+                                                <SearchIcon sx={{ fontSize: 19, color: isDark ? '#94a3b8' : '#64748b' }} />
                                             </InputAdornment>
                                         ),
                                         endAdornment: searchQuery ? (
@@ -1356,11 +1476,12 @@ export default function Welcome({
                                     width: { xs: '100%', md: 360 },
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: 99,
-                                        bgcolor: '#f8fafc',
+                                        bgcolor: isDark ? '#152844' : '#f8fafc',
+                                        color: isDark ? '#f8fafc' : '#0f172a',
                                         fontSize: '0.86rem',
-                                        '& fieldset': { borderColor: '#e2e8f0' },
-                                        '&:hover fieldset': { borderColor: '#cbd5e1' },
-                                        '&.Mui-focused fieldset': { borderColor: '#0056d6' },
+                                        '& fieldset': { borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0' },
+                                        '&:hover fieldset': { borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : '#cbd5e1' },
+                                        '&.Mui-focused fieldset': { borderColor: isDark ? '#38bdf8' : '#0056d6' },
                                     },
                                 }}
                             />
@@ -1383,11 +1504,19 @@ export default function Welcome({
                                         fontWeight: 750,
                                         fontSize: '0.82rem',
                                         transition: 'all 0.2s ease',
-                                        bgcolor: selectedGrupoId === 'all' ? '#0056d6' : '#f1f5f9',
-                                        color: selectedGrupoId === 'all' ? '#ffffff' : '#334155',
-                                        boxShadow: selectedGrupoId === 'all' ? '0 4px 12px rgba(0, 86, 214, 0.25)' : 'none',
+                                        bgcolor: selectedGrupoId === 'all'
+                                            ? (isDark ? '#0284c7' : '#0056d6')
+                                            : (isDark ? '#152844' : '#f1f5f9'),
+                                        color: selectedGrupoId === 'all'
+                                            ? '#ffffff'
+                                            : (isDark ? '#cbd5e1' : '#334155'),
+                                        boxShadow: selectedGrupoId === 'all'
+                                            ? (isDark ? '0 4px 12px rgba(2, 132, 199, 0.35)' : '0 4px 12px rgba(0, 86, 214, 0.25)')
+                                            : 'none',
                                         '&:hover': {
-                                            bgcolor: selectedGrupoId === 'all' ? '#004ec2' : '#e2e8f0',
+                                            bgcolor: selectedGrupoId === 'all'
+                                                ? (isDark ? '#0369a1' : '#004ec2')
+                                                : (isDark ? '#1e3a5f' : '#e2e8f0'),
                                         },
                                     }}
                                 >
@@ -1421,11 +1550,19 @@ export default function Welcome({
                                                 fontWeight: 750,
                                                 fontSize: '0.82rem',
                                                 transition: 'all 0.2s ease',
-                                                bgcolor: isSelected ? '#0056d6' : '#f1f5f9',
-                                                color: isSelected ? '#ffffff' : '#334155',
-                                                boxShadow: isSelected ? '0 4px 12px rgba(0, 86, 214, 0.25)' : 'none',
+                                                bgcolor: isSelected
+                                                    ? (isDark ? '#0284c7' : '#0056d6')
+                                                    : (isDark ? '#152844' : '#f1f5f9'),
+                                                color: isSelected
+                                                    ? '#ffffff'
+                                                    : (isDark ? '#cbd5e1' : '#334155'),
+                                                boxShadow: isSelected
+                                                    ? (isDark ? '0 4px 12px rgba(2, 132, 199, 0.35)' : '0 4px 12px rgba(0, 86, 214, 0.25)')
+                                                    : 'none',
                                                 '&:hover': {
-                                                    bgcolor: isSelected ? '#004ec2' : '#e2e8f0',
+                                                    bgcolor: isSelected
+                                                        ? (isDark ? '#0369a1' : '#004ec2')
+                                                        : (isDark ? '#1e3a5f' : '#e2e8f0'),
                                                 },
                                             }}
                                         >
@@ -1441,7 +1578,17 @@ export default function Welcome({
 
                         {/* Cuadrícula de Marcas Adaptada */}
                         {filteredComercios.length === 0 ? (
-                            <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 4, my: 4, bgcolor: '#ffffff' }}>
+                            <Paper
+                                variant="outlined"
+                                sx={{
+                                    p: 6,
+                                    textAlign: 'center',
+                                    borderRadius: 4,
+                                    my: 4,
+                                    bgcolor: isDark ? '#0f1f38' : '#ffffff',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                }}
+                            >
                                 <StorefrontIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 1.5 }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                                     No se encontraron marcas
@@ -1479,15 +1626,16 @@ export default function Welcome({
                                                     flexDirection: 'column',
                                                     justifyContent: 'space-between',
                                                     borderRadius: 4,
-                                                    border: '1px solid #e2e8f0',
-                                                    bgcolor: '#ffffff',
+                                                    border: '1px solid',
+                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                                    bgcolor: isDark ? '#0f1f38' : '#ffffff',
                                                     p: { xs: 2.25, sm: 2.75 },
                                                     pl: { xs: 2.75, sm: 3.25 },
                                                     position: 'relative',
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
                                                     transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-                                                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)',
+                                                    boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.35)' : '0 2px 10px rgba(0, 0, 0, 0.03)',
                                                     // Barra vertical gruesa en el borde izquierdo
                                                     '&::before': {
                                                         content: '""',
@@ -1501,11 +1649,11 @@ export default function Welcome({
                                                     },
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
-                                                        boxShadow: '0 14px 30px rgba(15, 23, 42, 0.08)',
-                                                        borderColor: '#cbd5e1',
+                                                        boxShadow: isDark ? '0 14px 30px rgba(0, 0, 0, 0.6)' : '0 14px 30px rgba(15, 23, 42, 0.08)',
+                                                        borderColor: isDark ? 'rgba(56, 189, 248, 0.35)' : '#cbd5e1',
                                                         '& .brand-card-arrow': {
-                                                            bgcolor: '#2563eb',
-                                                            color: '#ffffff',
+                                                            bgcolor: isDark ? '#38bdf8' : '#2563eb',
+                                                            color: isDark ? '#0f172a' : '#ffffff',
                                                             transform: 'scale(1.08)',
                                                             '& svg': {
                                                                 transform: 'translateX(2px)',
@@ -1526,7 +1674,7 @@ export default function Welcome({
                                                             justifyContent: 'center',
                                                             flexShrink: 0,
                                                             pr: { xs: 1.5, sm: 2 },
-                                                            borderRight: '1px solid #f1f5f9',
+                                                            borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
                                                         }}
                                                     >
                                                         <Box
@@ -1548,7 +1696,7 @@ export default function Welcome({
                                                                 <Typography
                                                                     sx={{
                                                                         fontWeight: 900,
-                                                                        color: '#09152a',
+                                                                        color: isDark ? '#f8fafc' : '#09152a',
                                                                         fontSize: { xs: '0.95rem', sm: '1.05rem' },
                                                                         letterSpacing: '0.04em',
                                                                         textTransform: 'uppercase',
@@ -1581,8 +1729,8 @@ export default function Welcome({
                                                                     width: 36,
                                                                     height: 36,
                                                                     borderRadius: '50%',
-                                                                    bgcolor: '#eff6ff',
-                                                                    color: '#2563eb',
+                                                                    bgcolor: isDark ? 'rgba(56, 189, 248, 0.12)' : '#eff6ff',
+                                                                    color: isDark ? '#38bdf8' : '#2563eb',
                                                                     display: 'flex',
                                                                     alignItems: 'center',
                                                                     justifyContent: 'center',
@@ -1597,7 +1745,7 @@ export default function Welcome({
                                                         {/* Descripción de la Marca */}
                                                         <Typography
                                                             sx={{
-                                                                color: '#64748b',
+                                                                color: isDark ? '#94a3b8' : '#64748b',
                                                                 fontSize: '0.8rem',
                                                                 lineHeight: 1.45,
                                                                 display: '-webkit-box',
@@ -1621,7 +1769,7 @@ export default function Welcome({
                                                         flexWrap: { xs: 'wrap', sm: 'nowrap' },
                                                         gap: 1.2,
                                                         pt: 1.5,
-                                                        borderTop: '1px solid #f1f5f9',
+                                                        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
                                                     }}
                                                 >
                                                     {cfg.features.map((feat, idx) => {
@@ -1636,12 +1784,12 @@ export default function Welcome({
                                                                     minWidth: 0,
                                                                 }}
                                                             >
-                                                                <FeatIcon sx={{ fontSize: 16, color: '#334155', flexShrink: 0 }} />
+                                                                <FeatIcon sx={{ fontSize: 16, color: isDark ? '#38bdf8' : '#334155', flexShrink: 0 }} />
                                                                 <Typography
                                                                     sx={{
                                                                         fontSize: { xs: '0.72rem', sm: '0.76rem' },
                                                                         fontWeight: 650,
-                                                                        color: '#334155',
+                                                                        color: isDark ? '#cbd5e1' : '#334155',
                                                                         whiteSpace: 'nowrap',
                                                                     }}
                                                                 >
@@ -1661,7 +1809,7 @@ export default function Welcome({
                 </Box>
 
                 {/* 5. Sección: Sobre Grupo CAPSUR y Capacitaciones Drive */}
-                <Box id="nosotros" sx={{ py: { xs: 7, md: 10 }, bgcolor: '#ffffff', scrollMarginTop: { xs: '65px', md: '75px' } }}>
+                <Box id="nosotros" sx={{ py: { xs: 7, md: 10 }, bgcolor: isDark ? '#060f1e' : '#ffffff', scrollMarginTop: { xs: '65px', md: '75px' } }}>
                     <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
                         <SectionHeader
                             eyebrow="Sobre nosotros"
@@ -1670,41 +1818,68 @@ export default function Welcome({
                         />
                         <Grid container spacing={5} sx={{ alignItems: 'center' }}>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography sx={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 3 }}>
+                                <Typography sx={{ color: isDark ? '#94a3b8' : '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 3 }}>
                                     Grupo CAPSUR es una corporación dedicada a transformar el futuro de jóvenes y profesionales a través de una sólida red de institutos superiores, centros de capacitación continua y programas especializados adaptados a la demanda del mercado real.
                                 </Typography>
-                                <Typography sx={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
+                                <Typography sx={{ color: isDark ? '#94a3b8' : '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
                                     Nuestras instituciones cuentan con respaldo oficial, acreditación institucional y convenios estratégicos para garantizar empleabilidad, titulación y actualización constante.
                                 </Typography>
 
                                 {/* Métricas Institucionales */}
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: '#0056d6' }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2.5,
+                                                textAlign: 'center',
+                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            }}
+                                        >
+                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
                                                 {allComercios.length || 8}+
                                             </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b' }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
                                                 Marcas Oficiales
                                             </Typography>
                                         </Paper>
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: '#0056d6' }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2.5,
+                                                textAlign: 'center',
+                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            }}
+                                        >
+                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
                                                 {stats.totalCarreras + stats.totalDiplomados + stats.totalCursos || 70}+
                                             </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b' }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
                                                 Programas Activos
                                             </Typography>
                                         </Paper>
                                     </Grid>
                                     <Grid size={{ xs: 12, sm: 4 }}>
-                                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, textAlign: 'center', bgcolor: '#f8fafc' }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: '#0056d6' }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2.5,
+                                                textAlign: 'center',
+                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            }}
+                                        >
+                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
                                                 100%
                                             </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b' }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
                                                 Acreditación Legal
                                             </Typography>
                                         </Paper>
@@ -1719,8 +1894,8 @@ export default function Welcome({
                                     sx={{
                                         p: { xs: 3, sm: 4 },
                                         borderRadius: 4,
-                                        bgcolor: '#f8fbff',
-                                        border: '1px solid #dbeafe',
+                                        bgcolor: isDark ? '#0a172e' : '#f8fbff',
+                                        border: isDark ? '1px solid rgba(56, 189, 248, 0.2)' : '1px solid #dbeafe',
                                         position: 'relative',
                                         overflow: 'hidden',
                                     }}
@@ -1730,16 +1905,16 @@ export default function Welcome({
                                             <FolderSharedIcon />
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#09152a' }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 800, color: isDark ? '#f8fafc' : '#09152a' }}>
                                                 Repositorios Oficiales de Capacitación
                                             </Typography>
-                                            <Typography variant="caption" color="text.secondary">
+                                            <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : 'text.secondary' }}>
                                                 Acceso centralizado a recursos y grabaciones en Google Drive
                                             </Typography>
                                         </Box>
                                     </Box>
 
-                                    <Typography variant="body2" sx={{ color: '#475569', mb: 3.5, lineHeight: 1.6 }}>
+                                    <Typography variant="body2" sx={{ color: isDark ? '#cbd5e1' : '#475569', mb: 3.5, lineHeight: 1.6 }}>
                                         Plataforma directa para que estudiantes, docentes y colaboradores accedan a sesiones grabadas, material de estudio y talleres oficiales de nuestras divisiones formativas.
                                     </Typography>
 
@@ -1776,10 +1951,10 @@ export default function Welcome({
                                             endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
                                             onClick={() => handleRedirect(driveLinks?.multimarca, 'MULTIMARCA')}
                                             sx={{
-                                                bgcolor: '#ffffff',
-                                                borderColor: '#cbd5e1',
+                                                bgcolor: isDark ? '#0f2242' : '#ffffff',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#cbd5e1',
                                                 borderWidth: 1.5,
-                                                color: '#0f172a',
+                                                color: isDark ? '#f8fafc' : '#0f172a',
                                                 py: 1.4,
                                                 px: 3,
                                                 borderRadius: 2.5,
@@ -1788,8 +1963,8 @@ export default function Welcome({
                                                 textTransform: 'none',
                                                 justifyContent: 'space-between',
                                                 '&:hover': {
-                                                    borderColor: '#94a3b8',
-                                                    bgcolor: '#f8fafc',
+                                                    borderColor: isDark ? '#38bdf8' : '#94a3b8',
+                                                    bgcolor: isDark ? '#152c54' : '#f8fafc',
                                                     borderWidth: 1.5,
                                                 },
                                             }}
@@ -1804,7 +1979,15 @@ export default function Welcome({
                 </Box>
 
                 {/* 6. Sección: Beneficios de Formarse en Grupo CAPSUR */}
-                <Box id="beneficios" sx={{ py: { xs: 7, md: 10 }, bgcolor: '#f8fbff', borderTop: '1px solid #eef2f6', scrollMarginTop: { xs: '65px', md: '75px' } }}>
+                <Box
+                    id="beneficios"
+                    sx={{
+                        py: { xs: 7, md: 10 },
+                        bgcolor: isDark ? '#08142a' : '#f8fbff',
+                        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #eef2f6',
+                        scrollMarginTop: { xs: '65px', md: '75px' },
+                    }}
+                >
                     <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
                         <SectionHeader
                             eyebrow="Ventajas y garantías"
@@ -1815,22 +1998,22 @@ export default function Welcome({
                         <Grid container spacing={3.5}>
                             {[
                                 {
-                                    icon: <VerifiedUserIcon sx={{ fontSize: 32, color: '#0056d6' }} />,
+                                    icon: <VerifiedUserIcon sx={{ fontSize: 32, color: isDark ? '#38bdf8' : '#0056d6' }} />,
                                     title: 'Acreditación y Licenciamiento MINEDU',
                                     desc: 'Resoluciones ministeriales oficiales, códigos ESCALE verificables y títulos a nombre de la nación.',
                                 },
                                 {
-                                    icon: <SchoolIcon sx={{ fontSize: 32, color: '#0056d6' }} />,
+                                    icon: <SchoolIcon sx={{ fontSize: 32, color: isDark ? '#38bdf8' : '#0056d6' }} />,
                                     title: 'Aulas Virtuales y Soporte 24/7',
                                     desc: 'Campus digital interactivo con materiales actualizados, clases grabadas y acompañamiento docente continuo.',
                                 },
                                 {
-                                    icon: <WorkspacePremiumIcon sx={{ fontSize: 32, color: '#0056d6' }} />,
+                                    icon: <WorkspacePremiumIcon sx={{ fontSize: 32, color: isDark ? '#38bdf8' : '#0056d6' }} />,
                                     title: 'Alta Inserción y Prácticas',
                                     desc: 'Convenios estratégicos institucionales y empresariales para asegurar inserción laboral rápida.',
                                 },
                                 {
-                                    icon: <BusinessIcon sx={{ fontSize: 32, color: '#0056d6' }} />,
+                                    icon: <BusinessIcon sx={{ fontSize: 32, color: isDark ? '#38bdf8' : '#0056d6' }} />,
                                     title: 'Soluciones para Empresas',
                                     desc: 'Planes de capacitación corporativa in-house, seguridad industrial, idiomas y tecnología a medida.',
                                 },
@@ -1842,21 +2025,21 @@ export default function Welcome({
                                             p: 3.5,
                                             height: '100%',
                                             borderRadius: 3.5,
-                                            bgcolor: '#ffffff',
-                                            border: '1px solid #e2e8f0',
+                                            bgcolor: isDark ? '#0b1933' : '#ffffff',
+                                            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
                                             transition: 'all 0.25s ease',
                                             '&:hover': {
                                                 transform: 'translateY(-4px)',
-                                                boxShadow: '0 12px 28px rgba(0, 86, 214, 0.1)',
-                                                borderColor: '#93c5fd',
+                                                boxShadow: isDark ? '0 12px 28px rgba(0, 0, 0, 0.4)' : '0 12px 28px rgba(0, 86, 214, 0.1)',
+                                                borderColor: isDark ? '#38bdf8' : '#93c5fd',
                                             },
                                         }}
                                     >
                                         <Box sx={{ mb: 2 }}>{beneficio.icon}</Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem', mb: 1, color: '#0f172a' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem', mb: 1, color: isDark ? '#f8fafc' : '#0f172a' }}>
                                             {beneficio.title}
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: '#64748b', lineHeight: 1.6 }}>
+                                        <Typography variant="body2" sx={{ color: isDark ? '#94a3b8' : '#64748b', lineHeight: 1.6 }}>
                                             {beneficio.desc}
                                         </Typography>
                                     </Paper>
@@ -1872,8 +2055,8 @@ export default function Welcome({
                     id="contacto"
                     sx={{
                         py: { xs: 7, md: 10 },
-                        bgcolor: '#f8fbff',
-                        borderTop: '1px solid #e2e8f0',
+                        bgcolor: isDark ? '#060f1e' : '#f8fbff',
+                        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #e2e8f0',
                         scrollMarginTop: { xs: '65px', md: '75px' },
                         overflow: 'hidden',
                     }}
@@ -2031,8 +2214,8 @@ export default function Welcome({
                                 <Box
                                     sx={{
                                         height: { md: 500 },
-                                        bgcolor: '#ffffff',
-                                        border: '1px solid #dbe4ef',
+                                        bgcolor: isDark ? '#0b1933' : '#ffffff',
+                                        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #dbe4ef',
                                         borderLeft: { md: 'none' },
                                         borderRadius: { xs: '4px', md: '0 4px 4px 0' },
                                         p: { xs: 3, sm: 4, md: 5 },
@@ -2043,7 +2226,7 @@ export default function Welcome({
                                 >
                                     <Typography
                                         sx={{
-                                            color: '#0056d6',
+                                            color: isDark ? '#38bdf8' : '#0056d6',
                                             fontSize: '0.72rem',
                                             fontWeight: 800,
                                             letterSpacing: '0.16em',
@@ -2056,7 +2239,7 @@ export default function Welcome({
                                     <Typography
                                         component="h3"
                                         sx={{
-                                            color: '#09152a',
+                                            color: isDark ? '#f8fafc' : '#09152a',
                                             fontSize: { xs: '1.65rem', md: '2.15rem' },
                                             fontWeight: 800,
                                             letterSpacing: '-0.03em',
@@ -2069,14 +2252,14 @@ export default function Welcome({
 
                                     <Grid container spacing={{ xs: 2.5, md: 3.5 }}>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '2px solid', borderColor: 'primary.main', pt: 1.5 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : 'primary.main', pt: 1.5 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Sede central
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 750, fontSize: '0.98rem', lineHeight: 1.45 }}>
+                                                <Typography sx={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 750, fontSize: '0.98rem', lineHeight: 1.45 }}>
                                                     {contact.address}
                                                 </Typography>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
                                                     {contact.addressDetail}
                                                 </Typography>
                                                 <Button
@@ -2089,7 +2272,7 @@ export default function Welcome({
                                                         textTransform: 'none',
                                                         fontWeight: 750,
                                                         fontSize: '0.78rem',
-                                                        color: 'primary.main',
+                                                        color: isDark ? '#38bdf8' : 'primary.main',
                                                         justifyContent: 'flex-start',
                                                         minWidth: 0,
                                                         '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
@@ -2101,42 +2284,42 @@ export default function Welcome({
                                         </Grid>
 
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '2px solid #0056d6', pt: 1.5 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : '#0056d6', pt: 1.5 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Atención e informes
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 800, fontSize: '1rem' }}>
+                                                <Typography sx={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 800, fontSize: '1rem' }}>
                                                     {contact.phone}
                                                 </Typography>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.82rem', mt: 0.35 }}>
                                                     {contact.phoneDetail}
                                                 </Typography>
                                             </Box>
                                         </Grid>
 
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '1px solid #e2e8f0', pt: 1.8 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                            <Box sx={{ borderTop: '1px solid', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0', pt: 1.8 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Correo institucional
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
+                                                <Typography sx={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
                                                     {contact.email}
                                                 </Typography>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
                                                     {contact.emailDetail}
                                                 </Typography>
                                             </Box>
                                         </Grid>
 
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '1px solid #e2e8f0', pt: 1.8 }}>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
+                                            <Box sx={{ borderTop: '1px solid', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0', pt: 1.8 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Horario de atención
                                                 </Typography>
-                                                <Typography sx={{ color: '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
+                                                <Typography sx={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 700, fontSize: '0.88rem' }}>
                                                     {contact.schedule}
                                                 </Typography>
-                                                <Typography sx={{ color: '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
+                                                <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.78rem', mt: 0.3 }}>
                                                     {contact.scheduleDetail}
                                                 </Typography>
                                             </Box>
@@ -2174,6 +2357,12 @@ export default function Welcome({
                                                 borderRadius: 1,
                                                 textTransform: 'none',
                                                 fontWeight: 700,
+                                                borderColor: isDark ? 'rgba(56, 189, 248, 0.4)' : undefined,
+                                                color: isDark ? '#38bdf8' : undefined,
+                                                '&:hover': {
+                                                    borderColor: isDark ? '#38bdf8' : undefined,
+                                                    bgcolor: isDark ? 'rgba(56, 189, 248, 0.08)' : undefined,
+                                                },
                                             }}
                                         >
                                             Ver Mapa de Ubicación
@@ -2252,7 +2441,7 @@ export default function Welcome({
                                     p: 0,
                                     height: { xs: 350, sm: 440, md: 520 },
                                     position: 'relative',
-                                    bgcolor: '#f1f5f9',
+                                    bgcolor: isDark ? '#060f1e' : '#f1f5f9',
                                 }}
                             >
                                 {contact.mapsEmbedUrl ? (
@@ -2313,7 +2502,7 @@ export default function Welcome({
                 </Box>
 
                 {/* 8. Footer Corporativo */}
-                <Box sx={{ py: 6, bgcolor: '#08142a', color: '#ffffff', mt: 'auto', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Box sx={{ py: 6, bgcolor: isDark ? '#030813' : '#08142a', color: '#ffffff', mt: 'auto', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                     <Container maxWidth="xl">
                         <Grid container spacing={4} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
                             <Grid size={{ xs: 12, md: 6 }}>

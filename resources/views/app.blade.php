@@ -32,8 +32,10 @@
 
         <link rel="icon" href="/logo-app.png" sizes="any">
         <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+        <link rel="preload" as="image" href="/images/capsur-de-dia.jpeg">
+        <link rel="preload" as="image" href="/images/capsur-de-noche.jpeg">
+        <link rel="preload" as="image" href="/images/fondo-marcas.svg">
 
         @fonts
 

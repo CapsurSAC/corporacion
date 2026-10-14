@@ -1,6 +1,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Container, IconButton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface CoverflowBrandItem {
@@ -68,6 +69,9 @@ interface Props {
 }
 
 export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
+
     // Inicializar con CECAVA (índice 2) como tarjeta activa central
     const [activeIndex, setActiveIndex] = useState(2);
     const [isHovered, setIsHovered] = useState(false);
@@ -156,13 +160,14 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                 position: 'relative',
                 pt: { xs: 6, sm: 8, md: 9 },
                 pb: { xs: 7, sm: 9, md: 10 },
-                bgcolor: '#ffffff',
+                bgcolor: isDark ? '#08142a' : '#ffffff',
                 overflow: 'hidden',
                 scrollMarginTop: { xs: '65px', md: '75px' },
                 outline: 'none',
                 // Optimización de renderizado para no afectar el scroll general de la página
                 contentVisibility: 'auto',
                 containIntrinsicSize: '650px',
+                transition: 'background-color 0.4s ease',
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -182,7 +187,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                     fontSize: { xs: '3.6rem', sm: '6.2rem', md: '9rem', lg: '11.5rem' },
                     fontWeight: 950,
                     letterSpacing: { xs: '0.04em', md: '0.08em' },
-                    color: 'rgba(12, 67, 163, 0.038)',
+                    color: isDark ? 'rgba(56, 189, 248, 0.04)' : 'rgba(12, 67, 163, 0.038)',
                     textTransform: 'uppercase',
                     userSelect: 'none',
                     pointerEvents: 'none',
@@ -219,7 +224,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             sx={{
                                 width: { xs: 28, sm: 36, md: 44 },
                                 height: '2px',
-                                bgcolor: '#0066ee',
+                                bgcolor: isDark ? '#38bdf8' : '#0066ee',
                                 borderRadius: 1,
                             }}
                         />
@@ -228,7 +233,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                 fontSize: { xs: '0.72rem', sm: '0.78rem' },
                                 fontWeight: 800,
                                 letterSpacing: '0.18em',
-                                color: '#0066ee',
+                                color: isDark ? '#38bdf8' : '#0066ee',
                                 textTransform: 'uppercase',
                                 lineHeight: 1,
                             }}
@@ -239,7 +244,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             sx={{
                                 width: { xs: 28, sm: 36, md: 44 },
                                 height: '2px',
-                                bgcolor: '#0066ee',
+                                bgcolor: isDark ? '#38bdf8' : '#0066ee',
                                 borderRadius: 1,
                             }}
                         />
@@ -254,14 +259,14 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             letterSpacing: '-0.035em',
                             lineHeight: 1.15,
                             mb: 1.4,
-                            color: '#09152a',
+                            color: isDark ? '#f8fafc' : '#09152a',
                         }}
                     >
                         Una corporación,{' '}
                         <Box
                             component="span"
                             sx={{
-                                color: '#0066ee',
+                                color: isDark ? '#38bdf8' : '#0066ee',
                                 display: 'inline',
                             }}
                         >
@@ -272,7 +277,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                     {/* Subtítulo descriptivo */}
                     <Typography
                         sx={{
-                            color: '#64748b',
+                            color: isDark ? '#94a3b8' : '#64748b',
                             fontSize: { xs: '0.88rem', sm: '0.96rem', md: '1.02rem' },
                             lineHeight: 1.6,
                             maxWidth: 680,
@@ -308,19 +313,20 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             top: '50%',
                             transform: 'translateY(-50%)',
                             zIndex: 30,
-                            bgcolor: '#ffffff',
-                            color: '#0f172a',
-                            border: '1px solid #e2e8f0',
-                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                            bgcolor: isDark ? '#0f1f38' : '#ffffff',
+                            color: isDark ? '#f8fafc' : '#0f172a',
+                            border: '1px solid',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0',
+                            boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.4)' : '0 4px 14px rgba(0, 0, 0, 0.1)',
                             width: { xs: 40, sm: 46 },
                             height: { xs: 40, sm: 46 },
-                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease',
+                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease',
                             '&:hover': {
-                                bgcolor: '#ffffff',
-                                color: '#0066ee',
-                                borderColor: '#0066ee',
+                                bgcolor: isDark ? '#152844' : '#ffffff',
+                                color: isDark ? '#38bdf8' : '#0066ee',
+                                borderColor: isDark ? '#38bdf8' : '#0066ee',
                                 transform: 'translateY(-50%) scale(1.08)',
-                                boxShadow: '0 6px 20px rgba(0, 102, 238, 0.22)',
+                                boxShadow: isDark ? '0 6px 20px rgba(56, 189, 248, 0.28)' : '0 6px 20px rgba(0, 102, 238, 0.22)',
                             },
                         }}
                     >
@@ -476,19 +482,20 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             top: '50%',
                             transform: 'translateY(-50%)',
                             zIndex: 30,
-                            bgcolor: '#ffffff',
-                            color: '#0f172a',
-                            border: '1px solid #e2e8f0',
-                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                            bgcolor: isDark ? '#0f1f38' : '#ffffff',
+                            color: isDark ? '#f8fafc' : '#0f172a',
+                            border: '1px solid',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0',
+                            boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.4)' : '0 4px 14px rgba(0, 0, 0, 0.1)',
                             width: { xs: 40, sm: 46 },
                             height: { xs: 40, sm: 46 },
-                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease',
+                            transition: 'transform 0.18s ease, border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease',
                             '&:hover': {
-                                bgcolor: '#ffffff',
-                                color: '#0066ee',
-                                borderColor: '#0066ee',
+                                bgcolor: isDark ? '#152844' : '#ffffff',
+                                color: isDark ? '#38bdf8' : '#0066ee',
+                                borderColor: isDark ? '#38bdf8' : '#0066ee',
                                 transform: 'translateY(-50%) scale(1.08)',
-                                boxShadow: '0 6px 20px rgba(0, 102, 238, 0.22)',
+                                boxShadow: isDark ? '0 6px 20px rgba(56, 189, 248, 0.28)' : '0 6px 20px rgba(0, 102, 238, 0.22)',
                             },
                         }}
                     >
@@ -513,7 +520,7 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                             position: 'absolute',
                             width: { xs: 150, sm: 200 },
                             height: '2px',
-                            bgcolor: 'rgba(226, 232, 240, 0.85)',
+                            bgcolor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(226, 232, 240, 0.85)',
                             zIndex: 0,
                         }}
                     />
@@ -534,11 +541,11 @@ export default function BrandsCoverflowCarousel({ onSelectBrand }: Props) {
                                     height: 8,
                                     width: isActive ? 28 : 8,
                                     borderRadius: 4,
-                                    bgcolor: isActive ? '#0066ee' : '#cbd5e1',
+                                    bgcolor: isActive ? (isDark ? '#38bdf8' : '#0066ee') : (isDark ? 'rgba(255, 255, 255, 0.2)' : '#cbd5e1'),
                                     transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease',
-                                    boxShadow: isActive ? '0 2px 8px rgba(0, 102, 238, 0.4)' : 'none',
+                                    boxShadow: isActive ? (isDark ? '0 2px 8px rgba(56, 189, 248, 0.45)' : '0 2px 8px rgba(0, 102, 238, 0.4)') : 'none',
                                     '&:hover': {
-                                        bgcolor: isActive ? '#0066ee' : '#94a3b8',
+                                        bgcolor: isActive ? (isDark ? '#38bdf8' : '#0066ee') : (isDark ? 'rgba(255, 255, 255, 0.35)' : '#94a3b8'),
                                     },
                                 }}
                             />
