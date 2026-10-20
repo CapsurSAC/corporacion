@@ -11,8 +11,17 @@ class LoginResponse implements LoginResponseContract
 {
     public function toResponse($request): Response
     {
+        $user = $request->user();
+        if ($user?->esAdministrador()) {
+            $redirectUrl = Fortify::redirects('login');
+        } elseif ($user?->esCapacitado()) {
+            $redirectUrl = route('capacitado.index');
+        } else {
+            $redirectUrl = '/';
+        }
+
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 200)
-            : redirect()->intended(Fortify::redirects('login'));
+            : redirect()->intended($redirectUrl);
     }
 }

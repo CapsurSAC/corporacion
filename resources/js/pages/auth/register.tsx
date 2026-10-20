@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { ChevronDownIcon } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -9,11 +10,27 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
-type Props = {
-    passwordRules: string;
+type RolOption = {
+    id: number;
+    nombre: string;
+    slug: string;
+    descripcion?: string | null;
 };
 
-export default function Register({ passwordRules }: Props) {
+type Props = {
+    passwordRules: string;
+    roles?: RolOption[];
+};
+
+export default function Register({ passwordRules, roles = [] }: Props) {
+    const availableRoles =
+        roles.length > 0
+            ? roles
+            : [
+                  { id: 1, nombre: 'CAPACITADO', slug: 'capacitado' },
+                  { id: 2, nombre: 'ADMIN', slug: 'admin' },
+              ];
+
     return (
         <>
             <Head title="Registrarse" />
@@ -25,7 +42,6 @@ export default function Register({ passwordRules }: Props) {
             >
                 {({ processing, errors }) => (
                     <>
-
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nombre Completo</Label>
@@ -60,11 +76,44 @@ export default function Register({ passwordRules }: Props) {
                             </div>
 
                             <div className="grid gap-2">
+                                <Label htmlFor="rol_id">Rol de Usuario</Label>
+                                <div className="relative">
+                                    <select
+                                        id="rol_id"
+                                        name="rol_id"
+                                        required
+                                        tabIndex={3}
+                                        defaultValue=""
+                                        className="border-input text-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex h-9 w-full appearance-none rounded-md border bg-transparent px-3 py-1 pr-8 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm cursor-pointer dark:bg-[#0c0c0e] dark:border-zinc-800"
+                                    >
+                                        <option
+                                            value=""
+                                            disabled
+                                            className="text-muted-foreground dark:bg-zinc-900"
+                                        >
+                                            Selecciona un rol
+                                        </option>
+                                        {availableRoles.map((r) => (
+                                            <option
+                                                key={r.id}
+                                                value={r.id}
+                                                className="dark:bg-zinc-900 dark:text-zinc-100"
+                                            >
+                                                {r.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-2.5 size-4 opacity-50" />
+                                </div>
+                                <InputError message={errors.rol_id} />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="password">Contraseña</Label>
                                 <PasswordInput
                                     id="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Ingresa tu contraseña"
@@ -80,7 +129,7 @@ export default function Register({ passwordRules }: Props) {
                                 <PasswordInput
                                     id="password_confirmation"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Repite tu contraseña"
@@ -94,7 +143,7 @@ export default function Register({ passwordRules }: Props) {
                             <Button
                                 type="submit"
                                 className="mt-2 w-full"
-                                tabIndex={5}
+                                tabIndex={6}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
@@ -106,7 +155,7 @@ export default function Register({ passwordRules }: Props) {
                             ¿Ya tienes una cuenta?{' '}
                             <TextLink
                                 href={login()}
-                                tabIndex={6}
+                                tabIndex={7}
                             >
                                 Iniciar Sesión
                             </TextLink>

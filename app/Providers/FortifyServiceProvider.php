@@ -12,6 +12,7 @@ use App\Http\Responses\VerifyEmailResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -51,6 +52,17 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureActions(): void
     {
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = \App\Models\User::with('rol')
+                ->where('email', $request->input('email'))
+                ->first();
+
+            if ($user && $user->is_enabled && Hash::check($request->input('password'), $user->password)) {
+                return $user;
+            }
+
+            return null;
+        });
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
     }
@@ -75,7 +87,9 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn (Request $request) => Inertia::render('auth/register'));
+        Fortify::registerView(fn (Request $request) => Inertia::render('auth/register', [
+            'roles' => \App\Models\Rol::orderBy('id', 'asc')->get(['id', 'nombre', 'slug', 'descripcion']),
+        ]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 

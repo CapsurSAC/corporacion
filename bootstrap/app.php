@@ -15,7 +15,23 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'capacitado' => \App\Http\Middleware\EnsureUserIsCapacitado::class,
+            'redirect.from.public' => \App\Http\Middleware\RedirectAuthenticatedFromPublic::class,
+        ]);
+
+        $middleware->redirectUsersTo(function (Request $request) {
+            $user = $request->user();
+            if ($user?->esCapacitado()) {
+                return route('capacitado.index');
+            }
+            return route('dashboard');
+        });
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        $middleware->validateCsrfTokens(except: ['capacitado/chat']);
 
         $middleware->web(append: [
             HandleAppearance::class,
@@ -31,8 +47,5 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->create();
 
     $app->useEnvironmentPath('/home/corporacioncapsu/environment');
-
-
-    
 
 return $app;

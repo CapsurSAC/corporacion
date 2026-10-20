@@ -807,10 +807,10 @@ export default function ContactoIndex({ contact }: Props) {
                                                         textTransform: 'none',
                                                         fontWeight: 750,
                                                         fontSize: '0.72rem',
-                                                        color: 'primary.main',
+                                                        color: '#0c43a3',
                                                         justifyContent: 'flex-start',
                                                         minWidth: 0,
-                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline', color: '#092f73' },
                                                     }}
                                                 >
                                                     Ver ubicación en el mapa
@@ -819,7 +819,7 @@ export default function ContactoIndex({ contact }: Props) {
                                         </Grid>
 
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '2px solid', borderColor: 'primary.main', pt: 1.2 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: '#0c43a3', pt: 1.2 }}>
                                                 <Typography sx={{ color: '#64748b', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                                                     Atención e informes
                                                 </Typography>
@@ -864,20 +864,37 @@ export default function ContactoIndex({ contact }: Props) {
                                     <Box sx={{ display: 'flex', gap: 1.5, mt: 3 }}>
                                         <Button
                                             variant="contained"
-                                            color="primary"
                                             size="small"
                                             startIcon={<WhatsAppIcon sx={{ fontSize: 16 }} />}
-                                            sx={{ textTransform: 'none', fontWeight: 750 }}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 750,
+                                                bgcolor: '#0c43a3',
+                                                color: '#ffffff',
+                                                '&:hover': { bgcolor: '#092f73' },
+                                            }}
                                         >
                                             Escribir a WhatsApp
                                         </Button>
                                         <Button
                                             variant="outlined"
-                                            color="primary"
                                             size="small"
                                             startIcon={<MapIcon sx={{ fontSize: 16 }} />}
                                             onClick={() => setPreviewMapOpen(true)}
-                                            sx={{ textTransform: 'none', fontWeight: 700 }}
+                                            sx={{
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                borderWidth: 1.5,
+                                                borderColor: '#0c43a3',
+                                                color: '#0c43a3',
+                                                bgcolor: '#ffffff',
+                                                '&:hover': {
+                                                    borderWidth: 1.5,
+                                                    borderColor: '#092f73',
+                                                    color: '#092f73',
+                                                    bgcolor: '#eff6ff',
+                                                },
+                                            }}
                                         >
                                             Ver Mapa de Ubicación
                                         </Button>

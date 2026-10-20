@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class([
+    'dark' => ($appearance ?? 'system') == 'dark',
+    'light' => ($appearance ?? 'system') != 'dark',
+])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
+        {{-- Inline script to apply the initial color scheme before the app loads --}}
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
+                const isDark = appearance === 'dark' ||
+                    (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-                if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
-                }
+                document.documentElement.classList.toggle('dark', isDark);
+                document.documentElement.classList.toggle('light', !isDark);
+                document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-mui-color-scheme', isDark ? 'dark' : 'light');
             })();
         </script>
 
@@ -35,7 +38,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
         <link rel="preload" as="image" href="/images/capsur-de-dia.jpeg">
         <link rel="preload" as="image" href="/images/capsur-de-noche.jpeg">
-        <link rel="preload" as="image" href="/images/fondo-marcas.svg">
 
         @fonts
 

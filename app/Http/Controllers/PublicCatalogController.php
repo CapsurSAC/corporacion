@@ -18,8 +18,18 @@ class PublicCatalogController extends Controller
     /**
      * Display the public corporate catalog for workers and visitors.
      */
-    public function index(Request $request): Response
+    public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
+        if ($user = $request->user()) {
+            if ($user->esAdministrador()) {
+                return redirect()->route('dashboard');
+            }
+
+            if ($user->esCapacitado()) {
+                return redirect()->route('capacitado.index');
+            }
+        }
+
         $grupos = Grupo::query()
             ->where('activo', true)
             ->with([
@@ -63,8 +73,18 @@ class PublicCatalogController extends Controller
     /**
      * Display a specific commerce in the public corporate catalog.
      */
-    public function show(string $slug): Response
+    public function show(string $slug, Request $request): Response|\Illuminate\Http\RedirectResponse
     {
+        if ($user = $request->user()) {
+            if ($user->esAdministrador()) {
+                return redirect()->route('dashboard');
+            }
+
+            if ($user->esCapacitado()) {
+                return redirect()->route('capacitado.index');
+            }
+        }
+
         $comercio = Comercio::query()
             ->where('slug', $slug)
             ->with([

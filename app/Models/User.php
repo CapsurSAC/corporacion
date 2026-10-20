@@ -30,7 +30,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $updated_at
  * @property-read Rol|null $rol
  */
-#[Fillable(['rol_id', 'name', 'email', 'password'])]
+#[Fillable(['rol_id', 'name', 'email', 'password', 'email_verified_at', 'is_enabled'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -48,7 +48,29 @@ class User extends Authenticatable implements PasskeyUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'is_enabled' => 'boolean',
         ];
+    }
+
+    protected $appends = [
+        'es_admin',
+        'es_capacitado',
+    ];
+
+    /**
+     * Accesor para saber si el usuario es administrador en el frontend.
+     */
+    public function getEsAdminAttribute(): bool
+    {
+        return $this->esAdministrador();
+    }
+
+    /**
+     * Accesor para saber si el usuario es capacitado en el frontend.
+     */
+    public function getEsCapacitadoAttribute(): bool
+    {
+        return $this->esCapacitado();
     }
 
     /**
@@ -64,6 +86,28 @@ class User extends Authenticatable implements PasskeyUser
      */
     public function esAdministrador(): bool
     {
-        return in_array($this->rol?->slug, ['admin', 'administrador']);
+        $slug = strtolower($this->rol?->slug ?? '');
+        $nombre = strtoupper($this->rol?->nombre ?? '');
+
+        return in_array($slug, ['admin', 'administrador']) || in_array($nombre, ['ADMIN', 'ADMINISTRADOR']);
+    }
+
+    /**
+     * Alias de esAdministrador.
+     */
+    public function esAdmin(): bool
+    {
+        return $this->esAdministrador();
+    }
+
+    /**
+     * Comprueba si el usuario tiene rol de capacitado.
+     */
+    public function esCapacitado(): bool
+    {
+        $slug = strtolower($this->rol?->slug ?? '');
+        $nombre = strtoupper($this->rol?->nombre ?? '');
+
+        return $slug === 'capacitado' || $nombre === 'CAPACITADO';
     }
 }

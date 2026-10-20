@@ -738,10 +738,8 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
                                 px: 2.5,
                                 borderTop: '1px solid',
                                 borderColor: 'divider',
-                                bgcolor: (theme) =>
-                                    theme.palette.mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.02)'
-                                        : '#f8fafc',
+                                bgcolor: (theme) => theme.vars?.palette.action.hover ?? theme.palette.action.hover,
+                                color: 'text.primary',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',

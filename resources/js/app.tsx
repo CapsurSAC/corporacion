@@ -9,6 +9,9 @@ import { CapsurMuiThemeProvider } from '@/theme/mui-theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Grupo Capsur';
 
+// Apply the saved theme before Inertia mounts any component.
+initializeTheme();
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
@@ -40,6 +43,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-
-// This will set light / dark mode on load...
-initializeTheme();

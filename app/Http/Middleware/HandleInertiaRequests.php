@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\TrainingArea;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,6 +37,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        if ($user) {
+            $user->loadMissing('rol');
+        }
 
         return [
             ...parent::share($request),
@@ -43,6 +47,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
             ],
+            'trainingAreas' => fn () => $user?->esCapacitado()
+                ? TrainingArea::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'slug', 'color'])
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'toast' => fn () => $request->session()->get('toast'),

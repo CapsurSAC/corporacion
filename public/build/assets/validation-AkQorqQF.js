@@ -1,0 +1,1 @@
+var e=e=>e?/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(e.trim()):!1,t=(e,t)=>!e||typeof e!=`string`?!1:e.trim().length>=t;export{e as n,t};

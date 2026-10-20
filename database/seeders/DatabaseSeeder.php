@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Sin seeders activos para salvaguardar los registros de la base de datos.
+        $this->call([
+            RolSeeder::class,
+        ]);
     }
 }

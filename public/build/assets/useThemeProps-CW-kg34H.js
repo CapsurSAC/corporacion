@@ -1,0 +1,1 @@
+import{B as e,I as t,L as n}from"./Box-DIlM-xf4.js";var r=n();function i(e){let{theme:n,name:r,props:i}=e;return!n||!n.components||!n.components[r]||!n.components[r].defaultProps?i:t(n.components[r].defaultProps,i)}function a(t){let{props:n,name:r,defaultTheme:a,themeId:o}=t,s=e(a);return o&&(s=s[o]||s),i({theme:s,name:r,props:n})}export{r as n,a as t};

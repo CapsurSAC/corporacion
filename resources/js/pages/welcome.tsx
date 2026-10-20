@@ -199,8 +199,7 @@ export default function Welcome({
     const isDark = resolvedAppearance === 'dark';
     const heroThemeMode: 'dia' | 'noche' = isDark ? 'noche' : 'dia';
     const { notify } = useNotification();
-    const auth = (page.props.auth || {}) as { user?: any };
-    const dashboardUrl = auth.user ? '/dashboard' : '/';
+
 
     // Información institucional de contacto oficial
     const contact = useMemo(() => {
@@ -855,73 +854,31 @@ export default function Welcome({
                                 )}
                             </IconButton>
 
-                            {auth.user ? (
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Chip
-                                        avatar={
-                                            <Avatar sx={{ bgcolor: isDark ? '#0284c7' : '#0056d6', color: '#fff', width: 28, height: 28, fontSize: '0.8rem', fontWeight: 800 }}>
-                                                {(auth.user.name || 'A').substring(0, 1).toUpperCase()}
-                                            </Avatar>
-                                        }
-                                        label={auth.user.name || 'Administrador'}
-                                        size="medium"
-                                        variant="outlined"
-                                        sx={{
-                                            fontWeight: 700,
-                                            display: { xs: 'none', sm: 'inline-flex' },
-                                            color: isDark ? '#f8fafc' : '#0f172a',
-                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#e2e8f0',
-                                        }}
-                                    />
-                                    <Link href={dashboardUrl} style={{ textDecoration: 'none' }}>
-                                        <Button
-                                            variant="contained"
-                                            endIcon={<ArrowForwardIcon />}
-                                            sx={{
-                                                bgcolor: '#0056d6',
-                                                px: 2.6,
-                                                py: 0.85,
-                                                fontWeight: 700,
-                                                borderRadius: 99,
-                                                textTransform: 'none',
-                                                fontSize: '0.88rem',
-                                                boxShadow: '0 4px 14px rgba(0, 86, 214, 0.28)',
-                                                '&:hover': {
-                                                    bgcolor: '#0041a8',
-                                                },
-                                            }}
-                                        >
-                                            Panel de Control
-                                        </Button>
-                                    </Link>
-                                </Box>
-                            ) : (
-                                <Button
-                                    id="btn-iniciar-sesion"
-                                    variant="contained"
-                                    onClick={handleOpenLogin}
-                                    startIcon={<PersonOutlinedIcon sx={{ fontSize: 19 }} />}
-                                    sx={{
-                                        bgcolor: '#0056d6',
-                                        color: '#ffffff',
-                                        borderRadius: 99,
-                                        px: { xs: 2.2, sm: 3 },
-                                        py: 0.9,
-                                        fontWeight: 700,
-                                        fontSize: '0.9rem',
-                                        textTransform: 'none',
-                                        boxShadow: '0 4px 14px rgba(0, 86, 214, 0.25)',
-                                        transition: 'all 0.2s ease',
-                                        '&:hover': {
-                                            bgcolor: '#0041a8',
-                                            boxShadow: '0 6px 18px rgba(0, 86, 214, 0.35)',
-                                            transform: 'translateY(-1px)',
-                                        },
-                                    }}
-                                >
-                                    Ingresar
-                                </Button>
-                            )}
+                            <Button
+                                id="btn-iniciar-sesion"
+                                variant="contained"
+                                onClick={handleOpenLogin}
+                                startIcon={<PersonOutlinedIcon sx={{ fontSize: 19 }} />}
+                                sx={{
+                                    bgcolor: '#0056d6',
+                                    color: '#ffffff',
+                                    borderRadius: 99,
+                                    px: { xs: 2.2, sm: 3 },
+                                    py: 0.9,
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    textTransform: 'none',
+                                    boxShadow: '0 4px 14px rgba(0, 86, 214, 0.25)',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                        bgcolor: '#0041a8',
+                                        boxShadow: '0 6px 18px rgba(0, 86, 214, 0.35)',
+                                        transform: 'translateY(-1px)',
+                                    },
+                                }}
+                            >
+                                Ingresar
+                            </Button>
                         </Box>
                     </Container>
                 </Box>
@@ -1362,10 +1319,7 @@ export default function Welcome({
                         bgcolor: isDark ? '#040d1c' : '#f8faff',
                         backgroundImage: isDark
                             ? 'radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.12) 0%, rgba(12, 67, 163, 0.18) 35%, transparent 70%), linear-gradient(180deg, #040d1c 0%, #061021 100%)'
-                            : `url('/images/fondo-marcas.svg')`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center top',
-                        backgroundSize: isDark ? '100% 100%' : { xs: 'cover', md: '100% 100%' },
+                            : 'none',
                         borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #eef2f6',
                         scrollMarginTop: { xs: '65px', md: '75px' },
                         overflow: 'hidden',
@@ -1808,7 +1762,7 @@ export default function Welcome({
                     </Container>
                 </Box>
 
-                {/* 5. Sección: Sobre Grupo CAPSUR y Capacitaciones Drive */}
+                {/* 5. Sección: Sobre Grupo CAPSUR */}
                 <Box id="nosotros" sx={{ py: { xs: 7, md: 10 }, bgcolor: isDark ? '#060f1e' : '#ffffff', scrollMarginTop: { xs: '65px', md: '75px' } }}>
                     <Container maxWidth={false} sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 5, xl: 6 } }}>
                         <SectionHeader
@@ -1816,165 +1770,93 @@ export default function Welcome({
                             title="Formación con propósito y visión de futuro"
                             description="Más de una década brindando educación de vanguardia, acreditada por MINEDU y orientada a la inserción laboral efectiva."
                         />
-                        <Grid container spacing={5} sx={{ alignItems: 'center' }}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography sx={{ color: isDark ? '#94a3b8' : '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 3 }}>
-                                    Grupo CAPSUR es una corporación dedicada a transformar el futuro de jóvenes y profesionales a través de una sólida red de institutos superiores, centros de capacitación continua y programas especializados adaptados a la demanda del mercado real.
-                                </Typography>
-                                <Typography sx={{ color: isDark ? '#94a3b8' : '#475569', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
-                                    Nuestras instituciones cuentan con respaldo oficial, acreditación institucional y convenios estratégicos para garantizar empleabilidad, titulación y actualización constante.
-                                </Typography>
+                        <Box sx={{ maxWidth: 960, mx: 'auto', textAlign: 'center' }}>
+                            <Typography sx={{ color: isDark ? '#cbd5e1' : '#475569', fontSize: { xs: '1.05rem', md: '1.15rem' }, lineHeight: 1.8, mb: 2.5 }}>
+                                Grupo CAPSUR es una corporación dedicada a transformar el futuro de jóvenes y profesionales a través de una sólida red de institutos superiores, centros de capacitación continua y programas especializados adaptados a la demanda del mercado real.
+                            </Typography>
+                            <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: { xs: '1rem', md: '1.05rem' }, lineHeight: 1.8, mb: 5 }}>
+                                Nuestras instituciones cuentan con respaldo oficial, acreditación institucional y convenios estratégicos para garantizar empleabilidad, titulación y actualización constante.
+                            </Typography>
 
-                                {/* Métricas Institucionales */}
-                                <Grid container spacing={2}>
-                                    <Grid size={{ xs: 6, sm: 4 }}>
-                                        <Paper
-                                            variant="outlined"
-                                            sx={{
-                                                p: 2,
-                                                borderRadius: 2.5,
-                                                textAlign: 'center',
-                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
-                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
-                                            }}
-                                        >
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
-                                                {allComercios.length || 8}+
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
-                                                Marcas Oficiales
-                                            </Typography>
-                                        </Paper>
-                                    </Grid>
-                                    <Grid size={{ xs: 6, sm: 4 }}>
-                                        <Paper
-                                            variant="outlined"
-                                            sx={{
-                                                p: 2,
-                                                borderRadius: 2.5,
-                                                textAlign: 'center',
-                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
-                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
-                                            }}
-                                        >
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
-                                                {stats.totalCarreras + stats.totalDiplomados + stats.totalCursos || 70}+
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
-                                                Programas Activos
-                                            </Typography>
-                                        </Paper>
-                                    </Grid>
-                                    <Grid size={{ xs: 12, sm: 4 }}>
-                                        <Paper
-                                            variant="outlined"
-                                            sx={{
-                                                p: 2,
-                                                borderRadius: 2.5,
-                                                textAlign: 'center',
-                                                bgcolor: isDark ? '#0a172e' : '#f8fafc',
-                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
-                                            }}
-                                        >
-                                            <Typography variant="h4" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6' }}>
-                                                100%
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
-                                                Acreditación Legal
-                                            </Typography>
-                                        </Paper>
-                                    </Grid>
+                            {/* Métricas Institucionales */}
+                            <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            textAlign: 'center',
+                                            bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.03)',
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateY(-3px)',
+                                                boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.45)' : '0 6px 18px rgba(0,0,0,0.08)',
+                                            },
+                                        }}
+                                    >
+                                        <Typography variant="h3" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6', mb: 0.5 }}>
+                                            {allComercios.length || 8}+
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
+                                            Marcas Oficiales
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            textAlign: 'center',
+                                            bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.03)',
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateY(-3px)',
+                                                boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.45)' : '0 6px 18px rgba(0,0,0,0.08)',
+                                            },
+                                        }}
+                                    >
+                                        <Typography variant="h3" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6', mb: 0.5 }}>
+                                            {stats.totalCarreras + stats.totalDiplomados + stats.totalCursos || 70}+
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
+                                            Programas Activos
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            textAlign: 'center',
+                                            bgcolor: isDark ? '#0a172e' : '#f8fafc',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.03)',
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            '&:hover': {
+                                                transform: 'translateY(-3px)',
+                                                boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.45)' : '0 6px 18px rgba(0,0,0,0.08)',
+                                            },
+                                        }}
+                                    >
+                                        <Typography variant="h3" sx={{ fontWeight: 900, color: isDark ? '#38bdf8' : '#0056d6', mb: 0.5 }}>
+                                            100%
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b' }}>
+                                            Acreditación Legal
+                                        </Typography>
+                                    </Paper>
                                 </Grid>
                             </Grid>
-
-                            {/* Repositorios de Capacitaciones Google Drive */}
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Paper
-                                    elevation={0}
-                                    sx={{
-                                        p: { xs: 3, sm: 4 },
-                                        borderRadius: 4,
-                                        bgcolor: isDark ? '#0a172e' : '#f8fbff',
-                                        border: isDark ? '1px solid rgba(56, 189, 248, 0.2)' : '1px solid #dbeafe',
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                        <Avatar sx={{ bgcolor: '#0056d6', color: '#fff', width: 44, height: 44 }}>
-                                            <FolderSharedIcon />
-                                        </Avatar>
-                                        <Box>
-                                            <Typography variant="h6" sx={{ fontWeight: 800, color: isDark ? '#f8fafc' : '#09152a' }}>
-                                                Repositorios Oficiales de Capacitación
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : 'text.secondary' }}>
-                                                Acceso centralizado a recursos y grabaciones en Google Drive
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-
-                                    <Typography variant="body2" sx={{ color: isDark ? '#cbd5e1' : '#475569', mb: 3.5, lineHeight: 1.6 }}>
-                                        Plataforma directa para que estudiantes, docentes y colaboradores accedan a sesiones grabadas, material de estudio y talleres oficiales de nuestras divisiones formativas.
-                                    </Typography>
-
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        {/* Botón Capacitación ESCIFOR */}
-                                        <Button
-                                            variant="contained"
-                                            startIcon={<FolderSharedIcon />}
-                                            endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
-                                            onClick={() => handleRedirect(driveLinks?.escifor, 'ESCIFOR')}
-                                            sx={{
-                                                bgcolor: '#0c43a3',
-                                                color: '#ffffff',
-                                                py: 1.4,
-                                                px: 3,
-                                                borderRadius: 2.5,
-                                                fontWeight: 700,
-                                                fontSize: '0.9rem',
-                                                textTransform: 'none',
-                                                justifyContent: 'space-between',
-                                                boxShadow: '0 4px 14px rgba(12, 67, 163, 0.25)',
-                                                '&:hover': {
-                                                    bgcolor: '#092f73',
-                                                },
-                                            }}
-                                        >
-                                            Capacitación ESCIFOR (Google Drive)
-                                        </Button>
-
-                                        {/* Botón Capacitación MULTIMARCA */}
-                                        <Button
-                                            variant="outlined"
-                                            startIcon={<FolderSharedIcon />}
-                                            endIcon={<LaunchIcon sx={{ fontSize: 15 }} />}
-                                            onClick={() => handleRedirect(driveLinks?.multimarca, 'MULTIMARCA')}
-                                            sx={{
-                                                bgcolor: isDark ? '#0f2242' : '#ffffff',
-                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#cbd5e1',
-                                                borderWidth: 1.5,
-                                                color: isDark ? '#f8fafc' : '#0f172a',
-                                                py: 1.4,
-                                                px: 3,
-                                                borderRadius: 2.5,
-                                                fontWeight: 700,
-                                                fontSize: '0.9rem',
-                                                textTransform: 'none',
-                                                justifyContent: 'space-between',
-                                                '&:hover': {
-                                                    borderColor: isDark ? '#38bdf8' : '#94a3b8',
-                                                    bgcolor: isDark ? '#152c54' : '#f8fafc',
-                                                    borderWidth: 1.5,
-                                                },
-                                            }}
-                                        >
-                                            Capacitación MULTIMARCA (Google Drive)
-                                        </Button>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                        </Grid>
+                        </Box>
                     </Container>
                 </Box>
 
@@ -2252,7 +2134,7 @@ export default function Welcome({
 
                                     <Grid container spacing={{ xs: 2.5, md: 3.5 }}>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : 'primary.main', pt: 1.5 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : '#0c43a3', pt: 1.5 }}>
                                                 <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Sede central
                                                 </Typography>
@@ -2272,10 +2154,10 @@ export default function Welcome({
                                                         textTransform: 'none',
                                                         fontWeight: 750,
                                                         fontSize: '0.78rem',
-                                                        color: isDark ? '#38bdf8' : 'primary.main',
+                                                        color: isDark ? '#38bdf8' : '#0c43a3',
                                                         justifyContent: 'flex-start',
                                                         minWidth: 0,
-                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline', color: isDark ? '#7dd3fc' : '#092f73' },
                                                     }}
                                                 >
                                                     Ver ubicación en el mapa
@@ -2284,7 +2166,7 @@ export default function Welcome({
                                         </Grid>
 
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : '#0056d6', pt: 1.5 }}>
+                                            <Box sx={{ borderTop: '2px solid', borderColor: isDark ? '#38bdf8' : '#0c43a3', pt: 1.5 }}>
                                                 <Typography sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', mb: 0.7 }}>
                                                     Atención e informes
                                                 </Typography>
@@ -2329,7 +2211,6 @@ export default function Welcome({
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 3.5 }}>
                                         <Button
                                             variant="contained"
-                                            color="primary"
                                             startIcon={<WhatsAppIcon sx={{ fontSize: 19 }} />}
                                             endIcon={<ArrowForwardIcon sx={{ fontSize: 17 }} />}
                                             href={contact.whatsappHref}
@@ -2342,13 +2223,19 @@ export default function Welcome({
                                                 textTransform: 'none',
                                                 fontWeight: 750,
                                                 boxShadow: 'none',
+                                                bgcolor: isDark ? '#38bdf8' : '#0c43a3',
+                                                color: isDark ? '#09152a' : '#ffffff',
+                                                '&:hover': {
+                                                    bgcolor: isDark ? '#0ea5e9' : '#092f73',
+                                                    color: isDark ? '#09152a' : '#ffffff',
+                                                    boxShadow: '0 4px 12px rgba(12, 67, 163, 0.25)',
+                                                },
                                             }}
                                         >
                                             Escribir a WhatsApp
                                         </Button>
                                         <Button
                                             variant="outlined"
-                                            color="primary"
                                             startIcon={<MapIcon sx={{ fontSize: 18 }} />}
                                             onClick={() => setMapModalOpen(true)}
                                             sx={{
@@ -2357,11 +2244,15 @@ export default function Welcome({
                                                 borderRadius: 1,
                                                 textTransform: 'none',
                                                 fontWeight: 700,
-                                                borderColor: isDark ? 'rgba(56, 189, 248, 0.4)' : undefined,
-                                                color: isDark ? '#38bdf8' : undefined,
+                                                borderWidth: 1.5,
+                                                borderColor: isDark ? 'rgba(56, 189, 248, 0.4)' : '#0c43a3',
+                                                color: isDark ? '#38bdf8' : '#0c43a3',
+                                                bgcolor: isDark ? 'transparent' : '#ffffff',
                                                 '&:hover': {
-                                                    borderColor: isDark ? '#38bdf8' : undefined,
-                                                    bgcolor: isDark ? 'rgba(56, 189, 248, 0.08)' : undefined,
+                                                    borderWidth: 1.5,
+                                                    borderColor: isDark ? '#38bdf8' : '#092f73',
+                                                    bgcolor: isDark ? 'rgba(56, 189, 248, 0.08)' : '#eff6ff',
+                                                    color: isDark ? '#38bdf8' : '#092f73',
                                                 },
                                             }}
                                         >
@@ -2404,8 +2295,8 @@ export default function Welcome({
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <Avatar
                                         sx={{
-                                            bgcolor: 'primary.main',
-                                            color: '#ffffff',
+                                            bgcolor: isDark ? '#38bdf8' : '#0c43a3',
+                                            color: isDark ? '#09152a' : '#ffffff',
                                             width: 40,
                                             height: 40,
                                             borderRadius: 1,
@@ -2479,12 +2370,22 @@ export default function Welcome({
                                 <Button
                                     size="small"
                                     variant="outlined"
-                                    color="primary"
                                     endIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
                                     href={contact.mapsUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 1 }}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        borderRadius: 1,
+                                        borderColor: isDark ? '#38bdf8' : '#0c43a3',
+                                        color: isDark ? '#38bdf8' : '#0c43a3',
+                                        '&:hover': {
+                                            borderColor: isDark ? '#7dd3fc' : '#092f73',
+                                            color: isDark ? '#7dd3fc' : '#092f73',
+                                            bgcolor: isDark ? 'rgba(56, 189, 248, 0.08)' : '#eff6ff',
+                                        },
+                                    }}
                                 >
                                     Abrir en la aplicación de Google Maps
                                 </Button>

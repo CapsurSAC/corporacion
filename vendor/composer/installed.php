@@ -3,7 +3,7 @@
         'name' => 'laravel/react-starter-kit',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'fff273e33cce6157ac442c3fa886b42389eba4b0',
+        'reference' => '1b4c13ead372c3df390f614aa60b23857b7983cd',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -532,7 +532,7 @@
         'laravel/react-starter-kit' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'fff273e33cce6157ac442c3fa886b42389eba4b0',
+            'reference' => '1b4c13ead372c3df390f614aa60b23857b7983cd',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -1140,6 +1140,15 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+        'smalot/pdfparser' => array(
+            'pretty_version' => 'v2.13.1',
+            'version' => '2.13.1.0',
+            'reference' => 'a71c6dd38e60a995fdb4d36e4433b8b3557c65dc',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../smalot/pdfparser',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'spatie/once' => array(
             'dev_requirement' => false,
             'replaced' => array(
@@ -1324,9 +1333,9 @@
             'dev_requirement' => false,
         ),
         'symfony/polyfill-mbstring' => array(
-            'pretty_version' => 'v1.38.2',
-            'version' => '1.38.2.0',
-            'reference' => 'd3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6',
+            'pretty_version' => 'v1.43.0',
+            'version' => '1.43.0.0',
+            'reference' => '4d5d331bf731e0aedbc6b2f5e61135b7b7996a72',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-mbstring',
             'aliases' => array(),

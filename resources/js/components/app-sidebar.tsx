@@ -1,14 +1,16 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     Building2,
     CheckCircle2,
-    HardDrive,
+    FileText,
+    FolderOpen,
     Image,
     LayoutGrid,
     Phone,
     Store,
     Tags,
+    Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -25,10 +27,32 @@ import {
 } from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 
-export function AppSidebar() {
-    const dashboardUrl = '/dashboard';
+interface SharedTrainingArea {
+    name: string;
+    slug: string;
+    color: string;
+}
 
-    const mainNavItems: NavItem[] = [
+export function AppSidebar() {
+    const { auth, trainingAreas = [] } = usePage().props as { auth?: { user?: any }; trainingAreas?: SharedTrainingArea[] };
+    const user = auth?.user;
+    const esAdmin = Boolean(
+        user?.es_admin ||
+        user?.rol?.slug === 'admin' ||
+        user?.rol?.nombre?.toUpperCase() === 'ADMIN'
+    );
+    const esCapacitado = Boolean(
+        user?.es_capacitado ||
+        user?.rol?.slug === 'capacitado' ||
+        user?.rol?.nombre?.toUpperCase() === 'CAPACITADO'
+    );
+
+    const dashboardUrl = '/dashboard';
+    const capacitadoUrl = trainingAreas[0]?.slug
+        ? `/capacitado/area/${trainingAreas[0].slug}`
+        : '/capacitado';
+
+    const adminNavItems: NavItem[] = [
         {
             title: 'Dashboard',
             href: dashboardUrl,
@@ -55,11 +79,6 @@ export function AppSidebar() {
             icon: CheckCircle2,
         },
         {
-            title: 'Drive Capacitaciones',
-            href: '/admin/drive-capacitaciones',
-            icon: HardDrive,
-        },
-        {
             title: 'Logos',
             href: '/admin/logos',
             icon: Image,
@@ -69,7 +88,42 @@ export function AppSidebar() {
             href: '/admin/contacto',
             icon: Phone,
         },
+        {
+            title: 'Capacitación',
+            href: '/admin/capacitacion',
+            icon: FileText,
+        },
+        {
+            title: 'Archivos',
+            href: '/admin/archivos',
+            icon: FolderOpen,
+        },
+        {
+            title: 'Usuarios',
+            href: '/admin/usuarios',
+            icon: Users,
+        },
     ];
+
+    const capacitadoNavItems: NavItem[] = trainingAreas.map((area) => ({
+        title: area.name,
+        href: `/capacitado/area/${area.slug}`,
+        icon: BookOpen,
+    }));
+
+    const currentNavItems: NavItem[] = esAdmin
+        ? adminNavItems
+        : esCapacitado
+          ? capacitadoNavItems
+          : [];
+
+    const navLabel = esAdmin
+        ? 'Administración'
+        : esCapacitado
+          ? 'Capacitación'
+          : 'Platform';
+
+    const homeUrl = esAdmin ? dashboardUrl : esCapacitado ? capacitadoUrl : '/';
 
     const footerNavItems: NavItem[] = [
         {
@@ -90,7 +144,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboardUrl} prefetch>
+                            <Link href={homeUrl} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -99,7 +153,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={currentNavItems} label={navLabel} />
             </SidebarContent>
 
             <SidebarFooter>

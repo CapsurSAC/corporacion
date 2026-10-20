@@ -163,6 +163,21 @@ export const capsurTheme = createTheme({
                 },
             },
         },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    backgroundColor: `${theme.vars.palette.background.paper} !important`,
+                    color: theme.vars.palette.text.primary,
+                }),
+            },
+        },
+        MuiTable: {
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    backgroundColor: `${theme.vars.palette.background.paper} !important`,
+                }),
+            },
+        },
         MuiTableCell: {
             styleOverrides: {
                 root: ({ theme }) => ({
@@ -267,7 +282,7 @@ export const capsurTheme = createTheme({
 
 export function CapsurMuiThemeProvider({ children }: { children: ReactNode }) {
     return (
-        <ThemeProvider theme={capsurTheme}>
+        <ThemeProvider theme={capsurTheme} defaultMode="light" modeStorageKey="appearance">
             <CssBaseline enableColorScheme />
             {children}
         </ThemeProvider>

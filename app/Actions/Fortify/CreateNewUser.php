@@ -23,10 +23,15 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+            'rol_id' => ['required', 'integer', 'exists:roles,id'],
+        ], [
+            'rol_id.required' => 'Debes seleccionar un rol para la cuenta.',
+            'rol_id.exists' => 'El rol seleccionado no es válido.',
         ])->validate();
 
         return DB::transaction(function () use ($input) {
             return User::create([
+                'rol_id' => (int) $input['rol_id'],
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => $input['password'],
