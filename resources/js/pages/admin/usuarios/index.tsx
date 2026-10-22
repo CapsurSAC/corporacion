@@ -243,7 +243,6 @@ export default function UsersIndex({
                                 <TableRow key={user.id} hover>
                                     <TableCell>
                                         <Typography sx={{ fontWeight: 700 }}>{user.name}</Typography>
-                                        <Typography variant="caption" color="text.secondary">ID: {user.id}</Typography>
                                     </TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>
