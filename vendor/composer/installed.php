@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/react-starter-kit',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '1b4c13ead372c3df390f614aa60b23857b7983cd',
+        'pretty_version' => '1.0.0+no-version-set',
+        'version' => '1.0.0.0',
+        'reference' => null,
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -530,9 +530,9 @@
             'dev_requirement' => false,
         ),
         'laravel/react-starter-kit' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '1b4c13ead372c3df390f614aa60b23857b7983cd',
+            'pretty_version' => '1.0.0+no-version-set',
+            'version' => '1.0.0.0',
+            'reference' => null,
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

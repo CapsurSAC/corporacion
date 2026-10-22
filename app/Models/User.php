@@ -18,6 +18,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 /**
  * @property int $id
  * @property int|null $rol_id
+ * @property int|null $training_area_id
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
@@ -30,7 +31,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $updated_at
  * @property-read Rol|null $rol
  */
-#[Fillable(['rol_id', 'name', 'email', 'password', 'email_verified_at', 'is_enabled'])]
+#[Fillable(['rol_id', 'training_area_id', 'name', 'email', 'password', 'email_verified_at', 'is_enabled'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -79,6 +80,11 @@ class User extends Authenticatable implements PasskeyUser
     public function rol(): BelongsTo
     {
         return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    public function trainingArea(): BelongsTo
+    {
+        return $this->belongsTo(TrainingArea::class, 'training_area_id');
     }
 
     /**

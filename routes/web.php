@@ -26,7 +26,7 @@ Route::middleware(['redirect.from.public'])->group(function () {
 });
 
 // Portal para rol CAPACITADO (usuarios autenticados)
-Route::middleware(['auth', 'verified', 'capacitado'])->prefix('capacitado')->as('capacitado.')->group(function () {
+Route::middleware(['auth', 'verified', 'capacitado', 'capacitado.area'])->prefix('capacitado')->as('capacitado.')->group(function () {
     Route::get('/', [CapacitadoController::class, 'index'])->name('index');
     Route::get('venta', [CapacitadoController::class, 'venta'])->name('venta');
     Route::get('postventa', [CapacitadoController::class, 'postventa'])->name('postventa');

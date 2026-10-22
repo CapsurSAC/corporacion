@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useState, type MouseEvent } from 'react';
 import {
     BookOpen,
     Building2,
@@ -16,6 +17,16 @@ import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     Sidebar,
     SidebarContent,
@@ -36,6 +47,7 @@ interface SharedTrainingArea {
 export function AppSidebar() {
     const { auth, trainingAreas = [] } = usePage().props as { auth?: { user?: any }; trainingAreas?: SharedTrainingArea[] };
     const user = auth?.user;
+    const [unauthorizedArea, setUnauthorizedArea] = useState<string | null>(null);
     const esAdmin = Boolean(
         user?.es_admin ||
         user?.rol?.slug === 'admin' ||
@@ -48,8 +60,9 @@ export function AppSidebar() {
     );
 
     const dashboardUrl = '/dashboard';
-    const capacitadoUrl = trainingAreas[0]?.slug
-        ? `/capacitado/area/${trainingAreas[0].slug}`
+    const assignedTrainingAreaSlug = user?.training_area?.slug || user?.trainingArea?.slug;
+    const capacitadoUrl = assignedTrainingAreaSlug
+        ? `/capacitado/area/${assignedTrainingAreaSlug}`
         : '/capacitado';
 
     const adminNavItems: NavItem[] = [
@@ -125,6 +138,18 @@ export function AppSidebar() {
 
     const homeUrl = esAdmin ? dashboardUrl : esCapacitado ? capacitadoUrl : '/';
 
+    const handleNavClick = (item: NavItem, event: MouseEvent<Element>) => {
+        if (!esCapacitado || !item.href.toString().startsWith('/capacitado/area/')) {
+            return;
+        }
+
+        const targetAreaSlug = item.href.toString().split('/').pop();
+        if (targetAreaSlug !== assignedTrainingAreaSlug) {
+            event.preventDefault();
+            setUnauthorizedArea(item.title);
+        }
+    };
+
     const footerNavItems: NavItem[] = [
         {
             title: 'Portal Capsur',
@@ -139,7 +164,8 @@ export function AppSidebar() {
     ];
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <>
+            <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -153,13 +179,30 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={currentNavItems} label={navLabel} />
+                <NavMain items={currentNavItems} label={navLabel} onItemClick={handleNavClick} />
             </SidebarContent>
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
-        </Sidebar>
+            </Sidebar>
+
+            <Dialog open={Boolean(unauthorizedArea)} onOpenChange={(open) => !open && setUnauthorizedArea(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Acceso no autorizado</DialogTitle>
+                        <DialogDescription>
+                            No tienes autorización para acceder al área de {unauthorizedArea || 'capacitación'}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button>Entendido</Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }

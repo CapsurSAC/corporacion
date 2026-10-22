@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import type { MouseEvent } from 'react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -12,9 +13,11 @@ import type { NavItem } from '@/types';
 export function NavMain({
     items = [],
     label = 'Platform',
+    onItemClick,
 }: {
     items: NavItem[];
     label?: string;
+    onItemClick?: (item: NavItem, event: MouseEvent<Element>) => void;
 }) {
     const { isCurrentUrl } = useCurrentUrl();
 
@@ -29,7 +32,7 @@ export function NavMain({
                             isActive={isCurrentUrl(item.href)}
                             tooltip={{ children: item.title }}
                         >
-                            <Link href={item.href} prefetch>
+                            <Link href={item.href} prefetch onClick={(event) => onItemClick?.(item, event)}>
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
                             </Link>

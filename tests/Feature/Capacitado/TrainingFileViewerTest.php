@@ -17,9 +17,9 @@ class TrainingFileViewerTest extends TestCase
 
     public function test_capacitado_receives_only_the_selected_area_file_tree(): void
     {
-        $capacitado = $this->capacitado();
         $area = $this->area('Ventas');
         $otherArea = $this->area('Área secundaria');
+        $capacitado = $this->capacitado($area);
 
         TrainingFileNode::create(['training_area_id' => $area->id, 'type' => 'folder', 'name' => 'Manuales']);
         TrainingFileNode::create(['training_area_id' => $otherArea->id, 'type' => 'folder', 'name' => 'Privada']);
@@ -36,8 +36,8 @@ class TrainingFileViewerTest extends TestCase
     public function test_capacitado_can_view_and_download_area_file(): void
     {
         Storage::fake();
-        $capacitado = $this->capacitado();
         $area = $this->area();
+        $capacitado = $this->capacitado($area);
         $path = 'training-files/ventas/manual.txt';
         Storage::put($path, 'contenido del manual');
         $node = TrainingFileNode::create([
@@ -59,8 +59,8 @@ class TrainingFileViewerTest extends TestCase
 
     public function test_capacitado_cannot_use_admin_file_mutations(): void
     {
-        $capacitado = $this->capacitado();
         $area = $this->area();
+        $capacitado = $this->capacitado($area);
 
         $this->actingAs($capacitado)->post("/admin/archivos/{$area->slug}/folders", [
             'name' => 'No autorizada',
@@ -69,11 +69,11 @@ class TrainingFileViewerTest extends TestCase
         $this->assertDatabaseMissing('training_file_nodes', ['name' => 'No autorizada']);
     }
 
-    private function capacitado(): User
+    private function capacitado(TrainingArea $area): User
     {
         $role = Rol::create(['nombre' => 'CAPACITADO', 'slug' => 'capacitado']);
 
-        return User::factory()->create(['rol_id' => $role->id, 'is_enabled' => true]);
+        return User::factory()->create(['rol_id' => $role->id, 'training_area_id' => $area->id, 'is_enabled' => true]);
     }
 
     private function area(string $name = 'Ventas'): TrainingArea

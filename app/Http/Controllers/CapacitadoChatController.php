@@ -6,6 +6,7 @@ use App\Services\CapacitadoChatService;
 use App\Models\TrainingArea;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CapacitadoChatController extends Controller
 {
@@ -28,6 +29,12 @@ class CapacitadoChatController extends Controller
             'history.*.sender' => 'nullable|string|in:bot,user',
             'history.*.text' => 'nullable|string',
         ]);
+
+        if ($validated['area'] !== $request->user()->trainingArea?->slug) {
+            throw ValidationException::withMessages([
+                'area' => 'No tienes autorización para consultar esta área de capacitación.',
+            ]);
+        }
 
         $reply = $chatService->ask(
             area: $validated['area'],

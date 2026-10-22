@@ -20,9 +20,10 @@ type RolOption = {
 type Props = {
     passwordRules: string;
     roles?: RolOption[];
+    trainingAreas?: { id: number; name: string; slug: string }[];
 };
 
-export default function Register({ passwordRules, roles = [] }: Props) {
+export default function Register({ passwordRules, roles = [], trainingAreas = [] }: Props) {
     const availableRoles =
         roles.length > 0
             ? roles
@@ -59,6 +60,21 @@ export default function Register({ passwordRules, roles = [] }: Props) {
                                     message={errors.name}
                                     className="mt-2"
                                 />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="training_area_id">Área de Capacitación (solo CAPACITADO)</Label>
+                                <select
+                                    id="training_area_id"
+                                    name="training_area_id"
+                                    tabIndex={4}
+                                    defaultValue=""
+                                    className="border-input text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs outline-none md:text-sm cursor-pointer dark:bg-[#0c0c0e] dark:border-zinc-800"
+                                >
+                                    <option value="">Sin área</option>
+                                    {trainingAreas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}
+                                </select>
+                                <InputError message={errors.training_area_id} />
                             </div>
 
                             <div className="grid gap-2">

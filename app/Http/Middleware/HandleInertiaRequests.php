@@ -38,7 +38,7 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         if ($user) {
-            $user->loadMissing('rol');
+            $user->loadMissing(['rol', 'trainingArea']);
         }
 
         return [
@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
             ],
             'trainingAreas' => fn () => $user?->esCapacitado()
-                ? TrainingArea::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'slug', 'color'])
+                    ? TrainingArea::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'slug', 'color'])
                 : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

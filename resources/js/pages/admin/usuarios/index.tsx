@@ -22,7 +22,7 @@ import {
     Select,
     Stack,
     Switch,
-    Table,
+    Table,  
     TableBody,
     TableCell,
     TableContainer,
@@ -46,21 +46,28 @@ interface Role {
 interface UserItem {
     id: number;
     rol_id: number;
+    training_area_id?: number | null;
     name: string;
     email: string;
-    email_verified_at?: string | null;
     is_enabled: boolean;
     rol?: Role | null;
+    trainingArea?: TrainingArea | null;
     created_at?: string;
+}
+
+interface TrainingArea {
+    id: number;
+    name: string;
+    slug: string;
 }
 
 interface UserForm {
     name: string;
     email: string;
     rol_id: number | '';
+    training_area_id: number | '';
     password: string;
     password_confirmation: string;
-    email_verified: boolean;
     is_enabled: boolean;
 }
 
@@ -68,19 +75,21 @@ const emptyForm: UserForm = {
     name: '',
     email: '',
     rol_id: '',
+    training_area_id: '',
     password: '',
     password_confirmation: '',
-    email_verified: true,
     is_enabled: true,
 };
 
 export default function UsersIndex({
     users = [],
     roles = [],
+    trainingAreas = [],
     filters = { search: '', role: 'all' },
 }: {
     users: UserItem[];
     roles: Role[];
+    trainingAreas: TrainingArea[];
     filters?: { search?: string; role?: string };
 }) {
     const { notify } = useNotification();
@@ -109,9 +118,9 @@ export default function UsersIndex({
             name: user.name,
             email: user.email,
             rol_id: user.rol_id,
+            training_area_id: user.training_area_id || '',
             password: '',
             password_confirmation: '',
-            email_verified: Boolean(user.email_verified_at),
             is_enabled: user.is_enabled,
         });
         setDialogOpen(true);
@@ -275,15 +284,27 @@ export default function UsersIndex({
                             <TextField required fullWidth type="email" label="Correo electrónico" value={form.email} onChange={(event) => updateForm('email', event.target.value)} />
                             <FormControl fullWidth required>
                                 <InputLabel>Rol</InputLabel>
-                                <Select label="Rol" value={form.rol_id} onChange={(event) => updateForm('rol_id', Number(event.target.value))}>
+                                <Select label="Rol" value={form.rol_id} onChange={(event) => {
+                                    const roleId = Number(event.target.value);
+                                    updateForm('rol_id', roleId);
+                                    if (roles.find((role) => role.id === roleId)?.slug !== 'capacitado') {
+                                        updateForm('training_area_id', '');
+                                    }
+                                }}>
                                     {roles.map((role) => <MenuItem key={role.id} value={role.id}>{role.nombre}</MenuItem>)}
                                 </Select>
                             </FormControl>
+                            {roles.find((role) => role.id === form.rol_id)?.slug === 'capacitado' && (
+                                <FormControl fullWidth required>
+                                    <InputLabel>Área de capacitación</InputLabel>
+                                    <Select label="Área de capacitación" value={form.training_area_id} onChange={(event) => updateForm('training_area_id', Number(event.target.value))}>
+                                        <MenuItem value="" disabled>Selecciona un área</MenuItem>
+                                        {trainingAreas.map((area) => <MenuItem key={area.id} value={area.id}>{area.name}</MenuItem>)}
+                                    </Select>
+                                </FormControl>
+                            )}
                             <TextField required={!editingUser} fullWidth type="password" label={editingUser ? 'Nueva contraseña (opcional)' : 'Contraseña'} value={form.password} onChange={(event) => updateForm('password', event.target.value)} helperText="Mínimo 8 caracteres." />
                             <TextField required={!editingUser} fullWidth type="password" label="Confirmar contraseña" value={form.password_confirmation} onChange={(event) => updateForm('password_confirmation', event.target.value)} />
-                            <Button variant={form.email_verified ? 'contained' : 'outlined'} onClick={() => updateForm('email_verified', !form.email_verified)}>
-                                {form.email_verified ? 'Correo verificado' : 'Marcar correo como verificado'}
-                            </Button>
                         </Stack>
                     </DialogContent>
                     <DialogActions>

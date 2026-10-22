@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-Bfj1fwqP.js";import{i as t}from"./Button-EXChzDU7.js";var n=e(),r=t((0,n.jsx)(`path`,{d:`M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z`}),`Description`);export{r as t};

@@ -16,13 +16,9 @@ class CapacitadoController extends Controller
      */
     public function index(): RedirectResponse
     {
-        $area = TrainingArea::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->first();
+        $area = request()->user()->trainingArea;
 
-        if (! $area) {
+        if (! $area?->is_active) {
             return redirect()->route('home')->with('error', 'No hay áreas de capacitación activas disponibles.');
         }
 
@@ -128,7 +124,8 @@ class CapacitadoController extends Controller
         abort_unless(
             $node->type === 'file'
             && $node->storage_path
-            && $node->area?->is_active,
+            && $node->area?->is_active
+            && $node->training_area_id === request()->user()->training_area_id,
             404
         );
     }

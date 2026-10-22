@@ -34,4 +34,9 @@ class TrainingArea extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function usuarios(): HasMany
+    {
+        return $this->hasMany(User::class, 'training_area_id');
+    }
 }

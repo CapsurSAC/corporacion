@@ -89,6 +89,7 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::registerView(fn (Request $request) => Inertia::render('auth/register', [
             'roles' => \App\Models\Rol::orderBy('id', 'asc')->get(['id', 'nombre', 'slug', 'descripcion']),
+            'trainingAreas' => \App\Models\TrainingArea::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
         ]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
