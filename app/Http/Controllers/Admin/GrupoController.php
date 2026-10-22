@@ -123,6 +123,19 @@ class GrupoController extends Controller
     public function destroy(Request $request, $grupo): RedirectResponse
     {
         $grupoModel = $grupo instanceof Grupo ? $grupo : Grupo::findOrFail($grupo);
+
+        // El borrado arrastra en cascada comercios y programas: solo se permite con el grupo vacío.
+        $comerciosCount = $grupoModel->comercios()->count();
+        if ($comerciosCount > 0) {
+            $mensajeError = "No se puede eliminar el grupo porque tiene {$comerciosCount} "
+                .($comerciosCount === 1 ? 'comercio asociado' : 'comercios asociados')
+                .'. Elimina o reasigna sus comercios, o desactiva el grupo.';
+
+            Inertia::flash('toast', ['type' => 'error', 'message' => $mensajeError]);
+
+            return back()->with('error', $mensajeError);
+        }
+
         $grupoModel->delete();
 
         Inertia::flash('toast', [

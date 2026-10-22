@@ -20,9 +20,9 @@ export default function AdminFilesIndex({ areas = [] }: { areas?: Area[] }) {
                                 <CardActionArea
                                     href={`/admin/archivos/${area.slug}`}
                                     onClick={(event) => {
-                                        if (event.detail < 2) event.preventDefault();
+                                        event.preventDefault();
+                                        router.visit(`/admin/archivos/${area.slug}`);
                                     }}
-                                    onDoubleClick={() => router.visit(`/admin/archivos/${area.slug}`)}
                                     sx={{ p: 1 }}
                                 >
                                     <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

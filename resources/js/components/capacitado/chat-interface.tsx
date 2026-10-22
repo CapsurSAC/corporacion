@@ -62,6 +62,39 @@ function renderMessageText(text: string): React.ReactNode {
     ));
 }
 
+const MAX_MESSAGE_LENGTH = 1500;
+
+class ChatRequestError extends Error {
+    constructor(
+        public status: number,
+        public serverMessage?: string,
+    ) {
+        super(`Server returned ${status}`);
+    }
+}
+
+function chatErrorMessage(error: unknown): string {
+    const prefix = '⚠️ **No se pudo procesar tu consulta.**';
+
+    if (!(error instanceof ChatRequestError)) {
+        return `${prefix} No hay conexión con el servidor. Revisa tu conexión a Internet e inténtalo nuevamente.`;
+    }
+
+    if (error.status === 419 || error.status === 401) {
+        return `${prefix} Tu sesión expiró. Recarga la página e inicia sesión nuevamente.`;
+    }
+
+    if (error.status === 403) {
+        return `${prefix} ${error.serverMessage || 'No tienes autorización para consultar esta área.'}`;
+    }
+
+    if (error.status === 422) {
+        return `${prefix} ${error.serverMessage || 'Revisa tu mensaje e inténtalo nuevamente.'}`;
+    }
+
+    return `${prefix} El asistente no está disponible en este momento. Inténtalo nuevamente en unos minutos o consulta a tu jefatura de área.`;
+}
+
 export function ChatInterface({
     areaKey,
     areaTitle,
@@ -185,16 +218,17 @@ Para brindarte una instrucción precisa sobre el área de **${areaTitle}**, te r
                 };
                 setMessages((prev) => [...prev, botMsg]);
             } else {
-                throw new Error('Server returned ' + res.status);
+                const data = await res.json().catch(() => null);
+
+                throw new ChatRequestError(res.status, data?.message);
             }
         } catch (error) {
             console.error('Error en consulta al asistente IA:', error);
-            // Caída suave al motor local si el servidor o la red no responden
-            const botReplyText = findAnswer(text);
+            // Se avisa del fallo en lugar de inventar una respuesta local: el usuario debe saber que su consulta no llegó.
             const botMsg: Message = {
                 id: `bot-${Date.now()}`,
                 sender: 'bot',
-                text: botReplyText,
+                text: chatErrorMessage(error),
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
             setMessages((prev) => [...prev, botMsg]);
@@ -588,10 +622,11 @@ Para brindarte una instrucción precisa sobre el área de **${areaTitle}**, te r
                             size="small"
                             placeholder={`Pregúntale al Asistente de ${areaTitle} sobre procesos, directrices o herramientas...`}
                             value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
+                            onChange={(e) => setInputValue(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
                             onKeyDown={handleKeyDown}
                             disabled={isTyping}
                             slotProps={{
+                                htmlInput: { maxLength: MAX_MESSAGE_LENGTH },
                                 input: {
                                     sx: {
                                         borderRadius: 1.5,
@@ -628,6 +663,7 @@ Para brindarte una instrucción precisa sobre el área de **${areaTitle}**, te r
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, px: 0.5 }}>
                             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                                 Presiona <strong>Enter</strong> para enviar.
+                                {inputValue.length > MAX_MESSAGE_LENGTH * 0.8 && ` (${inputValue.length}/${MAX_MESSAGE_LENGTH})`}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                                 Asistente Virtual de Inducción · Grupo CAPSUR 2026

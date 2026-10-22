@@ -15,10 +15,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControlLabel,
     IconButton,
     InputLabel,
     Paper,
     Stack,
+    Switch,
     Table,
     TableBody,
     TableCell,
@@ -401,6 +403,17 @@ export default function TrainingAreasIndex({ areas = [] }: { areas: Area[] }) {
                                     sx={{ width: 120 }}
                                 />
                             </Box>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={areaForm.is_active}
+                                        onChange={(event) => setAreaForm({ ...areaForm, is_active: event.target.checked })}
+                                    />
+                                }
+                                label={areaForm.is_active
+                                    ? 'Área activa: visible para el personal capacitado'
+                                    : 'Área inactiva: oculta para el personal capacitado'}
+                            />
                         </Box>
                     </DialogContent>
                     <DialogActions>

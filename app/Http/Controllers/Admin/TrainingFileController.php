@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,7 +39,13 @@ class TrainingFileController extends Controller
             'parent_id' => ['nullable', 'integer', 'exists:training_file_nodes,id'],
         ]);
         $parent = $this->parentForArea($data['parent_id'] ?? null, $trainingArea);
-        $this->createNode($trainingArea, $parent, trim($data['name']), 'folder', $request);
+        $name = trim($data['name']);
+        if ($this->nameExists($trainingArea, $parent, $name)) {
+            throw ValidationException::withMessages([
+                'name' => 'Ya existe una carpeta o archivo con ese nombre en esta ubicación.',
+            ]);
+        }
+        $this->createNode($trainingArea, $parent, $name, 'folder', $request);
         return back();
     }
 
@@ -53,7 +60,7 @@ class TrainingFileController extends Controller
         $node = $this->createNode(
             $trainingArea,
             $parent,
-            trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)),
+            $this->availableFileName($trainingArea, $parent, trim(basename($file->getClientOriginalName()))),
             'file',
             $request,
         );
@@ -78,7 +85,7 @@ class TrainingFileController extends Controller
     public function download(TrainingFileNode $trainingFileNode)
     {
         abort_unless($trainingFileNode->type === 'file' && $trainingFileNode->storage_path, 404);
-        return Storage::download($trainingFileNode->storage_path, $trainingFileNode->name);
+        return Storage::download($trainingFileNode->storage_path, $trainingFileNode->downloadName());
     }
 
     private function nodes(TrainingArea $area): array
@@ -105,6 +112,26 @@ class TrainingFileController extends Controller
         }
         return TrainingFileNode::where('training_area_id', $area->id)
             ->where('type', 'folder')->findOrFail($parentId);
+    }
+
+    private function nameExists(TrainingArea $area, ?TrainingFileNode $parent, string $name): bool
+    {
+        return TrainingFileNode::where('training_area_id', $area->id)
+            ->where('parent_id', $parent?->id)
+            ->where('name', $name)
+            ->exists();
+    }
+
+    // Si el nombre ya existe en la carpeta, agrega un sufijo: "guia (2).pdf".
+    private function availableFileName(TrainingArea $area, ?TrainingFileNode $parent, string $name): string
+    {
+        $base = pathinfo($name, PATHINFO_FILENAME);
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+        $candidate = $name;
+        for ($i = 2; $this->nameExists($area, $parent, $candidate); $i++) {
+            $candidate = $extension !== '' ? "{$base} ({$i}).{$extension}" : "{$base} ({$i})";
+        }
+        return $candidate;
     }
 
     private function createNode(TrainingArea $area, ?TrainingFileNode $parent, string $name, string $type, Request $request): TrainingFileNode

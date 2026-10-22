@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TrainingArea;
 use App\Models\TrainingDocument;
+use App\Models\TrainingFileNode;
+use App\Models\User;
 use App\Services\TrainingKnowledgeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,8 +46,20 @@ class TrainingAreaController extends Controller
 
     public function destroy(TrainingArea $trainingArea): RedirectResponse
     {
+        $assignedUsers = User::where('training_area_id', $trainingArea->id)->count();
+        if ($assignedUsers > 0) {
+            return back()->withErrors([
+                'area' => "No se puede eliminar el área porque tiene {$assignedUsers} usuario(s) asignado(s). Reasígnalos a otra área o desactívala.",
+            ]);
+        }
+
         foreach ($trainingArea->documents as $document) {
             Storage::delete($document->storage_path);
+        }
+        $storedFiles = TrainingFileNode::where('training_area_id', $trainingArea->id)
+            ->whereNotNull('storage_path')->pluck('storage_path');
+        foreach ($storedFiles as $path) {
+            Storage::delete($path);
         }
         $trainingArea->delete();
         return back();

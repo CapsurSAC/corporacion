@@ -98,7 +98,7 @@ export default function GruposIndex({ grupos = [] }: Props) {
     const handleDeletePrompt = async (grupo: Grupo) => {
         const confirmed = await confirmDeleteAlert({
             title: `¿Eliminar grupo "${grupo.nombre}"?`,
-            text: 'Esta acción eliminará permanentemente el grupo comercial y todos los comercios y programas asociados a él.',
+            text: 'Esta acción eliminará permanentemente el grupo comercial. Solo se puede eliminar si no tiene comercios asociados.',
             confirmButtonText: 'Sí, eliminar grupo',
         });
 

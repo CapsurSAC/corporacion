@@ -34,6 +34,20 @@ class TrainingAreaAuthorizationTest extends TestCase
             ->assertRedirect('/capacitado/area/ventas');
     }
 
+    public function test_capacitado_with_inactive_area_is_logged_out_instead_of_looping(): void
+    {
+        $area = $this->area('Ventas', 'ventas');
+        $area->update(['is_active' => false]);
+
+        $this->actingAs($this->capacitado($area))
+            ->get('/capacitado')
+            ->assertRedirect('/')
+            ->assertSessionHas('error');
+
+        $this->assertGuest();
+        $this->get('/')->assertOk();
+    }
+
     public function test_capacitado_cannot_access_a_fixed_route_for_another_area(): void
     {
         $area = $this->area('Informática', 'informatica');

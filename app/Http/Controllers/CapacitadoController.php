@@ -14,12 +14,18 @@ class CapacitadoController extends Controller
     /**
      * Redirect to the first active area configured by the administrator.
      */
-    public function index(): RedirectResponse
+    public function index(Request $request): RedirectResponse
     {
-        $area = request()->user()->trainingArea;
+        $area = $request->user()->trainingArea;
 
         if (! $area?->is_active) {
-            return redirect()->route('home')->with('error', 'No hay áreas de capacitación activas disponibles.');
+            // Se cierra la sesión: la página pública redirige a los capacitados
+            // de vuelta aquí, y sin área activa eso sería un bucle infinito.
+            auth()->guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('home')->with('error', 'Tu área de capacitación no está disponible. Contacta al administrador.');
         }
 
         return redirect()->route('capacitado.area', ['trainingArea' => $area->slug]);
@@ -91,7 +97,7 @@ class CapacitadoController extends Controller
     {
         $this->authorizeFile($trainingFileNode);
 
-        return \Illuminate\Support\Facades\Storage::download($trainingFileNode->storage_path, $trainingFileNode->name);
+        return \Illuminate\Support\Facades\Storage::download($trainingFileNode->storage_path, $trainingFileNode->downloadName());
     }
 
     public function view(TrainingFileNode $trainingFileNode)

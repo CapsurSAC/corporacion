@@ -287,6 +287,28 @@ class ComercioController extends Controller
     public function destroy(Request $request, $comercio): RedirectResponse
     {
         $comercioModel = $comercio instanceof Comercio ? $comercio : Comercio::findOrFail($comercio);
+
+        // El borrado arrastra en cascada toda la oferta: solo se permite sin programas.
+        $conteos = [
+            'carrera' => $comercioModel->carreras()->count(),
+            'especialidad' => $comercioModel->especialidades()->count(),
+            'diplomado' => $comercioModel->diplomados()->count(),
+            'curso' => $comercioModel->cursos()->count(),
+        ];
+        $plurales = ['carrera' => 'carreras', 'especialidad' => 'especialidades', 'diplomado' => 'diplomados', 'curso' => 'cursos'];
+        $detalles = collect($conteos)->filter()->map(
+            fn (int $total, string $tipo) => $total.' '.($total === 1 ? $tipo : $plurales[$tipo])
+        );
+
+        if ($detalles->isNotEmpty()) {
+            $mensajeError = 'No se puede eliminar el comercio porque tiene '.$detalles->implode(', ')
+                .'. Elimina primero su oferta formativa o desactiva el comercio.';
+
+            Inertia::flash('toast', ['type' => 'error', 'message' => $mensajeError]);
+
+            return back()->with('error', $mensajeError);
+        }
+
         $comercioModel->delete();
 
         Inertia::flash('toast', [

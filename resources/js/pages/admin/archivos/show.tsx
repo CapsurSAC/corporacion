@@ -1,16 +1,19 @@
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Head, router } from '@inertiajs/react';
-import { Box, Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Alert, Box, Button, Card, CardContent, Chip, Stack, TextField, Typography } from '@mui/material';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { FileTree, type FileNode } from '@/components/file-tree';
 
 type Area = { id: number; name: string; slug: string; color: string };
 
 export default function AdminFilesShow({ area, nodes = [] }: { area: Area; nodes?: FileNode[] }) {
+    const { errors } = usePage<{ errors: Record<string, string> }>().props;
     const [folderName, setFolderName] = useState('');
-    const [parentId, setParentId] = useState<number | null>(null);
+    const [destination, setDestination] = useState<FileNode | null>(null);
+    const parentId = destination?.id ?? null;
     const inputRef = useRef<HTMLInputElement>(null);
     const createFolder = (event: FormEvent) => {
         event.preventDefault();
@@ -26,7 +29,13 @@ export default function AdminFilesShow({ area, nodes = [] }: { area: Area; nodes
     };
     const removeNode = (node: FileNode) => {
         if (window.confirm(`¿Eliminar "${node.name}"?`)) {
-            router.delete(`/admin/archivos/nodes/${node.id}`);
+            router.delete(`/admin/archivos/nodes/${node.id}`, {
+                onSuccess: () => {
+                    if (destination?.id === node.id) {
+                        setDestination(null);
+                    }
+                },
+            });
         }
     };
 
@@ -43,10 +52,27 @@ export default function AdminFilesShow({ area, nodes = [] }: { area: Area; nodes
                     <input ref={inputRef} type="file" hidden onChange={uploadFile} />
                     <Button variant="outlined" startIcon={<DriveFolderUploadIcon />} onClick={() => inputRef.current?.click()}>Subir archivo</Button>
                 </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {parentId ? 'La carpeta seleccionada es el destino actual.' : 'Selecciona una carpeta para crear subcarpetas o subir archivos dentro de ella.'}
+                {(errors.name || errors.file) && (
+                    <Alert severity="error" sx={{ mb: 2 }}>{errors.name ?? errors.file}</Alert>
+                )}
+                <Stack direction="row" spacing={1} sx={{ mb: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <Typography variant="body2" color="text.secondary">Destino actual:</Typography>
+                    <Chip
+                        size="small"
+                        color="primary"
+                        variant={destination ? 'outlined' : 'filled'}
+                        label={destination ? destination.name : 'Raíz del área'}
+                    />
+                    {destination && (
+                        <Button size="small" startIcon={<HomeIcon />} onClick={() => setDestination(null)}>
+                            Volver a la raíz
+                        </Button>
+                    )}
+                </Stack>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    Haz clic en una carpeta para crear subcarpetas o subir archivos dentro de ella.
                 </Typography>
-                <Card><CardContent><FileTree nodes={nodes} onDelete={removeNode} onFolderSelect={(node) => setParentId(node.id)} /></CardContent></Card>
+                <Card><CardContent><FileTree nodes={nodes} selectedId={parentId} onDelete={removeNode} onFolderSelect={setDestination} /></CardContent></Card>
             </Box>
         </>
     );

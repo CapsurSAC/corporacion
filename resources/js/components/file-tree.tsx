@@ -26,21 +26,42 @@ const formatSize = (bytes?: number | null): string => {
 function TreeNode({
     node,
     readOnly,
+    selectedId,
     onDelete,
     onFolderSelect,
 }: {
     node: FileNode;
     readOnly: boolean;
+    selectedId?: number | null;
     onDelete?: (node: FileNode) => void;
     onFolderSelect?: (node: FileNode) => void;
 }) {
     const [open, setOpen] = useState(false);
     const isFolder = node.type === 'folder';
+    const isSelected = isFolder && selectedId === node.id;
+
+    const handleClick = () => {
+        if (!isFolder) {
+            return;
+        }
+
+        onFolderSelect?.(node);
+        // Un segundo clic sobre la carpeta ya seleccionada la pliega.
+        setOpen(isSelected || !onFolderSelect ? !open : true);
+    };
 
     return (
         <>
             <ListItem
-                sx={{ pl: 1 + (open ? 0 : 0), borderRadius: 1, '&:hover': { bgcolor: 'action.hover' } }}
+                sx={{
+                    pl: 1,
+                    borderRadius: 1,
+                    cursor: isFolder ? 'pointer' : 'default',
+                    bgcolor: isSelected ? 'action.selected' : undefined,
+                    outline: isSelected ? '1px solid' : undefined,
+                    outlineColor: 'primary.main',
+                    '&:hover': { bgcolor: isSelected ? 'action.selected' : 'action.hover' },
+                }}
                 secondaryAction={
                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                         {!isFolder && node.download_url && (
@@ -66,7 +87,7 @@ function TreeNode({
                         )}
                     </Box>
                 }
-                onClick={() => isFolder && (onFolderSelect?.(node), setOpen(true))}
+                onClick={handleClick}
             >
                 <ListItemIcon sx={{ minWidth: 38 }}>
                     {isFolder ? <WindowsFolderIcon color="primary" /> : <InsertDriveFileIcon color="action" />}
@@ -79,7 +100,7 @@ function TreeNode({
             {isFolder && open && (
                 <List sx={{ pl: 4, pt: 0 }}>
                     {(node.children ?? []).map((child) => (
-                        <TreeNode key={child.id} node={child} readOnly={readOnly} onDelete={onDelete} onFolderSelect={onFolderSelect} />
+                        <TreeNode key={child.id} node={child} readOnly={readOnly} selectedId={selectedId} onDelete={onDelete} onFolderSelect={onFolderSelect} />
                     ))}
                     {node.children?.length === 0 && (
                         <Typography variant="caption" color="text.secondary" sx={{ pl: 2 }}>
@@ -95,11 +116,13 @@ function TreeNode({
 export function FileTree({
     nodes,
     readOnly = false,
+    selectedId,
     onDelete,
     onFolderSelect,
 }: {
     nodes: FileNode[];
     readOnly?: boolean;
+    selectedId?: number | null;
     onDelete?: (node: FileNode) => void;
     onFolderSelect?: (node: FileNode) => void;
 }) {
@@ -110,7 +133,7 @@ export function FileTree({
     return (
         <List disablePadding>
             {nodes.map((node) => (
-                <TreeNode key={node.id} node={node} readOnly={readOnly} onDelete={onDelete} onFolderSelect={onFolderSelect} />
+                <TreeNode key={node.id} node={node} readOnly={readOnly} selectedId={selectedId} onDelete={onDelete} onFolderSelect={onFolderSelect} />
             ))}
         </List>
     );

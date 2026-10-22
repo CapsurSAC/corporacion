@@ -131,7 +131,7 @@ export default function ComerciosIndex({ comercios = [], grupos = [], filters = 
     const handleDeletePrompt = async (comercio: Comercio) => {
         const confirmed = await confirmDeleteAlert({
             title: `¿Eliminar comercio "${comercio.nombre}"?`,
-            text: 'Esta acción eliminará permanentemente el comercio y todos sus programas vinculados.',
+            text: 'Esta acción eliminará permanentemente el comercio. Solo se puede eliminar si no tiene carreras ni programas vinculados.',
             confirmButtonText: 'Sí, eliminar comercio',
         });
 

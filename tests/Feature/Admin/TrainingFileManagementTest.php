@@ -45,10 +45,58 @@ class TrainingFileManagementTest extends TestCase
             'parent_id' => $subfolder->id,
         ])->assertRedirect();
 
-        $uploaded = TrainingFileNode::query()->where('name', 'guia')->firstOrFail();
+        $uploaded = TrainingFileNode::query()->where('name', 'guia.pdf')->firstOrFail();
         $this->assertSame($area->id, $uploaded->training_area_id);
         $this->assertSame($subfolder->id, $uploaded->parent_id);
         Storage::assertExists($uploaded->storage_path);
+    }
+
+    public function test_duplicate_file_names_get_a_numbered_suffix(): void
+    {
+        Storage::fake();
+        $admin = $this->admin();
+        $area = $this->area();
+        $folder = TrainingFileNode::create(['training_area_id' => $area->id, 'type' => 'folder', 'name' => 'Manuales']);
+
+        foreach (range(1, 2) as $ignored) {
+            $this->actingAs($admin)->post("/admin/archivos/{$area->slug}/files", [
+                'file' => UploadedFile::fake()->create('guia.pdf', 10, 'application/pdf'),
+                'parent_id' => $folder->id,
+            ])->assertRedirect();
+        }
+
+        $this->assertDatabaseHas('training_file_nodes', ['parent_id' => $folder->id, 'name' => 'guia.pdf']);
+        $this->assertDatabaseHas('training_file_nodes', ['parent_id' => $folder->id, 'name' => 'guia (2).pdf']);
+    }
+
+    public function test_duplicate_folder_name_returns_a_validation_error(): void
+    {
+        $admin = $this->admin();
+        $area = $this->area();
+        $parent = TrainingFileNode::create(['training_area_id' => $area->id, 'type' => 'folder', 'name' => 'Manuales']);
+        TrainingFileNode::create(['training_area_id' => $area->id, 'parent_id' => $parent->id, 'type' => 'folder', 'name' => 'Ventas']);
+
+        $this->actingAs($admin)->post("/admin/archivos/{$area->slug}/folders", [
+            'name' => 'Ventas',
+            'parent_id' => $parent->id,
+        ])->assertSessionHasErrors('name');
+    }
+
+    public function test_download_restores_extension_for_legacy_file_names(): void
+    {
+        Storage::fake();
+        Storage::put('training-files/ventas/abc123.pdf', 'contenido');
+        $admin = $this->admin();
+        $area = $this->area();
+        $node = TrainingFileNode::create([
+            'training_area_id' => $area->id,
+            'type' => 'file',
+            'name' => 'guia',
+            'storage_path' => 'training-files/ventas/abc123.pdf',
+        ]);
+
+        $this->actingAs($admin)->get("/admin/archivos/nodes/{$node->id}/download")
+            ->assertDownload('guia.pdf');
     }
 
     public function test_admin_cannot_place_a_node_in_another_area(): void

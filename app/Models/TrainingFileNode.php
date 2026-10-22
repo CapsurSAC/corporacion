@@ -34,4 +34,19 @@ class TrainingFileNode extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Nombre con el que se descarga el archivo. Los registros antiguos se
+     * guardaban sin extensión, así que se recupera desde el archivo almacenado.
+     */
+    public function downloadName(): string
+    {
+        if (pathinfo($this->name, PATHINFO_EXTENSION) !== '' || ! $this->storage_path) {
+            return $this->name;
+        }
+
+        $extension = pathinfo($this->storage_path, PATHINFO_EXTENSION);
+
+        return $extension !== '' ? "{$this->name}.{$extension}" : $this->name;
+    }
 }
