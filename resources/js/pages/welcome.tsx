@@ -1566,48 +1566,55 @@ export default function Welcome({
                                 )}
                             </Paper>
                         ) : (
-                            <Grid container spacing={3}>
+                            <Grid container spacing={{ xs: 2, sm: 2.5, md: 2.75 }}>
                                 {filteredComercios.map((comercio) => {
                                     const cfg = getBrandCardConfig(comercio);
+                                    const logoSrc = isDark
+                                        ? comercio.logo_modo_oscuro || comercio.logo_modo_claro || cfg.logoSrc
+                                        : comercio.logo_modo_claro || comercio.logo_modo_oscuro || cfg.logoSrc;
                                     return (
                                         <Grid size={{ xs: 12, md: 6, lg: 4 }} key={comercio.id}>
                                             <Card
                                                 onClick={() => handleOpenComercioDetail(comercio)}
                                                 elevation={0}
                                                 sx={{
-                                                    height: '100%',
+                                                    height: { xs: 152, sm: 174, md: 192 },
                                                     display: 'flex',
                                                     flexDirection: 'column',
                                                     justifyContent: 'space-between',
-                                                    borderRadius: 4,
+                                                    borderRadius: { xs: 3, sm: 3.5 },
                                                     border: '1px solid',
-                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.9)',
                                                     bgcolor: isDark ? '#0f1f38' : '#ffffff',
-                                                    p: { xs: 2.25, sm: 2.75 },
-                                                    pl: { xs: 2.75, sm: 3.25 },
+                                                    backgroundImage: isDark
+                                                        ? 'linear-gradient(135deg, rgba(15, 31, 56, 0.96), rgba(8, 20, 42, 0.98)), url("/images/fondo-marcas.svg")'
+                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 255, 0.94)), url("/images/fondo-marcas.svg")',
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center',
+                                                    p: { xs: 1.5, sm: 2 },
+                                                    pl: { xs: 2, sm: 2.5 },
                                                     position: 'relative',
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
-                                                    transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-                                                    boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.35)' : '0 2px 10px rgba(0, 0, 0, 0.03)',
-                                                    // Barra vertical gruesa en el borde izquierdo
+                                                    transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+                                                    boxShadow: isDark ? '0 8px 22px rgba(0, 0, 0, 0.28)' : '0 8px 22px rgba(73, 104, 153, 0.12)',
                                                     '&::before': {
                                                         content: '""',
                                                         position: 'absolute',
                                                         top: 0,
                                                         left: 0,
                                                         bottom: 0,
-                                                        width: 6,
+                                                        width: 8,
                                                         bgcolor: cfg.accent,
                                                         zIndex: 2,
                                                     },
                                                     '&:hover': {
-                                                        transform: 'translateY(-4px)',
-                                                        boxShadow: isDark ? '0 14px 30px rgba(0, 0, 0, 0.6)' : '0 14px 30px rgba(15, 23, 42, 0.08)',
-                                                        borderColor: isDark ? 'rgba(56, 189, 248, 0.35)' : '#cbd5e1',
+                                                        transform: 'translateY(-5px)',
+                                                        boxShadow: isDark ? `0 16px 34px rgba(0, 0, 0, 0.5), 0 0 0 1px ${cfg.accent}55` : `0 16px 34px rgba(73, 104, 153, 0.2), 0 0 0 1px ${cfg.accent}55`,
+                                                        borderColor: cfg.accent,
                                                         '& .brand-card-arrow': {
-                                                            bgcolor: isDark ? '#38bdf8' : '#2563eb',
-                                                            color: isDark ? '#0f172a' : '#ffffff',
+                                                            bgcolor: `${cfg.accent}18`,
+                                                            color: cfg.accent,
                                                             transform: 'scale(1.08)',
                                                             '& svg': {
                                                                 transform: 'translateX(2px)',
@@ -1617,24 +1624,24 @@ export default function Welcome({
                                                 }}
                                             >
                                                 {/* Sección Superior: Logo (Izquierda) + Datos y Botón (Derecha) */}
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.2, mb: 1.5 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flex: 1, minHeight: 0 }}>
                                                     {/* Columna Izquierda: Logo de la Marca con divisor vertical */}
                                                     <Box
                                                         sx={{
-                                                            width: { xs: 95, sm: 118 },
-                                                            height: { xs: 68, sm: 76 },
+                                                            width: 'auto',
+                                                            height: '100%',
+                                                            flex: 1,
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             flexShrink: 0,
-                                                            pr: { xs: 1.5, sm: 2 },
-                                                            borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
+                                                            pr: { xs: 0.5, sm: 1 },
                                                         }}
                                                     >
                                                         <Box
                                                             component="img"
-                                                            src={cfg.logoSrc}
-                                                            alt={cfg.displayName}
+                                                            src={logoSrc}
+                                                            alt={comercio.nombre}
                                                             sx={{
                                                                 maxWidth: '100%',
                                                                 maxHeight: '100%',
@@ -1644,11 +1651,12 @@ export default function Welcome({
                                                     </Box>
 
                                                     {/* Columna Derecha: Título, Línea de acento, Descripción y Botón */}
-                                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                                                    <Box sx={{ minWidth: 36, flexShrink: 0 }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
                                                             <Box sx={{ minWidth: 0 }}>
                                                                 <Typography
                                                                     sx={{
+                                                                        display: 'none',
                                                                         fontWeight: 900,
                                                                         color: isDark ? '#f8fafc' : '#09152a',
                                                                         fontSize: { xs: '0.95rem', sm: '1.05rem' },
@@ -1666,6 +1674,7 @@ export default function Welcome({
                                                                 {/* Línea horizontal de acento en el color de la marca */}
                                                                 <Box
                                                                     sx={{
+                                                                        display: 'none',
                                                                         width: 26,
                                                                         height: 2.5,
                                                                         bgcolor: cfg.accent,
@@ -1702,7 +1711,7 @@ export default function Welcome({
                                                                 color: isDark ? '#94a3b8' : '#64748b',
                                                                 fontSize: '0.8rem',
                                                                 lineHeight: 1.45,
-                                                                display: '-webkit-box',
+                                                                display: 'none',
                                                                 WebkitLineClamp: 2,
                                                                 WebkitBoxOrient: 'vertical',
                                                                 overflow: 'hidden',
@@ -1717,7 +1726,7 @@ export default function Welcome({
                                                 {/* Fila Inferior: Divider + 3 Badges de Características */}
                                                 <Box
                                                     sx={{
-                                                        display: 'flex',
+                                                        display: 'none',
                                                         alignItems: 'center',
                                                         justifyContent: 'space-between',
                                                         flexWrap: { xs: 'wrap', sm: 'nowrap' },

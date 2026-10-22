@@ -6,7 +6,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import EmailIcon from '@mui/icons-material/Email';
-import HelpOutlineIcon from '@mui/icons-material/InfoOutlined';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
@@ -17,7 +16,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import {
-    Alert,
     Avatar,
     Box,
     Button,
@@ -198,15 +196,6 @@ export default function ContactoIndex({ contact }: Props) {
                     </Box>
                 </Paper>
 
-                {/* Nota informativa */}
-                <Alert
-                    severity="info"
-                    icon={<HelpOutlineIcon />}
-                    sx={{ borderRadius: 2, fontSize: '0.88rem', alignItems: 'center' }}
-                >
-                    Los cambios que guardes aquí se reflejan de inmediato en la sección <strong>"Contacto"</strong> del portal público institucional.
-                </Alert>
-
                 {/* Alternador entre Formulario y Vista Previa */}
                 <Paper
                     elevation={0}
@@ -251,19 +240,22 @@ export default function ContactoIndex({ contact }: Props) {
                                     sx={{
                                         borderRadius: 2.5,
                                         height: '100%',
-                                        borderTop: '4px solid',
-                                        borderColor: 'primary.main',
+                                        borderColor: 'divider',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 1px 4px rgba(0, 0, 0, 0.16)'
+                                                : '0 1px 4px rgba(15, 23, 42, 0.04)',
                                     }}
                                 >
                                     <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                <PhoneIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <PhoneIcon sx={{ color: 'text.secondary', fontSize: 22 }} />
+                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                     1. Canales de Teléfono y WhatsApp
                                                 </Typography>
                                             </Box>
-                                            <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
                                         </Box>
                                         <Typography variant="body2" color="text.secondary">
                                             Líneas telefónicas principales para llamadas directas y chats instantáneos de orientación.
@@ -350,19 +342,22 @@ export default function ContactoIndex({ contact }: Props) {
                                     sx={{
                                         borderRadius: 2.5,
                                         height: '100%',
-                                        borderTop: '4px solid',
-                                        borderColor: 'primary.main',
+                                        borderColor: 'divider',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 1px 4px rgba(0, 0, 0, 0.16)'
+                                                : '0 1px 4px rgba(15, 23, 42, 0.04)',
                                     }}
                                 >
                                     <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                <EmailIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <EmailIcon sx={{ color: 'text.secondary', fontSize: 22 }} />
+                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                     2. Correo y Horarios de Atención
                                                 </Typography>
                                             </Box>
-                                            <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
                                         </Box>
                                         <Typography variant="body2" color="text.secondary">
                                             Buzón oficial de correspondencia corporativa y franja horaria de atención al público.
@@ -447,19 +442,22 @@ export default function ContactoIndex({ contact }: Props) {
                                     variant="outlined"
                                     sx={{
                                         borderRadius: 2.5,
-                                        borderTop: '4px solid',
-                                        borderColor: 'primary.main',
+                                        borderColor: 'divider',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 1px 4px rgba(0, 0, 0, 0.16)'
+                                                : '0 1px 4px rgba(15, 23, 42, 0.04)',
                                     }}
                                 >
                                     <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                <LocationOnIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <LocationOnIcon sx={{ color: 'text.secondary', fontSize: 22 }} />
+                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                     3. Sede Central y Geolocalización (Google Maps)
                                                 </Typography>
                                             </Box>
-                                            <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
                                         </Box>
                                         <Typography variant="body2" color="text.secondary">
                                             Dirección física, referencias para visitantes, enlace a Google Maps y visualización interactiva en mapa.
@@ -600,19 +598,22 @@ export default function ContactoIndex({ contact }: Props) {
                                     variant="outlined"
                                     sx={{
                                         borderRadius: 2.5,
-                                        borderTop: '4px solid',
-                                        borderColor: 'primary.main',
+                                        borderColor: 'divider',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 1px 4px rgba(0, 0, 0, 0.16)'
+                                                : '0 1px 4px rgba(15, 23, 42, 0.04)',
                                     }}
                                 >
                                     <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                <BusinessIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <BusinessIcon sx={{ color: 'text.secondary', fontSize: 22 }} />
+                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                     4. Portada y Lema Institucional de la Sede
                                                 </Typography>
                                             </Box>
-                                            <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
                                         </Box>
                                         <Typography variant="body2" color="text.secondary">
                                             Textos destacados sobreimpresos sobre la fotografía de atención y recepción institucional.

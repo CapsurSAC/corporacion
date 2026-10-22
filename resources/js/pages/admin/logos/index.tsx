@@ -172,6 +172,10 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                         bgcolor: 'background.paper',
                         border: '1px solid',
                         borderColor: 'divider',
+                        boxShadow: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                : '0 2px 10px rgba(0,0,0,0.03)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -299,11 +303,19 @@ export default function LogosIndex({ comercios = [], grupos = [], filters = {} }
                                         justifyContent: 'space-between',
                                         position: 'relative',
                                         overflow: 'hidden',
-                                        borderTop: `4px solid ${brandColor}`,
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        boxShadow: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? '0 2px 10px rgba(0, 0, 0, 0.2)'
+                                                : '0 2px 10px rgba(15, 23, 42, 0.04)',
                                         transition: 'all 0.2s ease',
                                         '&:hover': {
-                                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-                                            borderColor: brandColor,
+                                            boxShadow: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? '0 8px 24px rgba(0, 0, 0, 0.28)'
+                                                    : '0 8px 24px rgba(15, 23, 42, 0.1)',
+                                            borderColor: 'divider',
                                         },
                                     }}
                                 >

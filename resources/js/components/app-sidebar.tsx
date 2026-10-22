@@ -71,16 +71,17 @@ export function AppSidebar() {
             href: dashboardUrl,
             icon: LayoutGrid,
         },
+          {
+            title: 'Grupos Comerciales',
+            href: '/admin/grupos',
+            icon: Building2,
+        },
         {
             title: 'Comercios',
             href: '/admin/comercios',
             icon: Store,
         },
-        {
-            title: 'Grupos Comerciales',
-            href: '/admin/grupos',
-            icon: Building2,
-        },
+
         {
             title: 'Rubros',
             href: '/admin/rubros',

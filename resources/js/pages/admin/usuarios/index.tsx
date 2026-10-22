@@ -185,7 +185,19 @@ export default function UsersIndex({
         <>
             <Head title="Gestión de Usuarios - Grupo Capsur" />
             <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 2.5, width: '100%', boxSizing: 'border-box' }}>
-                <Paper elevation={0} sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1.5, border: '1px solid', borderColor: 'divider' }}>
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        borderRadius: 1.5,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? '0 2px 10px rgba(0,0,0,0.3)'
+                                : '0 2px 10px rgba(0,0,0,0.03)',
+                    }}
+                >
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
                             <Avatar sx={{ bgcolor: 'primary.main', color: '#fff', width: 42, height: 42, borderRadius: 1 }}>

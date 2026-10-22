@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, Link, router } from '@inertiajs/react';
+﻿import { Head, useForm, usePage, Link, router } from '@inertiajs/react';
 import { dashboard } from '@/routes';
 import { useNotification } from '@/hooks/use-notification';
 import { confirmDeleteAlert } from '@/lib/swal';
@@ -285,8 +285,6 @@ function CarreraTableRow({
 export default function EditComercioPage({ comercio, grupos, rubros = [], estados = [] }: EditComercioPageProps) {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
-    const [logoError, setLogoError] = useState(false);
-
     const { notify } = useNotification();
 
     // Tabs state - initialize from URL ?tab=3 or ?tab=oferta
@@ -331,7 +329,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
         return 'carreras';
     });
 
-    // Sub-tab for Oferta General / Directa: 'especialidades' | 'diplomados' | 'cursos'
+    // Sub-tab for Oferta Directa: 'especialidades' | 'diplomados' | 'cursos'
     const [directSubTab, setDirectSubTab] = useState<'especialidades' | 'diplomados' | 'cursos'>('especialidades');
 
     const { data, setData, put, processing, errors } = useForm({
@@ -363,17 +361,6 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
     });
 
     const brandColor = data.color_hex || comercio.color_hex || '#0c43a3';
-
-    const activeLogoClaro = data.logo_modo_claro || comercio.logo_modo_claro;
-    const activeLogoOscuro = data.logo_modo_oscuro || comercio.logo_modo_oscuro;
-    const rawLogo = isDark
-        ? (activeLogoOscuro || activeLogoClaro)
-        : (activeLogoClaro || activeLogoOscuro);
-    const logoSrc = rawLogo ? getDriveDirectImageUrl(rawLogo) : null;
-
-    useEffect(() => {
-        setLogoError(false);
-    }, [logoSrc]);
 
     const totalCarreras = comercio.carreras?.length || 0;
     const totalDiplomados = comercio.diplomados?.length || 0;
@@ -560,55 +547,6 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                     </IconButton>
                                 </Tooltip>
                             </Link>
-
-                            {/* Logo institucional según tema claro/oscuro con fallback a avatar de sigla */}
-                            {logoSrc && !logoError ? (
-                                <Box
-                                    sx={{
-                                        height: 52,
-                                        minWidth: 52,
-                                        maxWidth: 100,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        px: 1,
-                                        py: 0.5,
-                                        bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#ffffff',
-                                        borderRadius: 2,
-                                        border: '1px solid',
-                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
-                                        boxShadow: isDark ? '0 2px 10px rgba(0, 0, 0, 0.4)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
-                                        flexShrink: 0,
-                                    }}
-                                >
-                                    <Box
-                                        component="img"
-                                        src={logoSrc}
-                                        alt={`Logo ${data.nombre || comercio.nombre}`}
-                                        onError={() => setLogoError(true)}
-                                        sx={{
-                                            maxHeight: 38,
-                                            maxWidth: 84,
-                                            objectFit: 'contain',
-                                        }}
-                                    />
-                                </Box>
-                            ) : (
-                                <Avatar
-                                    sx={{
-                                        bgcolor: brandColor,
-                                        color: '#ffffff',
-                                        fontWeight: 900,
-                                        fontSize: '1.2rem',
-                                        width: 52,
-                                        height: 52,
-                                        boxShadow: `0 4px 14px ${brandColor}40`,
-                                        border: '2px solid #ffffff',
-                                    }}
-                                >
-                                    {(data.sigla || data.nombre || 'C').substring(0, 3).toUpperCase()}
-                                </Avatar>
-                            )}
 
                             <Box sx={{ minWidth: 0 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
@@ -1809,7 +1747,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                             iconPosition="start"
                                             label={
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <span>Oferta General / Directa</span>
+                                                    <span>Oferta Directa</span>
                                                     <Chip
                                                         size="small"
                                                         label={totalGenerales}
@@ -1938,7 +1876,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                     )
                                 )}
 
-                                {/* SECCIÓN 2: OFERTA GENERAL / DIRECTA DEL COMERCIO */}
+                                {/* SECCIÓN 2: OFERTA DIRECTA DEL COMERCIO */}
                                 {ofertaSection === 'directas' && (
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                         {/* SUB-TABS: Especialidades, Diplomados, Cursos */}
@@ -1969,31 +1907,31 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                     value="especialidades"
                                                     icon={<CategoryIcon sx={{ fontSize: 16 }} />}
                                                     iconPosition="start"
-                                                    label={`Especialidades Directas (${especialidadesDirectas.length})`}
+                                                    label={`Especialidades (${especialidadesDirectas.length})`}
                                                 />
                                                 <Tab
                                                     value="diplomados"
                                                     icon={<WorkspacePremiumIcon sx={{ fontSize: 16 }} />}
                                                     iconPosition="start"
-                                                    label={`Diplomados Directos (${diplomadosDirectos.length})`}
+                                                    label={`Diplomados (${diplomadosDirectos.length})`}
                                                 />
                                                 <Tab
                                                     value="cursos"
                                                     icon={<MenuBookIcon sx={{ fontSize: 16 }} />}
                                                     iconPosition="start"
-                                                    label={`Cursos Directos (${cursosDirectos.length})`}
+                                                    label={`Cursos (${cursosDirectos.length})`}
                                                 />
                                             </Tabs>
                                         </Box>
 
                                         <Box>
-                                            {/* SubTab: Especialidades Directas */}
+                                            {/* SubTab: Especialidades */}
                                             {directSubTab === 'especialidades' && (
                                                 <Box>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                                                         <Typography variant="caption" sx={{ fontWeight: 800, color: brandColor, display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.78rem' }}>
                                                             <CategoryIcon sx={{ fontSize: 17 }} />
-                                                            ESPECIALIDADES DIRECTAS DEL COMERCIO ({especialidadesDirectas.length})
+                                                            ESPECIALIDADES DEL COMERCIO ({especialidadesDirectas.length})
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <Link href={`/admin/especialidades?comercio_id=${comercio.id}&create=1`} style={{ textDecoration: 'none' }}>
@@ -2016,7 +1954,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    Nueva Especialidad Directa
+                                                                    Nueva Especialidad
                                                                 </Button>
                                                             </Link>
                                                             <Link href={`/admin/especialidades?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
@@ -2153,7 +2091,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                         <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
                                                             <CategoryIcon sx={{ fontSize: 36, color: brandColor, mb: 1, opacity: 0.85 }} />
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                                                Sin especialidades directas asociadas a este comercio.
+                                                                Sin especialidades asociadas a este comercio.
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                                 Puedes registrar especialidades independientes que pertenezcan a la institución sin depender de una carrera específica.
@@ -2174,7 +2112,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    + Registrar Primera Especialidad Directa
+                                                                    + Registrar Primera Especialidad
                                                                 </Button>
                                                             </Link>
                                                         </Paper>
@@ -2182,13 +2120,13 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                 </Box>
                                             )}
 
-                                            {/* SubTab: Diplomados Directos */}
+                                            {/* SubTab: Diplomados */}
                                             {directSubTab === 'diplomados' && (
                                                 <Box>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                                                         <Typography variant="caption" sx={{ fontWeight: 800, color: brandColor, display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.78rem' }}>
                                                             <WorkspacePremiumIcon sx={{ fontSize: 17 }} />
-                                                            DIPLOMADOS DIRECTOS DEL COMERCIO ({diplomadosDirectos.length})
+                                                            DIPLOMADOS DEL COMERCIO ({diplomadosDirectos.length})
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
@@ -2211,7 +2149,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    Nuevo Diplomado Directo
+                                                                    Nuevo Diplomado
                                                                 </Button>
                                                             </Link>
                                                             <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
@@ -2323,10 +2261,10 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                         <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
                                                             <WorkspacePremiumIcon sx={{ fontSize: 36, color: brandColor, mb: 1, opacity: 0.85 }} />
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                                                Sin diplomados directos asociados a este comercio.
+                                                                Sin diplomados asociados a este comercio.
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
-                                                                Puedes crear diplomados institucionales directos que no pertenezcan a una carrera en particular.
+                                                                Puedes crear diplomados institucionales que no pertenezcan a una carrera en particular.
                                                             </Typography>
                                                             <Link href={`/admin/diplomados?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
                                                                 <Button
@@ -2344,7 +2282,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    + Registrar Primer Diplomado Directo
+                                                                    + Registrar Primer Diplomado
                                                                 </Button>
                                                             </Link>
                                                         </Paper>
@@ -2352,13 +2290,13 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                 </Box>
                                             )}
 
-                                            {/* SubTab: Cursos Directos */}
+                                            {/* SubTab: Cursos */}
                                             {directSubTab === 'cursos' && (
                                                 <Box>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                                                         <Typography variant="caption" sx={{ fontWeight: 800, color: brandColor, display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.78rem' }}>
                                                             <MenuBookIcon sx={{ fontSize: 17 }} />
-                                                            CURSOS DIRECTOS DEL COMERCIO ({cursosDirectos.length})
+                                                            CURSOS DEL COMERCIO ({cursosDirectos.length})
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde&create=1`} style={{ textDecoration: 'none' }}>
@@ -2381,7 +2319,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    Nuevo Curso Directo
+                                                                    Nuevo Curso
                                                                 </Button>
                                                             </Link>
                                                             <Link href={`/admin/cursos?comercio_id=${comercio.id}&carrera_id=no_corresponde`} style={{ textDecoration: 'none' }}>
@@ -2493,7 +2431,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                         <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
                                                             <MenuBookIcon sx={{ fontSize: 36, color: brandColor, mb: 1, opacity: 0.85 }} />
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                                                Sin cursos directos asociados a este comercio.
+                                                                Sin cursos asociados a este comercio.
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                                                                 Puedes crear cursos institucionales libres que pertenezcan a la institución.
@@ -2514,7 +2452,7 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         },
                                                                     }}
                                                                 >
-                                                                    + Registrar Primer Curso Directo
+                                                                    + Registrar Primer Curso
                                                                 </Button>
                                                             </Link>
                                                         </Paper>
