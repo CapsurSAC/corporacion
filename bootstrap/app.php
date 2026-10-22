@@ -18,6 +18,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'capacitado' => \App\Http\Middleware\EnsureUserIsCapacitado::class,
+            'capacitado.area' => \App\Http\Middleware\EnsureUserCanAccessTrainingArea::class,
             'redirect.from.public' => \App\Http\Middleware\RedirectAuthenticatedFromPublic::class,
         ]);
 
