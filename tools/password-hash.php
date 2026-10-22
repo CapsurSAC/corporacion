@@ -5,27 +5,10 @@ declare(strict_types=1);
 /*
  * Temporary password hash generator for cPanel.
  *
- * Before uploading this file, change both values below. Delete this file from
- * public_html immediately after generating the required hash.
+ * Delete this file from public_html immediately after generating the required
+ * hash.
  */
-$adminUsername = 'CHANGE_THIS_USERNAME';
-$adminPassword = 'CHANGE_THIS_PASSWORD';
 $bcryptCost = 12;
-
-if ($adminUsername === 'CHANGE_THIS_USERNAME' || $adminPassword === 'CHANGE_THIS_PASSWORD') {
-    http_response_code(503);
-    exit('Configure the temporary administrator credentials before using this tool.');
-}
-
-if (
-    ! isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])
-    || ! hash_equals($adminUsername, (string) $_SERVER['PHP_AUTH_USER'])
-    || ! hash_equals($adminPassword, (string) $_SERVER['PHP_AUTH_PW'])
-) {
-    header('WWW-Authenticate: Basic realm="Temporary password hash tool"');
-    http_response_code(401);
-    exit('Authentication required.');
-}
 
 session_start([
     'cookie_httponly' => true,

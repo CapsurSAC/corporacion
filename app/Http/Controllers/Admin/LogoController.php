@@ -94,12 +94,10 @@ class LogoController extends Controller
 
         $comercio->save();
 
-        return back()->with('flash', [
-            'toast' => [
-                'type' => 'success',
-                'title' => '¡Logos Actualizados!',
-                'message' => 'Logotipos institucionales actualizados con éxito.',
-            ],
+        return back()->with('toast', [
+            'type' => 'success',
+            'title' => '¡Logos Actualizados!',
+            'message' => 'Logotipos institucionales actualizados con éxito.',
         ]);
     }
 }
