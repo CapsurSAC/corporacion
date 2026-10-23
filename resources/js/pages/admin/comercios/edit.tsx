@@ -833,7 +833,10 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                 sx={{
                                                     p: 2.5,
                                                     borderRadius: 2.5,
-                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
+                                                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#12233d !important' : '#f8fafc',
+                                                    'html.dark &': {
+                                                        backgroundColor: '#12233d !important',
+                                                    },
                                                     border: '1px solid',
                                                     borderColor: 'divider',
                                                     display: 'flex',
@@ -841,17 +844,29 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                     gap: 2,
                                                 }}
                                             >
-                                                <Box sx={{ position: 'relative' }}>
+                                                <Box
+                                                    sx={{
+                                                        position: 'relative',
+                                                        width: 48,
+                                                        height: 48,
+                                                        borderRadius: '50%',
+                                                        bgcolor: data.color_hex,
+                                                        border: '2px solid',
+                                                        borderColor: 'divider',
+                                                        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
+                                                        overflow: 'hidden',
+                                                    }}
+                                                >
                                                     <input
                                                         type="color"
                                                         value={data.color_hex}
                                                         onChange={(e) => setData('color_hex', e.target.value)}
                                                         style={{
-                                                            width: 48,
-                                                            height: 48,
-                                                            padding: 0,
-                                                            border: 'none',
-                                                            borderRadius: '50%',
+                                                            position: 'absolute',
+                                                            inset: 0,
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            opacity: 0,
                                                             cursor: 'pointer',
                                                         }}
                                                     />
@@ -866,6 +881,25 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                         value={data.color_hex}
                                                         onChange={(e) => setData('color_hex', e.target.value)}
                                                         fullWidth
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                backgroundColor: (theme) =>
+                                                                    theme.palette.mode === 'dark' ? '#0d1b2e !important' : '#ffffff',
+                                                                color: 'text.primary',
+                                                                '& fieldset': {
+                                                                    borderColor: 'divider',
+                                                                },
+                                                            },
+                                                            '& .MuiInputBase-input': {
+                                                                color: 'text.primary',
+                                                            },
+                                                            'html.dark & .MuiOutlinedInput-root': {
+                                                                backgroundColor: '#0d1b2e !important',
+                                                            },
+                                                            'html.dark & .MuiInputBase-input': {
+                                                                color: '#f8fafc !important',
+                                                            },
+                                                        }}
                                                         placeholder="#0c43a3"
                                                         error={!!errors.color_hex}
                                                         helperText={errors.color_hex}
@@ -911,14 +945,17 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                                 : theme.palette.mode === 'dark'
                                                                                   ? 'rgba(255, 255, 255, 0.1)'
                                                                                   : '#e2e8f0',
-                                                                        bgcolor: (theme) =>
+                                                                        backgroundColor: (theme) =>
                                                                             isSelected
                                                                                 ? theme.palette.mode === 'dark'
                                                                                     ? `${preset.hex}25`
                                                                                     : `${preset.hex}15`
                                                                                 : theme.palette.mode === 'dark'
-                                                                                  ? 'rgba(255, 255, 255, 0.04)'
+                                                                                  ? '#12233d !important'
                                                                                   : '#ffffff',
+                                                                        'html.dark &': {
+                                                                            backgroundColor: '#12233d !important',
+                                                                        },
                                                                         display: 'flex',
                                                                         alignItems: 'center',
                                                                         gap: 1.2,
@@ -926,10 +963,13 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                         transition: 'all 0.15s ease',
                                                                         '&:hover': {
                                                                             borderColor: preset.hex,
-                                                                            bgcolor: (theme) =>
+                                                                            backgroundColor: (theme) =>
                                                                                 theme.palette.mode === 'dark'
-                                                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                                                    ? '#1a3152 !important'
                                                                                     : '#f8fafc',
+                                                                            'html.dark &': {
+                                                                                backgroundColor: '#1a3152 !important',
+                                                                            },
                                                                             transform: 'translateY(-1px)',
                                                                         },
                                                                     }}
@@ -956,6 +996,9 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                                         ? '#ffffff'
                                                                                         : preset.hex
                                                                                     : 'text.primary',
+                                                                            'html.dark &': {
+                                                                                color: '#f8fafc !important',
+                                                                            },
                                                                         }}
                                                                     >
                                                                         {preset.name}
@@ -978,7 +1021,13 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                         p: 2,
                                                         borderRadius: 2,
                                                         borderLeft: `5px solid ${brandColor}`,
-                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#fafafa',
+                                                        backgroundColor: (theme) =>
+                                                            theme.palette.mode === 'dark'
+                                                                ? '#0d1b2e !important'
+                                                                : '#fafafa',
+                                                        'html.dark &': {
+                                                            backgroundColor: '#0d1b2e !important',
+                                                        },
                                                     }}
                                                 >
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
@@ -1259,12 +1308,20 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                             </CardContent>
                                         </Card>
 
-                                        {/* Gestor de Fotos / Galería */}
-                                        <Card variant="outlined" sx={{ borderRadius: 2.5 }}>
+                                        {/* Gestor de Fotos */}
+                                        <Card
+                                            variant="outlined"
+                                            sx={{
+                                                borderRadius: 2.5,
+                                                'html.dark &': {
+                                                    backgroundColor: '#152844 !important',
+                                                },
+                                            }}
+                                        >
                                             <CardHeader
                                                 avatar={<PhotoLibraryIcon sx={{ color: brandColor }} />}
-                                                title={`Galería Fotográfica y Sedes (${data.fotos.length})`}
-                                                subheader="Fotos de infraestructura, eventos y sedes (enlaces de Google Drive o imágenes directas)"
+                                                title={`Fotos (${data.fotos.length})`}
+                                                subheader="Fotos de infraestructura y eventos (enlaces de Google Drive o imágenes directas)"
                                                 titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
                                             />
                                             <Divider />
@@ -1324,6 +1381,9 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                     borderColor: 'divider',
                                                                     transition: 'all 0.2s',
                                                                     bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#ffffff',
+                                                                    'html.dark &': {
+                                                                        backgroundColor: '#152844 !important',
+                                                                    },
                                                                     '&:hover': {
                                                                         borderColor: brandColor,
                                                                         boxShadow: `0 4px 14px ${brandColor}30`,
@@ -1380,15 +1440,18 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                                 </Box>
 
                                                                 {/* Barra de información y acciones */}
-                                                                <Box sx={{ p: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                                                                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                                                                        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 700, fontSize: '0.85rem' }}>
-                                                                            Foto / Sede {index + 1}
-                                                                        </Typography>
-                                                                        <Typography variant="caption" noWrap color="text.secondary" sx={{ display: 'block' }}>
-                                                                            {isGoogleDriveUrl(url) ? 'Google Drive' : 'Imagen web'}
-                                                                        </Typography>
-                                                                    </Box>
+                                                                <Box
+                                                                    sx={{
+                                                                        p: 1.5,
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'space-between',
+                                                                        gap: 1,
+                                                                        'html.dark &': {
+                                                                            backgroundColor: '#152844 !important',
+                                                                        },
+                                                                    }}
+                                                                >
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                         <Tooltip title="Ampliar foto" arrow>
                                                                             <IconButton
@@ -1428,7 +1491,19 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                                     ))}
                                                     {data.fotos.length === 0 && (
                                                         <Grid size={{ xs: 12 }}>
-                                                            <Box sx={{ textAlign: 'center', py: 4, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
+                                                            <Box
+                                                                sx={{
+                                                                    textAlign: 'center',
+                                                                    py: 4,
+                                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc',
+                                                                    borderRadius: 2,
+                                                                    border: '1px dashed',
+                                                                    borderColor: 'divider',
+                                                                    'html.dark &': {
+                                                                        backgroundColor: '#152844 !important',
+                                                                    },
+                                                                }}
+                                                            >
                                                                 <PhotoLibraryIcon sx={{ fontSize: 40, color: 'text.secondary', opacity: 0.4, mb: 1 }} />
                                                                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
                                                                     No hay fotos agregadas.
@@ -1676,7 +1751,21 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                         {/* PESTAÑA 3: OFERTA FORMATIVA (CARRERAS, DIPLOMADOS Y CURSOS) */}
                         {/* ========================================================================= */}
                         {currentTab === 3 && (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, width: '100%', boxSizing: 'border-box' }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 2.5,
+                                    width: '100%',
+                                    boxSizing: 'border-box',
+                                    'html.dark & .MuiPaper-root': {
+                                        backgroundColor: '#152844 !important',
+                                    },
+                                    'html.dark & .MuiTableContainer-root': {
+                                        backgroundColor: '#152844 !important',
+                                    },
+                                }}
+                            >
                                 {/* SELECTOR DE SECCIÓN TIPO SEGMENTED PILL (CARRERAS vs OFERTA GENERAL) */}
                                 <Paper
                                     variant="outlined"
@@ -1685,6 +1774,9 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                         mb: 2.5,
                                         borderRadius: 2.5,
                                         bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f172a' : '#f8fafc',
+                                        'html.dark &': {
+                                            backgroundColor: '#0f172a !important',
+                                        },
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
@@ -1816,7 +1908,16 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                 {/* SECCIÓN 1: CARRERAS PROFESIONALES */}
                                 {ofertaSection === 'carreras' && (
                                     filteredCarreras.length > 0 ? (
-                                        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+                                        <TableContainer
+                                            component={Paper}
+                                            variant="outlined"
+                                            sx={{
+                                                borderRadius: 2,
+                                                'html.dark &': {
+                                                    backgroundColor: '#152844 !important',
+                                                },
+                                            }}
+                                        >
                                             <Table size="small">
                                                 <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? '#0f1f38' : '#f8fafc' }}>
                                                     <TableRow>
@@ -1842,7 +1943,18 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                                             </Table>
                                         </TableContainer>
                                     ) : (
-                                        <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc', borderRadius: 2 }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                p: 4,
+                                                textAlign: 'center',
+                                                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc',
+                                                borderRadius: 2,
+                                                'html.dark &': {
+                                                    backgroundColor: '#152844 !important',
+                                                },
+                                            }}
+                                        >
                                             <SchoolIcon sx={{ fontSize: 44, color: brandColor, mb: 1, opacity: 0.85 }} />
                                             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
                                                 {searchCarrera ? 'No se encontraron carreras con ese criterio de búsqueda' : `No hay carreras registradas para ${comercio.nombre}`}
@@ -2526,8 +2638,17 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
             <Dialog
                 open={Boolean(previewImageUrl)}
                 onClose={() => setPreviewImageUrl(null)}
-                maxWidth="md"
-                fullWidth
+                maxWidth={false}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            width: 'fit-content',
+                            maxWidth: 'calc(100vw - 32px)',
+                            m: 2,
+                            overflow: 'hidden',
+                        },
+                    },
+                }}
             >
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
@@ -2537,17 +2658,17 @@ export default function EditComercioPage({ comercio, grupos, rubros = [], estado
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 </DialogTitle>
-                <DialogContent sx={{ p: 2, textAlign: 'center', bgcolor: '#0f172a' }}>
+                <DialogContent sx={{ p: 0, lineHeight: 0, bgcolor: '#0f172a' }}>
                     {previewImageUrl && (
                         <Box
                             component="img"
                             src={previewImageUrl}
                             alt="Previsualización"
                             sx={{
-                                maxWidth: '100%',
-                                maxHeight: '70vh',
+                                display: 'block',
+                                maxWidth: 'calc(100vw - 32px)',
+                                maxHeight: 'calc(100vh - 120px)',
                                 objectFit: 'contain',
-                                borderRadius: 1.5,
                             }}
                         />
                     )}

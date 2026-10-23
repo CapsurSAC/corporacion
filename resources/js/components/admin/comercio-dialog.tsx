@@ -670,7 +670,7 @@ export function ComercioDialog({
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <GoogleDriveIcon size={20} />
-                                        <span>Galería Fotográfica y Sedes ({data.fotos.filter(Boolean).length})</span>
+                                        <span>Fotos ({data.fotos.filter(Boolean).length})</span>
                                     </Typography>
                                     <Button
                                         size="small"
